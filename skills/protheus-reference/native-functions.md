@@ -2105,11 +2105,14 @@ Loads and displays the parameter screen from SX1 dictionary.
 
 **Example:**
 ```advpl
+Local cFromDate := ""
+Local cToDate   := ""
+
 // Show parameter dialog for report filter
 If Pergunte("MTR010", .T., "Sales Report Parameters")
     // Parameters are loaded into MV_PAR01, MV_PAR02, etc.
-    Local cFromDate := MV_PAR01
-    Local cToDate   := MV_PAR02
+    cFromDate := MV_PAR01
+    cToDate   := MV_PAR02
     RunReport(cFromDate, cToDate)
 EndIf
 
@@ -2744,8 +2747,10 @@ Checks if a code block (point of entry / user exit) exists.
 
 **Example:**
 ```advpl
+Local lOk := .T.
+
 If ExistBlock("MT100LOK")
-    Local lOk := ExecBlock("MT100LOK", .F., .F.)
+    lOk := ExecBlock("MT100LOK", .F., .F.)
 EndIf
 ```
 
@@ -2932,13 +2937,15 @@ Executes a user function or code block by name (used for Points of Entry).
 
 **Example:**
 ```advpl
+Local xRet    := NIL
+Local aParams := {"SA1", 3}
+
 // Execute a Point of Entry
 If ExistBlock("MT010BRW")
-    Local xRet := ExecBlock("MT010BRW", .F., .F.)
+    xRet := ExecBlock("MT010BRW", .F., .F.)
 EndIf
 
 // Execute with parameters
-Local aParams := {"SA1", 3}
 ExecBlock("MyValidation", .F., .F., aParams)
 ```
 
@@ -2989,6 +2996,8 @@ Executes a standard Protheus routine automatically (batch mode) for AxCadastro-b
 Private lMsErroAuto := .F.
 
 Local aFields := {}
+Local cError  := ""
+
 aAdd(aFields, {"A1_FILIAL", xFilial("SA1"), NIL})
 aAdd(aFields, {"A1_COD",    "000100",        NIL})
 aAdd(aFields, {"A1_LOJA",   "01",            NIL})
@@ -2998,7 +3007,7 @@ aAdd(aFields, {"A1_TIPO",   "F",             NIL})
 MsExecAuto({|x,y| MATA030(x,y)}, aFields, 3) // Insert
 
 If lMsErroAuto
-    Local cError := GetAutoGRLog()
+    cError := GetAutoGRLog()
     Conout("Error in MsExecAuto: " + cError)
 EndIf
 ```
@@ -3023,9 +3032,12 @@ Executes MVC model operations automatically (batch mode).
 
 **Example:**
 ```advpl
-Local aData := {}
+Local aData   := {}
 Local aHeader := {}
-Local aItems := {}
+Local aItems  := {}
+Local lRet    := .F.
+Local oModel  := NIL
+Local cError  := ""
 
 // Header data (FormGrid)
 aAdd(aHeader, {"A1_FILIAL", xFilial("SA1")})
@@ -3035,11 +3047,11 @@ aAdd(aHeader, {"A1_NOME",   "MVC Customer"})
 
 aAdd(aData, {"SA1MASTER", aHeader})
 
-Local lRet := FWMVCRotAuto(NIL, "MATA030", MODEL_OPERATION_INSERT, aData)
+lRet := FWMVCRotAuto(NIL, "MATA030", MODEL_OPERATION_INSERT, aData)
 
 If !lRet
-    Local oModel := FWLoadModel("MATA030")
-    Local cError := oModel:GetErrorMessage()
+    oModel := FWLoadModel("MATA030")
+    cError := oModel:GetErrorMessage()
     Conout("MVC Error: " + cError)
 EndIf
 ```
@@ -3299,16 +3311,18 @@ Utility class for making REST API calls from ADVPL.
 
 **Example:**
 ```advpl
-Local oRest := FWCallRest():New()
+Local oRest     := FWCallRest():New()
+Local lRet      := .F.
+Local cResponse := ""
 
 oRest:SetPath("/api/v1/customers")
 oRest:SetMethod("GET")
 oRest:AddHeader("Content-Type", "application/json")
 oRest:AddHeader("Authorization", "Bearer " + cToken)
 
-Local lRet := oRest:Execute()
+lRet := oRest:Execute()
 If lRet
-    Local cResponse := oRest:GetResult()
+    cResponse := oRest:GetResult()
     Conout("Response: " + cResponse)
 Else
     Conout("Error: " + Str(oRest:GetStatusCode()))
@@ -3615,10 +3629,12 @@ Returns the error log from the last MsExecAuto execution.
 
 **Example:**
 ```advpl
+Local cLog := ""
+
 MsExecAuto({|x,y| MATA030(x,y)}, aFields, 3)
 
 If lMsErroAuto
-    Local cLog := GetAutoGRLog()
+    cLog := GetAutoGRLog()
     Conout("MsExecAuto errors:")
     Conout(cLog)
 EndIf
