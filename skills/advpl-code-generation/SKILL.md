@@ -148,7 +148,7 @@ ErrorBlock(bErrorOld)
 | MVC | .prw | patterns-mvc.md |
 | REST API | .prw or .tlpp | patterns-rest.md |
 | Ponto de Entrada | .prw | patterns-pontos-entrada.md |
-| Web Service SOAP | .prw | See TDN for SOAP patterns |
+| Web Service SOAP | .prw | patterns-soap.md |
 
 ## Common Mistakes
 

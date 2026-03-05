@@ -42,6 +42,7 @@ Activate this agent when the user:
 - Check the appropriate supporting file:
   - MVC -> patterns-mvc.md
   - REST -> patterns-rest.md
+  - SOAP -> patterns-soap.md
   - Entry point -> patterns-pontos-entrada.md
   - Class -> templates-classes.md
 - Load `protheus-reference` skill if native function lookup is needed
