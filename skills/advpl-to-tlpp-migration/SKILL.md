@@ -14,7 +14,7 @@ Systematic approach for converting legacy ADVPL procedural code to modern TLPP w
 - Converting procedural ADVPL functions to TLPP classes
 - Refactoring User Functions into object-oriented service classes
 - Replacing Private/Public variable scoping with class properties
-- Modernizing `#Include` directives to `using namespace` declarations
+- Modernizing multiple `#Include` directives to `#Include "TOTVS.CH"` and adding proper `namespace` declarations
 - Migrating Static Functions to private class methods
 - Wrapping legacy function calls for backward compatibility during gradual migration
 - Any `.prw` to `.tlpp` file conversion
@@ -56,7 +56,7 @@ digraph migration {
 
 | ADVPL Construct | TLPP Equivalent | Notes |
 |----------------|-----------------|-------|
-| `#Include "Protheus.ch"` | `using namespace tlpp.core` | Replace preprocessor includes with namespace imports |
+| `#Include "Protheus.ch"` | `#Include "TOTVS.CH"` | Use the standard TOTVS include; do NOT add `using namespace tlpp.core` or `tlpp.log` unless the code explicitly uses classes from those namespaces |
 | `User Function Name()` | `namespace mymod; class NameService; method execute()` | Main entry point becomes the primary public method |
 | `Static Function Helper()` | `method helper() as private` | Internal functions become private methods |
 | `Private cVar := "x"` | `data cVar as character` (class property) | Private variables become class-level data declarations |
@@ -126,8 +126,7 @@ Return nSoma
 ### After (TLPP Object-Oriented) -- `PedidoService.tlpp`
 
 ```tlpp
-using namespace tlpp.core
-using namespace tlpp.log
+#Include "TOTVS.CH"
 
 namespace pedidos
 

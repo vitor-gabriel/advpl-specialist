@@ -6,16 +6,18 @@ Complete mapping reference for converting ADVPL procedural constructs to their T
 
 | ADVPL | TLPP | Notes |
 |-------|------|-------|
-| `#Include "Protheus.ch"` | `using namespace tlpp.core` | Core namespace replaces the main include |
-| `#Include "TopConn.ch"` | `using namespace tlpp.data` | Database connectivity namespace |
-| `#Include "RestFul.ch"` | `using namespace tlpp.rest` | REST API namespace |
-| `#Include "FWMVCDef.ch"` | `using namespace tlpp.mvc` | MVC framework namespace |
+| `#Include "Protheus.ch"` | `#Include "TOTVS.CH"` | Use the standard TOTVS include; do NOT add `using namespace tlpp.core/tlpp.log` unless the code explicitly uses classes from those namespaces |
+| `#Include "TopConn.ch"` | `#Include "TOTVS.CH"` | TOTVS.CH already includes TopConn functionality |
+| `#Include "RestFul.ch"` | `#Include "TOTVS.CH"` | For REST with TLPP annotations, use `@rest` annotations instead of WsRestFul macros |
+| `#Include "FWMVCDef.ch"` | `#Include "TOTVS.CH"` | TOTVS.CH already includes MVC definitions |
 | `#Define CONST_NAME value` | `static data CONST_NAME := value` | Define constants as static class data, or use `#define` if purely compile-time |
 | `#ifdef TOP_HAS_FEATURE` | Conditional compilation preserved | `#ifdef` / `#ifndef` blocks remain valid in `.tlpp` for compile-time branching |
 | `#ifndef` | Conditional compilation preserved | Same as `#ifdef` -- unchanged in TLPP |
 
 **Notes:**
-- Multiple `#Include` directives may map to a single `using namespace` if they belong to the same TLPP namespace.
+- In TLPP, `#Include "TOTVS.CH"` is the standard include that replaces all the individual Protheus includes (`Protheus.ch`, `TopConn.ch`, `FWMVCDef.ch`, etc.).
+- Do NOT add `using namespace tlpp.core`, `tlpp.log`, `tlpp.data`, etc. unless the code explicitly uses classes from those namespaces (e.g., `TlppCore`, `TlppLog`). The `using namespace` directive is only needed to import namespaces of classes/functions you are directly referencing.
+- Only add the project's own `namespace` declaration (e.g., `namespace mycompany.module`) to organize your own code.
 - `#Define` constants used only within a class can become `static data` properties. Constants shared across files should remain as `#define` in a shared `.ch` file.
 
 ## Variable Scope
@@ -225,6 +227,6 @@ The fundamental principle of ADVPL-to-TLPP migration is **structure changes, syn
 
 1. **Organization** -- functions become methods on classes
 2. **Scope** -- Private/Public variables become class properties
-3. **Imports** -- `#Include` becomes `using namespace`
+3. **Imports** -- Multiple `#Include` directives are replaced by `#Include "TOTVS.CH"`; add your own `namespace` declaration for code organization
 4. **Naming** -- files become `.tlpp`, classes follow PascalCase conventions
 5. **Encapsulation** -- internal helpers become private methods instead of Static Functions
