@@ -11,10 +11,25 @@ Plugin para Claude Code especializado em **ADVPL** e **TLPP** para desenvolvimen
 
 ## Instalacao
 
-Adicione o plugin ao seu Claude Code:
+### Opcao 1: Via Marketplace (recomendado)
+
+Adicione o marketplace e instale o plugin:
 
 ```bash
-claude plugin add /caminho/para/advpl-specialist
+# Dentro do Claude Code, adicione o marketplace
+/plugin marketplace add thalysjuvenal/advpl-specialist
+
+# Instale o plugin
+/plugin install advpl-specialist@thalysjuvenal-advpl-specialist
+```
+
+### Opcao 2: Direto do diretorio local (para teste/desenvolvimento)
+
+Clone o repositorio e inicie o Claude Code com a flag `--plugin-dir`:
+
+```bash
+git clone https://github.com/thalysjuvenal/advpl-specialist.git
+claude --plugin-dir ./advpl-specialist
 ```
 
 O plugin detecta automaticamente projetos Protheus (`.prw`, `.tlpp`, `.prx`, `.ch`) ao iniciar uma sessao.
@@ -73,7 +88,9 @@ O plugin detecta automaticamente projetos Protheus (`.prw`, `.tlpp`, `.prx`, `.c
 
 ```
 advpl-specialist/
-├── .claude-plugin/plugin.json     # Metadata do plugin
+├── .claude-plugin/
+│   ├── plugin.json                # Metadata do plugin
+│   └── marketplace.json           # Catalogo do marketplace
 ├── agents/                        # 4 agents especializados
 │   ├── code-generator.md
 │   ├── migrator.md
