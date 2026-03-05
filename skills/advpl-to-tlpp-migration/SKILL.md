@@ -14,7 +14,7 @@ Systematic approach for converting legacy ADVPL procedural code to modern TLPP w
 - Converting procedural ADVPL functions to TLPP classes
 - Refactoring User Functions into object-oriented service classes
 - Replacing Private/Public variable scoping with class properties
-- Modernizing multiple `#Include` directives to `#Include "TOTVS.CH"` and adding proper `namespace` declarations
+- Modernizing multiple `#Include` directives to TLPP `.th` includes (`tlpp-core.th`, `tlpp-rest.th`, etc.) and adding proper `namespace` declarations
 - Migrating Static Functions to private class methods
 - Wrapping legacy function calls for backward compatibility during gradual migration
 - Any `.prw` to `.tlpp` file conversion

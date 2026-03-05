@@ -16,7 +16,7 @@ Perform this analysis before writing any TLPP code.
 - [ ] Identify `Static` file-level variables and their usage patterns
 - [ ] List all external callers of each `User Function` (other `.prw` files, menus, jobs, schedules)
 - [ ] Identify all database aliases used (`DbSelectArea`, `RecLock`, direct alias references)
-- [ ] Document all `#Include` directives (they will be replaced by `#Include "TOTVS.CH"`)
+- [ ] Document all `#Include` directives (they will be replaced by TLPP `.th` includes: `tlpp-core.th`, `tlpp-rest.th`, etc.)
 - [ ] Identify any code blocks (`{|| ...}`) that reference `Private`/`Static` variables
 - [ ] Check for `MV_*` parameter usage (`GetMV`, `SuperGetMV`) that may need class-level access
 - [ ] Note any UI elements (dialogs, buttons, gets) that will need a separate View class
