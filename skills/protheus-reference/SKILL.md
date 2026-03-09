@@ -27,18 +27,28 @@ digraph lookup {
     "Return result" [shape=box];
     "Search TDN online" [shape=box];
     "WebSearch: site:tdn.totvs.com <term>" [shape=box];
+    "Fetch failed?" [shape=diamond];
+    "Playwright fallback" [shape=box];
 
     "Need function/API info?" -> "Check native-functions.md";
     "Check native-functions.md" -> "Found?";
     "Found?" -> "Return result" [label="yes"];
     "Found?" -> "Search TDN online" [label="no"];
     "Search TDN online" -> "WebSearch: site:tdn.totvs.com <term>";
+    "WebSearch: site:tdn.totvs.com <term>" -> "Fetch failed?";
+    "Fetch failed?" -> "Return result" [label="no"];
+    "Fetch failed?" -> "Playwright fallback" [label="yes"];
+    "Playwright fallback" -> "Return result";
 }
 ```
 
 1. **Local first:** Check supporting files (native-functions.md, sx-dictionary.md, rest-api-reference.md)
 2. **Online fallback:** Search TDN with `WebSearch` using query: `site:tdn.totvs.com <function_name>`
 3. **WebFetch TDN page:** If URL found, use `WebFetch` to extract details
+4. **Playwright fallback:** Se `WebSearch` ou `WebFetch` falhar, use Playwright MCP:
+   - `browser_navigate` para a URL do TDN (se disponível) ou buscar em `https://tdn.totvs.com`
+   - `browser_snapshot` para extrair texto; se insuficiente, `browser_take_screenshot` para captura visual
+   - `browser_close` ao finalizar para liberar recursos
 
 ## Function Categories
 
