@@ -10,7 +10,7 @@ Thumbs.db
 .idea/
 
 # Project local files
-docs/
+/docs/
 linkedin-post.txt
 
 # Playwright MCP
