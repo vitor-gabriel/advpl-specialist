@@ -5,11 +5,6 @@ export function baseOptions(): BaseLayoutProps {
     nav: {
       title: 'advpl-specialist',
     },
-    links: [
-      {
-        text: 'GitHub',
-        url: 'https://github.com/thalysjuvenal/advpl-specialist',
-      },
-    ],
+    githubUrl: 'https://github.com/thalysjuvenal/advpl-specialist',
   };
 }
