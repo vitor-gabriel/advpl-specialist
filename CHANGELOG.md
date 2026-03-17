@@ -6,6 +6,30 @@ Todas as mudancas notaveis deste projeto serao documentadas neste arquivo.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2026-03-17
+
+### Added / Adicionado
+- New `/explain` command for code explanation at 3 audience levels (junior, senior, functional)
+- Novo comando `/explain` para explicacao de codigo em 3 niveis de audiencia (junior, senior, funcional)
+- New `/refactor` command with `refactorer` agent and `advpl-refactoring` skill (6 refactoring patterns with before/after)
+- Novo comando `/refactor` com agent `refactorer` e skill `advpl-refactoring` (6 padroes de refatoracao com before/after)
+- New `/document` command with `doc-generator` agent and `documentation-patterns` skill (Protheus.doc header, full docs, API docs)
+- Novo comando `/document` com agent `doc-generator` e skill `documentation-patterns` (cabecalho Protheus.doc, documentacao completa, documentacao de API)
+- New `/changelog` command with `changelog-generator` agent and `changelog-patterns` skill
+- Novo comando `/changelog` com agent `changelog-generator` e skill `changelog-patterns`
+- New `/sxgen` command with `sx-configurator` agent and `sx-configuration` skill (SX3, SIX, SX1, SX5, SX7 dictionary scripts from natural language)
+- Novo comando `/sxgen` com agent `sx-configurator` e skill `sx-configuration` (scripts de dicionario SX3, SIX, SX1, SX5, SX7 a partir de linguagem natural)
+- New `code-explanation` skill with 3-level methodology for explaining code
+- Nova skill `code-explanation` com metodologia de 3 niveis para explicacao de codigo
+- Documentation website built with Fumadocs (Next.js + MDX) deployed on GitHub Pages
+- Site de documentacao construido com Fumadocs (Next.js + MDX) hospedado no GitHub Pages
+- Full documentation covering all 12 commands, 10 agents, 14 skills, reference and business processes
+- Documentacao completa cobrindo todos os 12 comandos, 10 agentes, 14 skills, referencia e processos de negocio
+
+### Fixed / Corrigido
+- Removed unsupported `bugs` key from plugin.json manifest
+- Removida chave `bugs` nao suportada do manifesto plugin.json
+
 ## [1.0.3] - 2026-03-11
 
 ### Added / Adicionado
