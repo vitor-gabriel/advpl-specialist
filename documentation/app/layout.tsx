@@ -53,6 +53,21 @@ export default function Layout({ children }: { children: ReactNode }) {
               api: '/advpl-specialist/api/search',
             },
           }}
+          i18n={{
+            locale: 'pt-BR',
+            translations: {
+              search: 'Pesquisar',
+              searchNoResult: 'Nenhum resultado encontrado',
+              toc: 'Nesta pagina',
+              tocNoHeadings: 'Sem topicos',
+              lastUpdate: 'Ultima atualizacao',
+              chooseLanguage: 'Escolher idioma',
+              nextPage: 'Proxima',
+              previousPage: 'Anterior',
+              chooseTheme: 'Alternar tema',
+              editOnGithub: 'Editar no GitHub',
+            },
+          }}
         >
           {children}
         </RootProvider>

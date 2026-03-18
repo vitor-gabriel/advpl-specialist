@@ -113,7 +113,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-8 text-center text-sm text-fd-muted-foreground">
+      <footer className="border-t py-8 text-center text-sm text-fd-muted-foreground space-y-3">
         <p>
           Criado por{' '}
           <a
@@ -133,6 +133,10 @@ export default function Home() {
           >
             LinkedIn
           </a>
+        </p>
+        <p className="text-xs max-w-2xl mx-auto">
+          Protheus, ADVPL, TLPP e TOTVS sao produtos e marcas registradas de propriedade da TOTVS S.A.
+          Este plugin e um projeto independente e nao possui vinculo com a TOTVS, suas franquias ou representantes.
         </p>
       </footer>
     </HomeLayout>
