@@ -1,5 +1,7 @@
 # Protheus Data Dictionary (SX Tables)
 
+> **Important**: Direct access to SX dictionary tables (e.g., `DbSelectArea("SX3")`, `DbSeek()`) is deprecated and blocked by TOTVS SonarQube rules. Use the recommended framework classes instead: `FWSX1Util`, `FWSX2Util`, `FWSX3Util`, `FWSX6Util`, `FWSIXUtil`, `FWGetSX5()`, and `FwPutSX5()`.
+
 Reference for the TOTVS Protheus data dictionary tables. These metadata tables define the structure of all business tables, fields, indexes, triggers, and parameters in the ERP system.
 
 ---
@@ -38,9 +40,22 @@ SX1 stores the parameter questions used in reports, processing routines, and oth
 
 ### Programmatic Access
 
+#### Recommended Approach
+
 ```advpl
-// Defining a question group for a report
-// Typically done via Configurador, but can be queried:
+// FWSX1Util - Recommended class for SX1 operations
+Local oSX1 := FWSX1Util():New()
+oSX1:AddGroup("MR0001")
+oSX1:SearchGroup()
+Local aPergunte := oSX1:GetGroup("MR0001")
+
+// Check if a question group exists
+Local lExists := FWSX1Util():ExistPergunte("MR0001")
+
+// Check if a specific item exists in the group
+Local lItem := FWSX1Util():ExistItem("MR0001", "De cliente?")
+
+// Using Pergunte() to open the parameter dialog (standard approach for reports)
 User Function MyReport()
 
     // Pergunte() opens the parameter dialog for group "MR0001"
@@ -67,8 +82,15 @@ User Function MyReport()
     EndDo
 
 Return
+```
 
+#### Legacy Approach (deprecated)
+
+> **Warning**: Direct access to SX tables via `DbSelectArea()` / `DbSeek()` is blocked by TOTVS SonarQube. Use `FWSX1Util` instead.
+
+```advpl
 // Reading SX1 directly to check what questions exist in a group
+// DEPRECATED - Use FWSX1Util():GetGroup() instead
 User Function ListQuestions(cGroup)
     Local aArea := GetArea()
 
@@ -116,8 +138,41 @@ SX2 is the master table registry. It contains one record for every table (alias)
 
 ### Programmatic Access
 
+#### Recommended Approach
+
+```advpl
+// FWSX2Util - Recommended class for SX2 operations
+
+// Get physical file name for a table
+Local cFile := FWSX2Util():GetFile("SA1")
+
+// Get path of the table
+Local cPath := FWSX2Util():GetPath("SA1")
+
+// Get table description
+Local cName := FWSX2Util():GetX2Name("SA1") // Returns "Clientes"
+
+// Get the module that owns the table
+Local nModule := FWSX2Util():GetX2Module("SA1")
+
+// Check if a table exists (positions on SX2)
+Local lExists := FWSX2Util():SeekX2File("SA1990")
+
+// Return specific fields from SX2
+Local aData := FWSX2Util():GetSX2Data("SA1", {"X2_UNICO"}, .F.)
+
+// Opening a table by its alias (standard Protheus pattern)
+DbSelectArea("SA1")       // Internally looks up SX2 to find the physical file
+DbSetOrder(1)             // Set to the first SIX index
+```
+
+#### Legacy Approach (deprecated)
+
+> **Warning**: Direct access to SX tables via `DbSelectArea()` / `DbSeek()` is blocked by TOTVS SonarQube. Use `FWSX2Util` instead.
+
 ```advpl
 // Check if a table alias exists in SX2
+// DEPRECATED - Use FWSX2Util():SeekX2File() instead
 User Function TableExists(cAlias)
     Local lExists := .F.
     Local aArea   := GetArea()
@@ -130,6 +185,7 @@ User Function TableExists(cAlias)
 Return lExists
 
 // List all custom tables (aliases starting with "Z")
+// DEPRECATED - Use FWSX2Util methods instead
 User Function ListCustomTables()
     Local aArea := GetArea()
 
@@ -146,10 +202,6 @@ User Function ListCustomTables()
 
     RestArea(aArea)
 Return
-
-// Opening a table by its alias (standard Protheus pattern)
-DbSelectArea("SA1")       // Internally looks up SX2 to find the physical file
-DbSetOrder(1)             // Set to the first SIX index
 ```
 
 ### Common Use Cases
@@ -200,8 +252,42 @@ SX3 is the field dictionary. It defines every field in every table registered in
 
 ### Programmatic Access
 
+#### Recommended Approach
+
+```advpl
+// FWSX3Util - Recommended class for SX3 operations
+
+// Get field description
+Local cDesc := FWSX3Util():GetDescription("A1_COD")
+
+// Get field type
+Local cType := FWSX3Util():GetFieldType("A1_COD")
+
+// Get complete field structure (name, type, size, decimals, picture)
+Local aStruct := FWSX3Util():GetFieldStruct("A1_COD")
+
+// List all fields for a table
+Local aFields := FWSX3Util():GetAllFields("SA1", .T.) // .T. includes virtual fields
+
+// Get structure of all fields for an alias
+Local aStruct := FWSX3Util():GetListFieldsStruct("SA1", .T., .F.)
+
+// Check if a field exists
+Local lExists := FWSX3Util():SeekX3File("A1_COD")
+
+// Using GetSX3Cache to get field properties efficiently (also valid)
+Local cType := GetSX3Cache("A1_COD", "X3_TIPO")     // Returns "C"
+Local nSize := GetSX3Cache("A1_COD", "X3_TAMANHO")   // Returns field size
+Local cPict := GetSX3Cache("A1_COD", "X3_PICTURE")   // Returns picture mask
+```
+
+#### Legacy Approach (deprecated)
+
+> **Warning**: Direct access to SX tables via `DbSelectArea()` / `DbSeek()` is blocked by TOTVS SonarQube. Use `FWSX3Util` instead.
+
 ```advpl
 // Read field properties from SX3
+// DEPRECATED - Use FWSX3Util():GetFieldStruct() instead
 User Function GetFieldInfo(cField)
     Local aArea := GetArea()
 
@@ -225,6 +311,7 @@ User Function GetFieldInfo(cField)
 Return
 
 // List all fields for a given table
+// DEPRECATED - Use FWSX3Util():GetAllFields() instead
 User Function ListTableFields(cAlias)
     Local aArea := GetArea()
 
@@ -242,11 +329,6 @@ User Function ListTableFields(cAlias)
 
     RestArea(aArea)
 Return
-
-// Using GetSX3Cache to get field properties efficiently
-Local cType := GetSX3Cache("A1_COD", "X3_TIPO")     // Returns "C"
-Local nSize := GetSX3Cache("A1_COD", "X3_TAMANHO")   // Returns field size
-Local cPict := GetSX3Cache("A1_COD", "X3_PICTURE")   // Returns picture mask
 ```
 
 ### Common Use Cases
@@ -274,8 +356,35 @@ SX5 stores generic code-description pairs grouped by a two-character table ident
 
 ### Programmatic Access
 
+#### Recommended Approach
+
+```advpl
+// FWGetSX5 / FwPutSX5 - Recommended functions for SX5 operations
+
+// Get all records from a generic table
+Local aContent := FWGetSX5("13") // Returns array with all records from table "13"
+// aContent[n][1] = Branch, [2] = Table, [3] = Key, [4] = Description
+
+// Get a specific record
+Local aContent := FWGetSX5("13", "SP") // Returns only key "SP" from table "13"
+
+// Get with a specific language
+Local aContent := FWGetSX5("13", , "en") // Description in English
+
+// Write to SX5
+FwPutSX5(, "ZZ", "001", "Descricao PT", "Description EN", "Descripcion ES")
+
+// Using the standard function X5Descri() (also valid for quick lookups)
+Local cDesc := X5Descri("13", "001") // Returns description for table 13, key 001
+```
+
+#### Legacy Approach (deprecated)
+
+> **Warning**: Direct access to SX tables via `DbSelectArea()` / `DbSeek()` is blocked by TOTVS SonarQube. Use `FWGetSX5()` and `FwPutSX5()` instead.
+
 ```advpl
 // Read a description from a generic table
+// DEPRECATED - Use FWGetSX5() instead
 User Function GetSX5Desc(cTabela, cChave)
     Local cDesc := ""
     Local aArea := GetArea()
@@ -289,14 +398,8 @@ User Function GetSX5Desc(cTabela, cChave)
     RestArea(aArea)
 Return cDesc
 
-// Example: Get state description
-Local cState := GetSX5Desc("12", "SP") // Returns "Sao Paulo"
-
-// Using the standard function X5Descri()
-// This is the recommended way to get SX5 descriptions
-Local cDesc := X5Descri("13", "001") // Returns description for table 13, key 001
-
 // List all entries in a specific generic table
+// DEPRECATED - Use FWGetSX5() instead
 User Function ListSX5Table(cTabela)
     Local aArea := GetArea()
 
@@ -341,22 +444,49 @@ SX6 stores all system parameters (also called MV parameters) that control the be
 
 ### Programmatic Access
 
-```advpl
-// Reading a parameter with GetMV (older approach)
-Local cEstado := GetMV("MV_ESTADO")  // Returns state, e.g., "SP"
+#### Recommended Approach
 
-// Reading with SuperGetMV (recommended, with default value fallback)
+```advpl
+// SuperGetMV - Recommended way to read parameters (with default value fallback)
 // SuperGetMV(cParam, lHelp, cDefault)
 Local cEstado := SuperGetMV("MV_ESTADO", .F., "SP")
 Local nMoeda  := SuperGetMV("MV_MOEDA1", .F., 1)
 
-// Reading with GetNewPar (alternative with default value)
+// GetNewPar - Alternative with default value
 Local cEstado := GetNewPar("MV_ESTADO", "SP")
+
+// GetMV - Older approach (still valid but SuperGetMV is preferred)
+Local cEstado := GetMV("MV_ESTADO")
 
 // Writing/updating a parameter value
 PutMV("MV_ESTADO", "RJ")  // Changes the state parameter to "RJ"
 
-// Reading SX6 directly (less common, but useful for bulk queries)
+// Example: Check if a feature is enabled
+If SuperGetMV("MV_USARFT", .F., "N") == "S"
+    // Feature is enabled
+EndIf
+
+// FWSX6Util - For existence checks and replication operations
+// Check if a parameter exists
+Local lExists := FWSX6Util():ExistsParam("MV_ESTADO")
+
+// Replicate parameter to specific branches
+Local lOk := FWSX6Util():ReplicateParam("MV_ESTADO", {"01","02"})
+
+// Replicate to all branches
+Local lOk := FWSX6Util():ReplicateParam("MV_ESTADO", "*")
+
+// Get parameter data in JSON format
+Local cJson := FWSX6Util():GetParamData("MV_ESTADO", "99")
+```
+
+#### Legacy Approach (deprecated)
+
+> **Warning**: Direct access to SX tables via `DbSelectArea()` / `DbSeek()` is blocked by TOTVS SonarQube. Use `SuperGetMV()`, `PutMV()`, and `FWSX6Util` instead.
+
+```advpl
+// Reading SX6 directly (bulk queries)
+// DEPRECATED - Use FWSX6Util methods instead
 User Function ListMVParams(cPrefix)
     Local aArea := GetArea()
 
@@ -374,11 +504,6 @@ User Function ListMVParams(cPrefix)
 
     RestArea(aArea)
 Return
-
-// Example: Check if a feature is enabled
-If SuperGetMV("MV_USARFT", .F., "N") == "S"
-    // Feature is enabled
-EndIf
 ```
 
 ### Common Use Cases
@@ -392,6 +517,8 @@ EndIf
 ## SX7 - Gatilhos (Field Triggers)
 
 SX7 defines automatic field triggers. A trigger fires when a source field changes value, evaluating an expression and writing the result into a target field. Triggers are used to auto-fill related fields -- for example, when the user enters a customer code, a trigger can automatically fill the customer name, address, and tax ID.
+
+> **Note**: SX7 is less commonly accessed programmatically. Triggers are typically managed through the Configurador module (SIGACFG). There is no dedicated TOTVS framework class for SX7 operations.
 
 ### Key Fields
 
@@ -458,6 +585,8 @@ Return
 
 SX9 defines relationships between tables, similar to foreign key constraints in relational databases. These relationships are used by the system for referential integrity checks, automatic joins in queries, and documentation of the data model.
 
+> **Note**: SX9 is less commonly accessed programmatically. Relationships are typically managed through the Configurador module (SIGACFG). There is no dedicated TOTVS framework class for SX9 operations.
+
 ### Key Fields
 
 | Field Name | Type | Size | Description |
@@ -522,6 +651,8 @@ Return
 ## SXB - Consultas Padrao (Standard Queries / F3 Lookups)
 
 SXB defines the standard queries (Consultas Padrao) used for F3 lookups. When a user presses F3 on a field, the system reads SXB to determine which table to query, which columns to display, how to search, and how to return the selected value. Each query is identified by an alias/code and can have multiple configuration rows (column definitions, search criteria, etc.).
+
+> **Note**: SXB is less commonly accessed programmatically. Standard queries are typically managed through the Configurador module (SIGACFG). There is no dedicated TOTVS framework class for SXB operations.
 
 ### Key Fields
 
@@ -604,8 +735,38 @@ SIX stores the index definitions for all tables in the system. Each record defin
 
 ### Programmatic Access
 
+#### Recommended Approach
+
+```advpl
+// FWSIXUtil - Recommended class for SIX operations
+
+// Check if an index exists by order number
+Local lExists := FWSIXUtil():ExistIndex("SA1", "1")
+
+// Check if an index exists by nickname
+Local lExists := FWSIXUtil():ExistIndex("SE1", "TITPAI", .T.)
+
+// Get all indexes for a table
+Local aIndexes := FWSIXUtil():GetAliasIndexes("SA1")
+// Returns: {{field1, field2}, {field1, field2, field3}}
+
+// Using indexes in practice:
+// DbSetOrder() sets the active index by its order number from SIX
+DbSelectArea("SA1")
+DbSetOrder(1)  // Order 1: A1_FILIAL + A1_COD + A1_LOJA
+DbSeek(xFilial("SA1") + "000001" + "01")  // Seek customer 000001, store 01
+
+DbSetOrder(3)  // Order 3: A1_FILIAL + A1_CGC (CNPJ/CPF index)
+DbSeek(xFilial("SA1") + "12345678000199")  // Seek by CNPJ
+```
+
+#### Legacy Approach (deprecated)
+
+> **Warning**: Direct access to SX tables via `DbSelectArea()` / `DbSeek()` is blocked by TOTVS SonarQube. Use `FWSIXUtil` instead.
+
 ```advpl
 // List all indexes for a table
+// DEPRECATED - Use FWSIXUtil():GetAliasIndexes() instead
 User Function ListIndexes(cAlias)
     Local aArea := GetArea()
 
@@ -624,16 +785,8 @@ User Function ListIndexes(cAlias)
     RestArea(aArea)
 Return
 
-// Using indexes in practice:
-// DbSetOrder() sets the active index by its order number from SIX
-DbSelectArea("SA1")
-DbSetOrder(1)  // Order 1: A1_FILIAL + A1_COD + A1_LOJA
-DbSeek(xFilial("SA1") + "000001" + "01")  // Seek customer 000001, store 01
-
-DbSetOrder(3)  // Order 3: A1_FILIAL + A1_CGC (CNPJ/CPF index)
-DbSeek(xFilial("SA1") + "12345678000199")  // Seek by CNPJ
-
 // Find which index order to use for a specific key pattern
+// DEPRECATED - Use FWSIXUtil():ExistIndex() instead
 User Function FindIndexByKey(cAlias, cKeyFragment)
     Local cOrder := ""
     Local aArea  := GetArea()
@@ -653,9 +806,6 @@ User Function FindIndexByKey(cAlias, cKeyFragment)
 
     RestArea(aArea)
 Return cOrder
-
-// Example: Find which index contains A1_CGC
-// FindIndexByKey("SA1", "A1_CGC") -> Returns "3"
 ```
 
 ### Common Use Cases
