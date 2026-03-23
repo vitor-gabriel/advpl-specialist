@@ -309,8 +309,8 @@ Static Function ViewDef()
     oView:SetOwnerView("VIEW_SA2", "INFERIOR")
 
     // Titles
-    oView:EnableTitleGroup("VIEW_SA1", "Dados do Cliente")
-    oView:EnableTitleGroup("VIEW_SA2", "Enderecos")
+    oView:EnableTitleView("VIEW_SA1", "Dados do Cliente")
+    oView:EnableTitleView("VIEW_SA2", "Enderecos")
 
 Return oView
 ```
@@ -325,7 +325,7 @@ Return oView
 | `CreateHorizontalBox(cId, nPercentual)` | Creates a horizontal box occupying N% of space |
 | `CreateVerticalBox(cId, nPercentual)` | Creates a vertical box occupying N% of space |
 | `SetOwnerView(cViewId, cBoxId)` | Places a view element inside a box |
-| `EnableTitleGroup(cViewId, cTitle)` | Shows a title bar above the view element |
+| `EnableTitleView(cViewId, cTitle)` | Shows a title bar above the view element |
 
 ### 4.3 FWFormStruct for View
 
@@ -375,8 +375,8 @@ Static Function ViewDef()
     oView:SetOwnerView("VIEW_SA1", "BOXMASTER")
     oView:SetOwnerView("VIEW_SA2", "BOXDETAIL")
 
-    oView:EnableTitleGroup("VIEW_SA1", "Dados do Cliente")
-    oView:EnableTitleGroup("VIEW_SA2", "Enderecos do Cliente")
+    oView:EnableTitleView("VIEW_SA1", "Dados do Cliente")
+    oView:EnableTitleView("VIEW_SA2", "Enderecos do Cliente")
 
 Return oView
 ```
@@ -567,8 +567,8 @@ Static Function ViewDef()
     oView:SetOwnerView("VIEW_ZA1", "BOXCAB")
     oView:SetOwnerView("VIEW_ZA2", "BOXITEM")
 
-    oView:EnableTitleGroup("VIEW_ZA1", "Cabecalho do Pedido")
-    oView:EnableTitleGroup("VIEW_ZA2", "Itens do Pedido")
+    oView:EnableTitleView("VIEW_ZA1", "Cabecalho do Pedido")
+    oView:EnableTitleView("VIEW_ZA2", "Itens do Pedido")
 
 Return oView
 ```

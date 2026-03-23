@@ -4395,6 +4395,438 @@ oMessage:AttachFile("\reports\invoice_" + cInvoice + ".pdf")
 
 ---
 
+## JsonObject Class Methods
+
+> **Source:** [TDN — Classe JsonObject](https://tdn.totvs.com/display/tec/Classe+JsonObject)
+
+### JsonObject:New
+
+Creates a new instance of JsonObject.
+
+**Syntax:** `JsonObject():New() --> oJson`
+
+**Return:** O - New JsonObject instance.
+
+**Example:**
+```advpl
+Local oJson := JsonObject():New()
+```
+
+---
+
+### JsonObject:FromJSON
+
+Populates the JsonObject from a JSON-formatted string.
+
+**Syntax:** `JsonObject:FromJSON( cJSON ) --> cRet`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cJSON | C | JSON string to parse |
+
+**Return:** C - NIL on success, or error description string on failure.
+
+**Example:**
+```advpl
+Local oJson := JsonObject():New()
+Local cRet  := oJson:FromJson('{"name":"John", "age":31}')
+
+If ValType(cRet) == "U"
+    Conout("JsonObject populado com sucesso")
+Else
+    Conout("Falha: " + cRet)
+EndIf
+```
+
+---
+
+### JsonObject:toJSON
+
+Serializes the JsonObject to a JSON-formatted string.
+
+**Syntax:** `JsonObject:toJSON() --> cJSON`
+
+**Return:** C - JSON string representation.
+
+**Example:**
+```advpl
+Local oJson := JsonObject():New()
+oJson["name"] := "John"
+oJson["age"]  := 31
+Conout(oJson:toJSON()) // {"name":"John","age":31}
+```
+
+---
+
+### JsonObject:GetNames
+
+Returns an array with all property names at the first level of the JsonObject.
+
+**Syntax:** `JsonObject:GetNames() --> aNames`
+
+**Return:** A - Array of property name strings.
+
+> **Minimum build:** 17.2.1.0
+
+**Example:**
+```advpl
+Local oJson := JsonObject():New()
+Local aNames, i
+oJson:FromJson('{"Content-Type":"application/json", "Authorization":"Bearer abc123", "X-Custom":"value"}')
+
+aNames := oJson:GetNames()
+For i := 1 To Len(aNames)
+    Conout(aNames[i]) // "Content-Type", "Authorization", "X-Custom"
+Next i
+```
+
+> **IMPORTANT:** Use `GetNames()` to iterate over JSON properties. Do NOT use fabricated methods like `:Keys()`, `:GetKeys()`, or `:Names()` — they do not exist.
+
+---
+
+### JsonObject:HasProperty
+
+Checks if the JsonObject contains a given key. Property names are **case-sensitive**.
+
+**Syntax:** `JsonObject:HasProperty( cKey ) --> lExists`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cKey | C | Property name to check |
+
+**Return:** L - .T. if property exists, .F. otherwise.
+
+> **Minimum build:** 17.3.0.19
+
+**Example:**
+```advpl
+Local oJson := JsonObject():New()
+oJson:FromJson('{"sKey":"texto", "nKey":23}')
+
+Conout(oJson:HasProperty("sKey"))  // .T.
+Conout(oJson:HasProperty("SKEY"))  // .F. (case-sensitive!)
+```
+
+---
+
+### JsonObject:GetJsonObject
+
+Returns a JsonObject contained in the specified property. For simple values, returns the value directly.
+
+**Syntax:** `JsonObject:GetJsonObject( cProperty ) --> oJsonObj`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cProperty | C | Property name |
+
+**Return:** O/U - JsonObject or value if found, NIL if property does not exist.
+
+> **Minimum build:** 17.2.1.0
+
+**Example:**
+```advpl
+Local oJson := JsonObject():New()
+oJson:FromJson('{"name":{"first":"John","last":"Doe"}, "age":31}')
+
+Local oName := oJson:GetJsonObject("name")  // JsonObject {"first":"John","last":"Doe"}
+Local nAge  := oJson:GetJsonObject("age")   // 31 (simple value)
+Local xNone := oJson:GetJsonObject("xpto")  // NIL
+```
+
+---
+
+### JsonObject:GetJsonText
+
+Returns the value of a property as a string, regardless of the original type.
+
+**Syntax:** `JsonObject:GetJsonText( cKey ) --> cValue`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cKey | C | Property name |
+
+**Return:** C - Value as string. Returns "null" for non-existent or null properties.
+
+> **Minimum build:** 17.2.1.0
+
+**Example:**
+```advpl
+Local oJson := JsonObject():New()
+oJson:FromJson('{"name":"John", "age":31, "active":true}')
+
+Conout(oJson:GetJsonText("name"))    // "John"
+Conout(oJson:GetJsonText("age"))     // "31"
+Conout(oJson:GetJsonText("active"))  // "true"
+```
+
+---
+
+### JsonObject:GetJsonValue
+
+Retrieves the value and type of a property by reference.
+
+**Syntax:** `JsonObject:GetJsonValue( cPropertyName, @xValue [, @cType] ) --> lFound`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cPropertyName | C | Property name |
+| xValue | U | (by reference) Receives the property value |
+| cType | C | (by reference, optional) Receives the value type ("C","N","L","A","J") |
+
+**Return:** L - .T. if property found, .F. otherwise.
+
+> **Minimum build:** 19.3.7.0
+
+**Example:**
+```advpl
+Local oJson := JsonObject():New()
+Local xVal, cType
+oJson:FromJson('{"name":"John", "age":31}')
+
+If oJson:GetJsonValue("name", @xVal, @cType)
+    Conout(xVal)   // "John"
+    Conout(cType)  // "C"
+EndIf
+```
+
+---
+
+### JsonObject:DelName
+
+Removes a property and its value from the JsonObject. Property name is **case-sensitive**.
+
+**Syntax:** `JsonObject:DelName( cName ) --> lSuccess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cName | C | Property name to remove |
+
+**Return:** L - .T. on success, .F. on failure.
+
+> **Minimum build:** 17.3.0.19
+
+**Example:**
+```advpl
+Local oJson := JsonObject():New()
+oJson:FromJson('{"name":"John", "age":31, "temp":"remove me"}')
+oJson:DelName("temp")
+Conout(oJson:toJSON()) // {"name":"John","age":31}
+```
+
+---
+
+### JsonObject:Set
+
+Inserts an Array or JsonObject at the root of the document.
+
+**Syntax:** `JsonObject:Set( aJson )`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| aJson | A/O | Array of JsonObjects or a single JsonObject |
+
+> **Minimum build:** 17.3.0.14
+
+**Example:**
+```advpl
+Local aItems := {}
+Local oRoot  := JsonObject():New()
+
+AAdd(aItems, JsonObject():New())
+aItems[1]["name"] := "Item1"
+AAdd(aItems, JsonObject():New())
+aItems[2]["name"] := "Item2"
+
+oRoot:Set(aItems)
+Conout(oRoot:toJSON()) // [{"name":"Item1"},{"name":"Item2"}]
+```
+
+---
+
+### Case-Insensitive Header Iteration Pattern
+
+When iterating over HTTP request headers (e.g., from a JSON body or parsed headers), use `GetNames()` + `Upper()` for case-insensitive matching:
+
+```advpl
+// Pattern: Find a header value regardless of casing
+Static Function GetHeaderCI(oHeaders, cHeaderName)
+    Local aNames := oHeaders:GetNames()
+    Local cUpper := Upper(cHeaderName)
+    Local i
+
+    For i := 1 To Len(aNames)
+        If Upper(aNames[i]) == cUpper
+            Return oHeaders:GetJsonText(aNames[i])
+        EndIf
+    Next i
+Return ""
+
+// Usage:
+Local oHeaders := JsonObject():New()
+oHeaders:FromJson('{"Content-Type":"application/json","authorization":"Bearer token123","X-Custom-Header":"value"}')
+
+Conout(GetHeaderCI(oHeaders, "content-type"))    // "application/json"
+Conout(GetHeaderCI(oHeaders, "Authorization"))    // "Bearer token123"
+Conout(GetHeaderCI(oHeaders, "x-custom-header"))  // "value"
+```
+
+> **CRITICAL:** JsonObject property access is **case-sensitive**. HTTP headers are case-insensitive by spec (RFC 7230). Always use `GetNames()` + `Upper()` when matching headers.
+
+---
+
+## TWsdlManager Class Methods
+
+Class for consuming external SOAP Web Services from ADVPL. Loads WSDL, calls operations, and reads responses.
+
+### New
+
+Constructor - creates a new TWsdlManager instance.
+
+**Syntax:** `TWsdlManager():New() --> oWsdl`
+
+**Return:** O - TWsdlManager object.
+
+### ParseURL
+
+Loads and parses a WSDL from a URL.
+
+**Syntax:** `oWsdl:ParseURL( cUrl ) --> lSuccess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cUrl | C | URL of the WSDL |
+
+**Return:** L - `.T.` if WSDL was loaded successfully.
+
+### ParseFile
+
+Loads and parses a WSDL from a local file.
+
+**Syntax:** `oWsdl:ParseFile( cPath ) --> lSuccess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cPath | C | Local file path of the WSDL |
+
+**Return:** L - `.T.` if WSDL was loaded successfully.
+
+### SetOperation
+
+Selects the SOAP operation to call.
+
+**Syntax:** `oWsdl:SetOperation( cOperation ) --> lSuccess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cOperation | C | Operation name from the WSDL |
+
+**Return:** L - `.T.` if operation was found and selected.
+
+### SendSoapMsg
+
+Sends a SOAP envelope message.
+
+**Syntax:** `oWsdl:SendSoapMsg( cXml ) --> lSuccess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cXml | C | Complete SOAP XML envelope |
+
+**Return:** L - `.T.` if message was sent successfully.
+
+### GetParsedResponse
+
+Returns the parsed response body after a successful SendSoapMsg.
+
+**Syntax:** `oWsdl:GetParsedResponse() --> cResponse`
+
+**Return:** C - Parsed response content.
+
+### GetSoapResponse
+
+Returns the raw SOAP XML response.
+
+**Syntax:** `oWsdl:GetSoapResponse() --> cRawXml`
+
+**Return:** C - Raw SOAP XML response.
+
+### GetSoapMsg
+
+Returns the SOAP message that will be or was sent.
+
+**Syntax:** `oWsdl:GetSoapMsg() --> cSoapXml`
+
+**Return:** C - SOAP XML message.
+
+### ListOperations
+
+Lists available operations for the current service port.
+
+**Syntax:** `oWsdl:ListOperations() --> aOperations`
+
+**Return:** A - Array of operation names.
+
+### SetPort
+
+Selects a service port from the WSDL.
+
+**Syntax:** `oWsdl:SetPort( cPort ) --> lSuccess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cPort | C | Port/service name |
+
+**Return:** L - `.T.` if port was selected.
+
+### SetValue
+
+Sets an input parameter value for the operation.
+
+**Syntax:** `oWsdl:SetValue( cParam, cValue ) --> lSuccess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cParam | C | Parameter name |
+| cValue | C | Parameter value |
+
+**Return:** L - `.T.` if value was set.
+
+### Key Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `cError` | C | Last error message |
+| `cFaultCode` | C | SOAP Fault code (check after SendSoapMsg) |
+| `cFaultSubCode` | C | SOAP Fault sub-code |
+| `cFaultString` | C | SOAP Fault description message |
+| `cFaultActor` | C | SOAP Fault actor |
+| `nTimeout` | N | Timeout in seconds (default 120) |
+| `bNoCheckPeerCert` | L | `.T.` to skip SSL certificate validation |
+| `lProcResp` | L | `.T.` to auto-process response (default `.T.`) |
+| `lVerbose` | L | `.T.` for debug output |
+
+**IMPORTANT:** SOAP Fault data is accessed via **properties** (`cFaultCode`, `cFaultString`, etc.), NOT via a method. There is NO `GetSoapFault()` method. There is NO `ListServices()` method — use `SetPort()` to select a port and `ListOperations()` to list operations.
+
+**Example:**
+```advpl
+Local oWsdl := TWsdlManager():New()
+oWsdl:nTimeout := 120
+oWsdl:bNoCheckPeerCert := .T.
+
+If oWsdl:ParseURL(cUrl)
+    oWsdl:SetOperation("OPERACAO")
+    If oWsdl:SendSoapMsg(cEnvelope)
+        If !Empty(oWsdl:cFaultCode)
+            Conout("SOAP Fault: " + oWsdl:cFaultCode + " - " + oWsdl:cFaultString)
+        Else
+            cResp := oWsdl:GetParsedResponse()
+        EndIf
+    EndIf
+EndIf
+```
+
+---
+
 ## Legacy / Compatibility Functions
 
 ### StaticCall (BLOCKED — DO NOT USE)

@@ -401,14 +401,7 @@ User Function ListOps()
         Return
     EndIf
 
-    // Listar servicos
-    Conout("Servicos disponiveis:")
-    Local aServices := oWsdl:ListServices()
-    For nI := 1 To Len(aServices)
-        Conout("  " + aServices[nI])
-    Next nI
-
-    // Listar operacoes do primeiro servico
+    // Listar operacoes do servico
     Conout("Operacoes disponiveis:")
     aOps := oWsdl:ListOperations()
     For nI := 1 To Len(aOps)
@@ -453,11 +446,10 @@ User Function ConsumeWSSafe()
         Return .F.
     EndIf
 
-    // Verificar SOAP Fault
-    cFault := oWsdl:GetSoapFault()
-    If !Empty(cFault)
+    // Verificar SOAP Fault via propriedades
+    If !Empty(oWsdl:cFaultCode)
         FWLogMsg("ERROR", , "ConsumeWS", "SoapFault", , , ;
-            "SOAP Fault recebido: " + cFault)
+            "SOAP Fault: [" + oWsdl:cFaultCode + "] " + oWsdl:cFaultString)
         Return .F.
     EndIf
 
@@ -500,10 +492,17 @@ Return cMsg
 | `SetOperation(cOp)` | Method | Select the operation to call. Returns `.T.`/`.F.` |
 | `SendSoapMsg(cXml)` | Method | Send SOAP envelope. Returns `.T.`/`.F.` |
 | `GetParsedResponse()` | Method | Get the parsed response body |
-| `GetSoapFault()` | Method | Get SOAP Fault message (empty if no fault) |
-| `GetSoapMsg()` | Method | Get the raw SOAP response XML |
-| `ListServices()` | Method | List available services in the WSDL |
+| `GetSoapResponse()` | Method | Get the raw SOAP XML response |
+| `GetSoapMsg()` | Method | Get the SOAP message that will be/was sent |
 | `ListOperations()` | Method | List operations for the current service |
+| `SetPort(cPort)` | Method | Select a service port from the WSDL |
+| `SetValue(cParam, cValue)` | Method | Set input parameter value |
+| `SimpleInput(cField)` | Method | Navigate to a simple input field |
+| `cFaultCode` | Property | SOAP Fault code (check after SendSoapMsg) |
+| `cFaultSubCode` | Property | SOAP Fault sub-code |
+| `cFaultString` | Property | SOAP Fault description message |
+| `cFaultActor` | Property | SOAP Fault actor |
+| `lProcResp` | Property | `.T.` to auto-process response (default `.T.`) |
 
 ---
 
@@ -576,11 +575,12 @@ EndIf
 **Solution:**
 ```advpl
 If oWsdl:SendSoapMsg(cMsgWs)
-    Local cFault := oWsdl:GetSoapFault()
-    If !Empty(cFault)
-        Conout("SOAP Fault: " + cFault)
+    // Check SOAP Fault via properties (NOT via GetSoapFault which does not exist)
+    If !Empty(oWsdl:cFaultCode)
+        Conout("SOAP Fault Code: " + oWsdl:cFaultCode)
+        Conout("SOAP Fault Msg:  " + oWsdl:cFaultString)
         // Also check the raw response for details
-        Conout("Raw XML: " + oWsdl:GetSoapMsg())
+        Conout("Raw XML: " + oWsdl:GetSoapResponse())
     Else
         cResp := oWsdl:GetParsedResponse()
     EndIf
@@ -632,7 +632,7 @@ oWsdl:bNoCheckPeerCert := .T.
 | Return structured responses | Use JSON via `JsonObject` for consistent output |
 | Log errors with context | Use `FWLogMsg` or `Conout` with service/method name |
 | Set appropriate timeout | Default 120s may be too long or short — adjust per service |
-| Handle SOAP Faults explicitly | Always check `GetSoapFault()` after `SendSoapMsg()` |
+| Handle SOAP Faults explicitly | Always check `cFaultCode`/`cFaultString` properties after `SendSoapMsg()` |
 | Use `MsExecAuto` for data operations | Triggers standard Protheus validations and workflows |
 | Do NOT use `Private` variables in new code | Exception: `lMsHelpAuto`, `lAutoErrNoFile`, `lMsErroAuto` required by `MsExecAuto` |
 | Name services with `z` prefix | Convention for custom services: `zWSClientes`, `zWSPedidos` |

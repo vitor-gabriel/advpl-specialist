@@ -427,7 +427,7 @@ Static Function ViewDef()
     oView:CreateHorizontalBox("BOXPROD", 100)
     oView:SetOwnerView("VIEW_SB1", "BOXPROD")
 
-    oView:EnableTitleGroup("VIEW_SB1", "Dados do Produto")
+    oView:EnableTitleView("VIEW_SB1", "Dados do Produto")
 
 Return oView
 ```

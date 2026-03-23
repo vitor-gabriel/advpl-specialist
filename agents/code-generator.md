@@ -117,6 +117,83 @@ Activate this agent when the user:
 - Save file with correct extension (.prw or .tlpp)
 - Explain key decisions to the user
 
+## CRITICAL: JsonObject Methods
+
+When generating code that uses `JsonObject`, **ONLY use methods that actually exist** in the class. The complete list of valid methods from the TDN is:
+
+| Method | Description |
+|--------|-------------|
+| `JsonObject():New()` | Constructor |
+| `:FromJSON(cJSON)` | Parse JSON string (returns NIL on success) |
+| `:toJSON()` | Serialize to JSON string |
+| `:GetNames()` | Returns array of property names |
+| `:HasProperty(cKey)` | Check if key exists (case-sensitive) |
+| `:GetJsonObject(cKey)` | Get sub-object or value |
+| `:GetJsonText(cKey)` | Get value as string |
+| `:GetJsonValue(cKey, @xVal, @cType)` | Get value and type by reference |
+| `:DelName(cKey)` | Remove property |
+| `:Set(aJson)` | Set array/object at root |
+| `oJson["key"]` | Bracket notation for get/set |
+
+**DO NOT generate fabricated methods** like `:Keys()`, `:GetKeys()`, `:Names()`, `:GetHeaders()`, `:HasKey()`, `:Count()`, `:Items()`, or any other method not listed above.
+
+**For case-insensitive header/key matching**, use `GetNames()` + `Upper()`:
+
+```advpl
+// Correct pattern for case-insensitive key lookup
+Local aNames := oJson:GetNames()
+Local cUpper := Upper(cTargetKey)
+For i := 1 To Len(aNames)
+    If Upper(aNames[i]) == cUpper
+        cValue := oJson:GetJsonText(aNames[i])
+    EndIf
+Next i
+```
+
+## CRITICAL: TWsdlManager Methods
+
+When generating code that uses `TWsdlManager`, **ONLY use methods/properties that actually exist** in the class. The complete list of valid methods from the TDN is:
+
+| Method/Property | Description |
+|-----------------|-------------|
+| `TWsdlManager():New()` | Constructor |
+| `:ParseURL(cUrl)` | Load WSDL from URL. Returns `.T.`/`.F.` |
+| `:ParseFile(cPath)` | Load WSDL from local file. Returns `.T.`/`.F.` |
+| `:SetOperation(cOp)` | Select operation to call. Returns `.T.`/`.F.` |
+| `:SendSoapMsg(cXml)` | Send SOAP envelope. Returns `.T.`/`.F.` |
+| `:GetParsedResponse()` | Get parsed response body |
+| `:GetSoapResponse()` | Get raw SOAP XML response |
+| `:GetSoapMsg()` | Get the SOAP message that will be/was sent |
+| `:ListOperations()` | List operations for the current service |
+| `:SetPort(cPort)` | Select a service port from the WSDL |
+| `:SetValue(cParam, cValue)` | Set input parameter value |
+| `:SimpleInput(cField)` | Navigate to a simple input field |
+| `:ComplexInput(cField)` | Navigate to a complex input field |
+| `:NextComplex()` | Navigate complex types |
+| `:SetComplexOccurs(n)` | Define tag occurrence count |
+| `.cError` | Last error message (property) |
+| `.cFaultCode` | SOAP Fault code (property) |
+| `.cFaultSubCode` | SOAP Fault sub-code (property) |
+| `.cFaultString` | SOAP Fault description (property) |
+| `.cFaultActor` | SOAP Fault actor (property) |
+| `.nTimeout` | Timeout in seconds (property, default 120) |
+| `.bNoCheckPeerCert` | Skip SSL cert validation (property) |
+| `.lProcResp` | Auto-process response (property) |
+
+**DO NOT generate fabricated methods** like `:GetSoapFault()`, `:ListServices()`, `:GetError()`, or any other method not listed above. SOAP Fault data is accessed via **properties** (`cFaultCode`, `cFaultString`), NOT via a getter method.
+
+## CRITICAL: FWFormView Methods
+
+When generating MVC ViewDef code, the correct method name for adding titles to view sections is **`EnableTitleView`**, NOT `EnableTitleGroup`.
+
+```advpl
+// CORRECT:
+oView:EnableTitleView("VIEW_SA1", "Dados do Cliente")
+
+// WRONG — EnableTitleGroup DOES NOT EXIST:
+// oView:EnableTitleGroup("VIEW_SA1", "Dados do Cliente")
+```
+
 ## Code Quality Checklist
 
 Before delivering any generated code, verify:
@@ -131,3 +208,6 @@ Before delivering any generated code, verify:
 - [ ] RecLock/MsUnlock properly paired
 - [ ] No hardcoded strings for table/field names where aliases exist
 - [ ] Return value properly documented
+- [ ] JsonObject methods are valid (only use methods from the TDN-documented list above)
+- [ ] TWsdlManager methods are valid (no GetSoapFault, no ListServices)
+- [ ] FWFormView uses EnableTitleView (NOT EnableTitleGroup)

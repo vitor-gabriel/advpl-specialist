@@ -69,6 +69,8 @@ See `restricted-functions.md` for the complete list and supported alternatives.
 | Network | HttpGet, HttpPost, FWRest, WsRestFul | native-functions.md |
 | System | GetMV, PutMV, SuperGetMV, Conout, FWLogMsg | native-functions.md |
 | Company/Branch | FWCodFil, FWCodEmp, FWFilial, FWCompany, xFilial | native-functions.md |
+| JsonObject | New, FromJSON, toJSON, GetNames, HasProperty, GetJsonObject, GetJsonText, GetJsonValue, DelName, Set | native-functions.md |
+| TWsdlManager | New, ParseURL, ParseFile, SetOperation, SendSoapMsg, GetParsedResponse, GetSoapResponse, GetSoapMsg, ListOperations, SetPort, SetValue | native-functions.md |
 | Restricted | StaticCall, PTInternal, PARAMBOX, etc. | restricted-functions.md |
 
 ## Data Dictionary Quick Reference
