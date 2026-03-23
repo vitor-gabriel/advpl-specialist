@@ -1787,7 +1787,9 @@ EndIf
 
 Returns the branch code (filial) for a given alias, used in index key composition.
 
-**Syntax:** `xFilial( cAlias [, nGroup] ) --> cFilial`
+**Syntax:** `xFilial( cAlias [, cFil] ) --> cRetFilial`
+
+> **Note:** The second parameter `cFil` defaults to the system Private variable `cFilAnt`. Never use `cFilial` or `cFilAnt` as Local variable names — they are reserved by the framework.
 
 | Param | Type | Description |
 |-------|------|-------------|
@@ -2781,6 +2783,209 @@ Checks if a function exists in the compiled RPO.
 If ExistFunc("MyCustomFunc")
     &("MyCustomFunc()")
 EndIf
+```
+
+---
+
+## Company/Branch Management Functions (FW*)
+
+> **CRITICAL:** The Protheus framework maintains Private variables (`cFilial`, `cFilAnt`, `cEmpAnt`) for company/branch context. **NEVER** use these names as Local/Static variables — it shadows the system variables and causes data isolation bugs. Use `cCodFil`, `cCodEmp` instead. Always use the FW* functions below to read company/branch values.
+
+### FWCodFil
+
+Returns the current branch code (M0_CODFIL).
+
+**Syntax:** `FWCodFil( [ cGrpCompany ] [, cEmpUDFil ] ) --> cCodFil`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cGrpCompany | C | Company group to check (default: SM0->M0_CODIGO) |
+| cEmpUDFil | A | Array with company, business unit, and branch (optional) |
+
+**Return:** C - Current branch code.
+
+**Example:**
+```advpl
+Local cCodFil := FWCodFil()
+Conout("Branch code: " + cCodFil)
+```
+
+---
+
+### FWCodEmp
+
+Returns the company code (or the company group if company is not configured in the group layout).
+
+**Syntax:** `FWCodEmp( [ cAlias ] ) --> cCodEmp`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cAlias | C | Table alias to check (optional) |
+
+**Return:** C - Company code or company group.
+
+**Example:**
+```advpl
+Local cCodEmp := FWCodEmp()
+Conout("Company: " + cCodEmp)
+```
+
+---
+
+### FWFilial
+
+Returns the branch used by the system. When an alias is provided, returns the branch according to the table's sharing mode.
+
+**Syntax:** `FWFilial( [ cAlias ] ) --> cFil`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cAlias | C | If provided, returns branch according to sharing mode |
+
+**Return:** C - Branch code used by the system.
+
+**Example:**
+```advpl
+Local cFil := FWFilial("SA1")
+// If SA1 is shared at company level, returns empty
+// If SA1 is exclusive per branch, returns current branch
+```
+
+---
+
+### FWCompany
+
+Returns the company used by the system.
+
+**Syntax:** `FWCompany( [ cAlias ] ) --> cCompany`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cAlias | C | Alias to evaluate (optional) |
+
+**Return:** C - Current company code.
+
+**Example:**
+```advpl
+Local cMyCompany := FWCompany()
+```
+
+---
+
+### FWGrpCompany
+
+Returns the company group used by the system.
+
+**Syntax:** `FWGrpCompany() --> cGrpCompany`
+
+**Return:** C - Current company group.
+
+**Example:**
+```advpl
+Local cGrp := FWGrpCompany()
+```
+
+---
+
+### FWUnitBusiness
+
+Returns the current business unit.
+
+**Syntax:** `FWUnitBusiness( [ cAlias ] ) --> cUnitBusiness`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cAlias | C | Alias to evaluate (optional) |
+
+**Return:** C - Current business unit code.
+
+**Example:**
+```advpl
+Local cUnit := FWUnitBusiness()
+```
+
+---
+
+### FWAllCompany
+
+Returns all companies for the given company group.
+
+**Syntax:** `FWAllCompany( [ cGrpCompany ] ) --> aAllCompany`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cGrpCompany | C | Company group (default: SM0->M0_CODIGO) |
+
+**Return:** A - Array with all companies in the group.
+
+**Example:**
+```advpl
+Local aEmpresas := FWAllCompany()
+Local nI
+For nI := 1 To Len(aEmpresas)
+    Conout("Company: " + aEmpresas[nI])
+Next nI
+```
+
+---
+
+### FWAllFilial
+
+Returns all branches for the given company group, company, and business unit.
+
+**Syntax:** `FWAllFilial( [ cCompany ] [, cUnitBusiness ] [, cGrpCompany ] [, lOnlyCode ] ) --> aAllFilial`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cCompany | C | Company to check (optional) |
+| cUnitBusiness | A | Business unit to check (optional) |
+| cGrpCompany | A | Company group (default: SM0->M0_CODIGO) |
+| lOnlyCode | L | If .T., returns only branch codes (default: .T.) |
+
+**Return:** A - Array with all branches.
+
+**Example:**
+```advpl
+Local aFiliais := FWAllFilial()
+Local nI
+For nI := 1 To Len(aFiliais)
+    Conout("Branch: " + aFiliais[nI])
+Next nI
+```
+
+---
+
+### FWAllGrpCompany
+
+Returns all available company groups.
+
+**Syntax:** `FWAllGrpCompany() --> aAllGroup`
+
+**Return:** A - Array with all company groups.
+
+**Example:**
+```advpl
+Local aGrupos := FWAllGrpCompany()
+```
+
+---
+
+### FWSizeFilial
+
+Returns the size of the branch field.
+
+**Syntax:** `FWSizeFilial( [ cGrpCompany ] ) --> nFilSize`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cGrpCompany | C | Company group (default: cEmpAnt) |
+
+**Return:** N - Branch field size.
+
+**Example:**
+```advpl
+Local nFilSize := FWSizeFilial()
+Conout("Branch field size: " + cValToChar(nFilSize))
 ```
 
 ---
@@ -3968,12 +4173,14 @@ EndIf
 
 Opens and initializes the Protheus environment in background threads or automated routines. Required when using StartJob.
 
-**Syntax:** `RpcSetEnv( cEmpresa, cFilial, cUser, cPassword, cModule, cFunName, aTables, lShowFinal, lAbend, lOpenSX, lConnect ) --> lSuccess`
+**Syntax:** `RpcSetEnv( cCodEmp, cCodFil, cUser, cPassword, cModule, cFunName, aTables, lShowFinal, lAbend, lOpenSX, lConnect ) --> lSuccess`
+
+> **IMPORTANT:** When calling RpcSetEnv, never use `cFilial`, `cFilAnt` or `cEmpAnt` as variable names for the parameters — these are reserved Private variables. Use `cCodEmp` and `cCodFil` instead.
 
 | Param | Type | Description |
 |-------|------|-------------|
-| cEmpresa | C | Company code (e.g., "99") |
-| cFilial | C | Branch code (e.g., "01") |
+| cCodEmp | C | Company code (e.g., "99") |
+| cCodFil | C | Branch code (e.g., "01") |
 | cUser | C | User login (optional) |
 | cPassword | C | User password (optional) |
 | cModule | C | Connection module (default: "FAT") |
@@ -4190,9 +4397,9 @@ oMessage:AttachFile("\reports\invoice_" + cInvoice + ".pdf")
 
 ## Legacy / Compatibility Functions
 
-### StaticCall
+### StaticCall (BLOCKED — DO NOT USE)
 
-Executes a Static Function from another source file. Legacy feature, not supported in TLPP.
+Executes a Static Function from another source file. **COMPILATION BLOCKED since release 12.1.33.** This function is TOTVS internal property and cannot be used in custom code.
 
 **Syntax:** `StaticCall( ProgramName, FunctionName [, xParam1, ..., xParamN] ) --> xResult`
 
@@ -4204,13 +4411,18 @@ Executes a Static Function from another source file. Legacy feature, not support
 
 **Return:** U - Return value from the executed Static Function.
 
-> **Warning:** StaticCall is inhibited in TLPP. For TLPP migration, refactor to use public functions or namespaced calls instead.
+> **CRITICAL: StaticCall() has its compilation BLOCKED since release 12.1.33.** It is listed as TOTVS internal property. Code using StaticCall will NOT compile on current releases. For alternatives, see: [TOTVS documentation on StaticCall replacement](https://centraldeatendimento.totvs.com/hc/pt-br/articles/4411463269911).
 
-**Example:**
+> **Migration path:** Refactor to use public User Functions or namespaced TLPP calls instead. If you need to call a function from another source, make it a `User Function` (public scope) or use TLPP namespaces.
+
+**Example (legacy — for reference only, DO NOT use in new code):**
 ```advpl
-// Call a Static Function from another program
-Local aMenu := StaticCall(MATA030, MenuDef)
+// DEPRECATED — WILL NOT COMPILE on 12.1.33+
+// Local aMenu := StaticCall(MATA030, MenuDef)
 
-// Call with parameters
-Local xRet := StaticCall(MyProgram, MyStaticFunc, "param1", 42)
+// CORRECT alternative: call as User Function
+Local aMenu := U_MenuDef()
+
+// CORRECT alternative in TLPP: use namespace
+// Local aMenu := custom.modulo.MenuDef()
 ```

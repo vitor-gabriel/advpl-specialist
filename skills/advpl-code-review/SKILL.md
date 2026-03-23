@@ -59,9 +59,9 @@ Each finding must include:
 
 | Prefix | Category | Example |
 |--------|----------|---------|
-| `BP` | Best Practices | `[BP-001]` RecLock without MsUnlock |
+| `BP` | Best Practices | `[BP-001]` RecLock without MsUnlock, `[BP-008]` Reserved system variables |
 | `PERF` | Performance | `[PERF-001]` SELECT * in Embedded SQL |
-| `SEC` | Security | `[SEC-001]` SQL injection via string concatenation |
+| `SEC` | Security | `[SEC-001]` SQL injection, `[SEC-005]` Restricted TOTVS functions |
 | `MOD` | Modernization | `[MOD-001]` .prw class candidate for .tlpp |
 
 ## References

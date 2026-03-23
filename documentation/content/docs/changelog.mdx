@@ -8,6 +8,21 @@ Todas as mudancas notaveis deste projeto sao documentadas neste arquivo.
 O formato e baseado no [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 e este projeto segue o [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2026-03-23
+
+### Adicionado
+
+- Nova regra de revisao `[BP-008]`: detecta uso de variaveis reservadas do sistema (`cFilial`, `cFilAnt`, `cEmpAnt`) como Local/Static, com alternativas recomendadas (`cCodFil`, `cCodEmp`)
+- Nova regra de seguranca `[SEC-005]`: detecta uso de 195+ funcoes, classes e variaveis restritas/internas da TOTVS com alternativas suportadas
+- Novo arquivo de referencia `restricted-functions.md` com lista completa de funcoes de propriedade interna da TOTVS (fonte: Central de Atendimento TOTVS)
+- Nova secao `Company/Branch Management Functions (FW*)` com 10 funcoes documentadas: `FWCodFil`, `FWCodEmp`, `FWFilial`, `FWCompany`, `FWGrpCompany`, `FWUnitBusiness`, `FWAllCompany`, `FWAllFilial`, `FWAllGrpCompany`, `FWSizeFilial`
+
+### Corrigido
+
+- Substituido `cFilial` por `cCodFil` e `cEmpresa` por `cCodEmp` em todos os exemplos de codigo (nomes de variaveis Private reservadas nao podem ser usados como variaveis Local)
+- Atualizada documentacao do `StaticCall()` para refletir status de compilacao bloqueada desde a release 12.1.33
+- Adicionados avisos sobre variaveis reservadas na documentacao de `xFilial()` e `RpcSetEnv()`
+
 ## [1.0.5] - 2026-03-18
 
 ### Corrigido

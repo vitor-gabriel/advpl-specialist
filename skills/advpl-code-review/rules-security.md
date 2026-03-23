@@ -229,3 +229,74 @@ Return cValue
 ```
 
 **Why it matters:** Hardcoded credentials in source code are exposed to every developer with repository access, remain in version history even after deletion, and can be extracted from compiled RPO. If the repository is compromised, all hardcoded credentials are immediately exposed. Use Protheus SX6 parameters, environment variables, or a secrets management solution instead.
+
+---
+
+## [SEC-005] Usage of TOTVS restricted/internal functions, classes, or variables
+
+**Severity:** CRITICAL
+
+**Description:** TOTVS maintains a list of functions, classes, and variables that are internal property. These resources are NOT documented, NOT supported, and may be altered or removed without notice. Some have their compilation blocked since release 12.1.33. Using them in custom code causes compilation failures, runtime errors, or unpredictable behavior after updates.
+
+**What to look for:** Any call to functions or classes listed in the TOTVS restricted resources list. See `restricted-functions.md` in the protheus-reference skill for the complete list.
+
+**Compilation BLOCKED (will not compile on 12.1.33+):**
+
+- `StaticCall()` — use public User Functions or TLPP namespaced calls instead
+- `PTInternal()` — no replacement available; redesign the logic
+
+**Commonly found restricted functions (NOT supported, may change without notice):**
+
+| Restricted | Alternative |
+|------------|-------------|
+| `PARAMBOX` | Use `Pergunte()` with SX1 or `FWInputDialog()` |
+| `MsExcel` | Use `FWMsExcel` or `FWAdaptor` |
+| `CriaVar` | Use `FWCriaVar()` |
+| `LASTKEY` | Use specific navigation control logic |
+| `SetPrvt` | Declare variables explicitly with `Private` |
+| `MontaBlock` | Build code blocks directly with `{|| ... }` |
+| `FWMVCROTAUTO` | Use `FWExecView()` for MVC automation |
+| `FWLOOKUP` | Use `FWInputDialog()` or standard F3 lookups |
+| `OPENSXS` | Tables are opened automatically by the framework |
+| `APPEND FROM` | Use `RecLock` + field-by-field copy |
+| `COPY TO` | Use `RecLock` + field-by-field copy |
+| `LoadLayout()` | Use `FWLoadLayout()` |
+| `PivotTable` | Use `FWPivotTable` |
+| `StaticCall()` | Use `User Function` (public) or TLPP namespace |
+| `ApOleClient` | Use `FWMsExcel` for Excel or native file operations |
+| `FWAUTHUSER` | Use proper REST authentication mechanisms |
+| `E_FIELD` | Use `GetSx3Cache()` or `TamSx3()` |
+
+**Violation:**
+
+```advpl
+User Function MyReport()
+    // WRONG: StaticCall is BLOCKED since 12.1.33
+    Local aMenu := StaticCall(MATA030, MenuDef)
+
+    // WRONG: PARAMBOX is restricted
+    PARAMBOX(aParams, "Filtros", , , , , , , , , .F., .F.)
+
+    // WRONG: CriaVar is restricted
+    Local xVal := CriaVar("A1_COD")
+Return
+```
+
+**Correct:**
+
+```advpl
+User Function MyReport()
+    // CORRECT: Call public function directly
+    Local aMenu := U_MenuDef()
+
+    // CORRECT: Use Pergunte() with SX1 configuration
+    Pergunte("MYREPORT", .F.)
+
+    // CORRECT: Use FWCriaVar
+    Local xVal := FWCriaVar("A1_COD")
+Return
+```
+
+**Reference:** Full list at https://centraldeatendimento.totvs.com/hc/pt-br/articles/360016461772
+
+**Why it matters:** TOTVS reserves the right to modify or remove internal functions without notice. Code that uses restricted functions will break silently after Protheus updates — or fail to compile entirely on releases 12.1.33+. The TOTVS support team does NOT provide assistance for issues caused by restricted function usage. Always use documented, supported alternatives.

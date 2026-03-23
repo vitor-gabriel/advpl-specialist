@@ -50,6 +50,12 @@ digraph lookup {
    - `browser_snapshot` para extrair texto; se insuficiente, `browser_take_screenshot` para captura visual
    - `browser_close` ao finalizar para liberar recursos
 
+## CRITICAL: Restricted Functions Check
+
+**Before recommending any function, ALWAYS check if it appears in `restricted-functions.md`.** TOTVS maintains a list of 195+ functions/classes that are internal property and MUST NOT be used in custom code. Some have their compilation blocked since release 12.1.33.
+
+See `restricted-functions.md` for the complete list and supported alternatives.
+
 ## Function Categories
 
 | Category | Common Functions | File Reference |
@@ -62,6 +68,8 @@ digraph lookup {
 | File I/O | FOpen, FRead, FWrite, FClose, FErase, Directory | native-functions.md |
 | Network | HttpGet, HttpPost, FWRest, WsRestFul | native-functions.md |
 | System | GetMV, PutMV, SuperGetMV, Conout, FWLogMsg | native-functions.md |
+| Company/Branch | FWCodFil, FWCodEmp, FWFilial, FWCompany, xFilial | native-functions.md |
+| Restricted | StaticCall, PTInternal, PARAMBOX, etc. | restricted-functions.md |
 
 ## Data Dictionary Quick Reference
 

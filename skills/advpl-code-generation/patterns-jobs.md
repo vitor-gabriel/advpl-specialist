@@ -109,13 +109,15 @@ StartJob("U_zProcessa", GetEnvServer(), .F., "99", "01", "PARAM3")
 ### 4.1 Syntax
 
 ```advpl
-lRet := RpcSetEnv(cEmpresa, cFilial, cUsuario, cSenha, cModulo, cFunName, aTables)
+lRet := RpcSetEnv(cCodEmp, cCodFil, cUsuario, cSenha, cModulo, cFunName, aTables)
 ```
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `cEmpresa` | Character | Company code (e.g., `"99"`) |
-| `cFilial` | Character | Branch code (e.g., `"01"`) |
+| `cCodEmp` | Character | Company code (e.g., `"99"`) |
+| `cCodFil` | Character | Branch code (e.g., `"01"`) |
+
+> **IMPORTANT:** Never use `cFilial`, `cFilAnt` or `cEmpAnt` as variable names — these are **reserved Private variables** maintained by the Protheus framework to track company/branch context. Using them as Local variables will shadow the system variables and cause unpredictable behavior. Use `cCodFil`, `cCodEmp` or similar names instead.
 | `cUsuario` | Character | User login (optional) |
 | `cSenha` | Character | User password (optional) |
 | `cModulo` | Character | Module code, e.g., `"FAT"`, `"CTB"` (default: `"FAT"`) |
@@ -239,13 +241,13 @@ Job de processamento em lote
 @version 1.0
 /*/
 User Function zJobLote()
-    Local cEmpresa := "99"
-    Local cFilial  := "01"
+    Local cCodEmp := "99"
+    Local cCodFil := "01"
 
     ConOut("[zJobLote] Iniciando job: " + DToC(Date()) + " " + Time())
 
     // Prepara o ambiente
-    If !RpcSetEnv(cEmpresa, cFilial, "admin", " ", "FAT", "zJobLote")
+    If !RpcSetEnv(cCodEmp, cCodFil, "admin", " ", "FAT", "zJobLote")
         ConOut("[zJobLote] ERRO: Falha ao preparar ambiente.")
         Return Nil
     EndIf

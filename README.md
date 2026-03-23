@@ -1,6 +1,6 @@
 # advpl-specialist
 
-![Version](https://img.shields.io/badge/version-1.0.5-blue)
+![Version](https://img.shields.io/badge/version-1.0.6-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Claude%20Code-blueviolet)
 ![TOTVS](https://img.shields.io/badge/TOTVS-Protheus-orange)
@@ -48,9 +48,9 @@ Repositorio: [https://github.com/thalysjuvenal/advpl-specialist](https://github.
 - **Geracao de codigo** - Funcoes, classes TLPP, MVC, REST APIs, Web Services, pontos de entrada, TReport, FWFormBrowse, Jobs, Workflow
 - **Migracao ADVPL -> TLPP** - Conversao de codigo procedural para orientado a objetos
 - **Diagnostico de erros** - Analise de erros de compilacao, runtime, performance e locks
-- **Revisao de codigo** - Analise de boas praticas, performance, seguranca e modernizacao
+- **Revisao de codigo** - Analise com 23 regras de boas praticas, performance, seguranca e modernizacao (inclui deteccao de funcoes restritas da TOTVS e variaveis reservadas do sistema)
 - **Testes ProBat** - Geracao de testes unitarios para codigo TLPP
-- **Referencia de documentacao** - Funcoes nativas, dicionario SX, APIs REST, parametros MV_*
+- **Referencia de documentacao** - Funcoes nativas, dicionario SX, APIs REST, parametros MV_*, funcoes FW* de empresa/filial, lista de funcoes restritas da TOTVS
 - **Processos de negocio** - Consulta de rotinas, tabelas, integracoes e fluxos de 8 modulos ERP
 - **Explicacao de codigo** - Explicacao em linguagem simples com niveis junior, senior e funcional
 - **Refatoracao** - Sugestoes de melhoria de estrutura com 6 padroes (RF-001 a RF-006)
@@ -181,9 +181,9 @@ Para uma experiencia completa, recomendamos instalar o plugin oficial **superpow
 | `advpl-code-generation` | Padroes e templates para geracao de codigo (MVC, REST, PE, SOAP, TReport, FWFormBrowse, Jobs, Workflow) |
 | `advpl-to-tlpp-migration` | Regras de conversao, checklist e exemplos before/after |
 | `advpl-debugging` | Top 50 erros comuns, metodologia de debug, dicas de performance |
-| `advpl-code-review` | 21 regras de revisao de codigo (boas praticas, performance, seguranca, modernizacao) |
+| `advpl-code-review` | 23 regras de revisao de codigo (boas praticas, performance, seguranca, modernizacao) |
 | `probat-testing` | Framework ProBat para testes unitarios TLPP (annotations, assertions, patterns) |
-| `protheus-reference` | 180+ funcoes nativas, dicionario SX, referencia REST API |
+| `protheus-reference` | 190+ funcoes nativas, dicionario SX, referencia REST API, funcoes FW*, lista de funcoes restritas |
 | `protheus-business` | 8 modulos ERP com tabelas, rotinas, parametros MV_* e integracoes |
 | `embedded-sql` | BeginSQL/EndSQL, macros %table%, %notDel%, %xfilial%, %exp%, column types |
 | `code-explanation` | Metodologia de explicacao de codigo com 3 niveis de audiencia |
@@ -232,11 +232,11 @@ advpl-specialist/
 │   ├── advpl-code-generation/     # Padroes MVC, REST, SOAP, PE, TReport, FWFormBrowse, Jobs, Workflow
 │   ├── advpl-to-tlpp-migration/   # Regras e checklist de migracao
 │   ├── advpl-debugging/           # Erros comuns e performance
-│   ├── advpl-code-review/         # 21 regras de revisao de codigo
+│   ├── advpl-code-review/         # 23 regras de revisao de codigo
 │   ├── probat-testing/            # Testes unitarios ProBat (TLPP)
 │   ├── protheus-business/         # 8 modulos ERP (COM, EST, FAT, FIN, CTB, FIS, PCP, MNT)
 │   ├── embedded-sql/              # BeginSQL/EndSQL, macros, patterns
-│   ├── protheus-reference/        # 180+ funcoes nativas, SX, REST API
+│   ├── protheus-reference/        # 190+ funcoes nativas, SX, REST API, funcoes restritas
 │   ├── code-explanation/          # Explicacao de codigo com 3 niveis de audiencia
 │   ├── advpl-refactoring/         # 6 padroes de refatoracao com before/after
 │   ├── documentation-patterns/    # Templates Protheus.doc, documentacao completa, API
@@ -257,7 +257,9 @@ advpl-specialist/
 
 O plugin inclui referencia local para consulta rapida:
 
-- **180+ funcoes nativas** documentadas com sintaxe, parametros e exemplos
+- **190+ funcoes nativas** documentadas com sintaxe, parametros e exemplos
+- **10 funcoes FW*** de gestao de empresa/filial (FWCodFil, FWCodEmp, FWFilial, FWCompany, etc.)
+- **195+ funcoes restritas** da TOTVS catalogadas com alternativas documentadas
 - **9 tabelas SX** (SX1-SX9, SIX) com campos e uso programatico
 - **REST API patterns** completos para WsRestFul e TLPP annotations
 - **50 erros comuns** com causa e solucao

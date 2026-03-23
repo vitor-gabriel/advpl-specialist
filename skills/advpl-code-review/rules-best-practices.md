@@ -319,3 +319,74 @@ Return nDiscount
 ```
 
 **Why it matters:** Documentation headers enable IDE tooltips, automatic documentation generation, and help other developers understand the function's contract without reading the implementation. They are especially important in large teams and long-lived codebases.
+
+---
+
+## [BP-008] Using reserved system variables as Local/Static variable names
+
+**Severity:** CRITICAL
+
+**Description:** The Protheus framework maintains several `Private` variables to track the current company, branch, and environment context. Declaring a `Local` variable with the same name shadows the system variable, causing loss of context, incorrect data filtering, and hard-to-reproduce bugs in multi-branch/multi-company environments.
+
+**Reserved variable names (NEVER use as Local/Static):**
+
+| Variable | Purpose |
+|----------|---------|
+| `cFilial` | Branch context — used internally by xFilial() and other framework functions |
+| `cFilAnt` | Current branch code — default value for xFilial() second parameter |
+| `cEmpAnt` | Current company/group code — used by FWSizeFilial() and environment functions |
+| `nModulo` | Current module number |
+| `cUsuario` | Current user login |
+
+**Violation:**
+
+```advpl
+User Function MyJob()
+    Local cEmpresa := "99"
+    Local cFilial  := "01"   // WRONG: shadows system Private variable
+
+    RpcSetEnv(cEmpresa, cFilial)
+    // After this call, the system's cFilial Private is overwritten
+    // xFilial() and other functions may return incorrect values
+Return
+```
+
+**Correct:**
+
+```advpl
+User Function MyJob()
+    Local cCodEmp := "99"
+    Local cCodFil := "01"   // Safe: different name from system variable
+
+    RpcSetEnv(cCodEmp, cCodFil)
+    // System's cFilAnt/cEmpAnt are set correctly by RpcSetEnv
+    // xFilial() works as expected
+Return
+```
+
+**Recommended alternatives:**
+
+| Instead of | Use |
+|------------|-----|
+| `cFilial` | `cCodFil` |
+| `cEmpresa` | `cCodEmp` |
+| `cFilAnt` | (never reassign — read-only system variable) |
+| `cEmpAnt` | (never reassign — read-only system variable) |
+
+**Use FW* functions to read company/branch values:**
+
+| Function | Purpose |
+|----------|---------|
+| `FWCodFil()` | Returns current branch code (M0_CODFIL) |
+| `FWCodEmp()` | Returns current company code |
+| `FWFilial(cAlias)` | Returns branch for the given alias (respects sharing mode) |
+| `FWCompany(cAlias)` | Returns company for the given alias |
+| `FWGrpCompany()` | Returns current company group |
+| `FWUnitBusiness(cAlias)` | Returns current business unit |
+| `FWAllFilial()` | Returns array of all branches for current group/company |
+| `FWAllCompany()` | Returns array of all companies for current group |
+| `FWAllGrpCompany()` | Returns array of all company groups |
+| `FWSizeFilial()` | Returns branch field size |
+| `xFilial(cAlias)` | Returns branch for index composition (respects sharing mode) |
+
+**Why it matters:** Shadowing system Private variables is one of the most dangerous bugs in Protheus because it is silent — the code compiles and appears to work in single-branch testing, but fails in multi-branch production environments where branch context is critical for data isolation.
