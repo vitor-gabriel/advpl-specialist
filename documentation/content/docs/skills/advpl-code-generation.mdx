@@ -155,12 +155,16 @@ ErrorBlock(bErrorOld)
 | Erro | Correcao |
 |------|----------|
 | Usar Private em vez de Local | Sempre declarar como Local, passar via parametros |
+| Declarar Local dentro de If/While/For | TODAS as declaracoes Local devem estar no topo da funcao, antes de qualquer codigo executavel |
 | Nao salvar/restaurar area (GetArea/RestArea) | Sempre envolver operacoes de DB com save/restore de area |
 | Sem tratamento de erros | Sempre usar Begin Sequence / Recover / End Sequence |
 | Nao fechar RecLock | Sempre usar MsUnlock() apos RecLock() |
 | Filial (branch) hardcoded | Usar xFilial(cAlias) para compatibilidade multi-filial |
 | Include TOTVS.CH faltando | Sempre incluir no minimo: #Include "TOTVS.CH" |
 | Nao validar parametros da funcao | Verificar ValType() e valores vazios no inicio da funcao |
+| Usar metodos inexistentes de JsonObject | Somente usar metodos documentados: New, FromJSON, toJSON, GetNames, HasProperty, etc. |
+| Usar GetSoapFault() em TWsdlManager | NAO existe — usar propriedades cFaultCode, cFaultString |
+| Usar EnableTitleGroup em FWFormView | NAO existe — usar EnableTitleView |
 
 ## Arquivos de Suporte
 

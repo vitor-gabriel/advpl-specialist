@@ -4390,6 +4390,158 @@ oMessage:AttachFile("\reports\invoice_" + cInvoice + ".pdf")
 
 ---
 
+## TWsdlManager Class Methods
+
+Class for consuming external SOAP Web Services from ADVPL. Loads WSDL, calls operations, and reads responses.
+
+### New (TWsdlManager)
+
+Constructor - creates a new TWsdlManager instance.
+
+**Syntax:** `TWsdlManager():New() --> oWsdl`
+
+**Return:** O - TWsdlManager object.
+
+### ParseURL
+
+Loads and parses a WSDL from a URL.
+
+**Syntax:** `oWsdl:ParseURL( cUrl ) --> lSuccess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cUrl | C | URL of the WSDL |
+
+**Return:** L - `.T.` if WSDL was loaded successfully.
+
+### ParseFile
+
+Loads and parses a WSDL from a local file.
+
+**Syntax:** `oWsdl:ParseFile( cPath ) --> lSuccess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cPath | C | Local file path of the WSDL |
+
+**Return:** L - `.T.` if WSDL was loaded successfully.
+
+### SetOperation
+
+Selects the SOAP operation to call.
+
+**Syntax:** `oWsdl:SetOperation( cOperation ) --> lSuccess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cOperation | C | Operation name from the WSDL |
+
+**Return:** L - `.T.` if operation was found and selected.
+
+### SendSoapMsg
+
+Sends a SOAP envelope message.
+
+**Syntax:** `oWsdl:SendSoapMsg( cXml ) --> lSuccess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cXml | C | Complete SOAP XML envelope |
+
+**Return:** L - `.T.` if message was sent successfully.
+
+### GetParsedResponse
+
+Returns the parsed response body after a successful SendSoapMsg.
+
+**Syntax:** `oWsdl:GetParsedResponse() --> cResponse`
+
+**Return:** C - Parsed response content.
+
+### GetSoapResponse
+
+Returns the raw SOAP XML response.
+
+**Syntax:** `oWsdl:GetSoapResponse() --> cRawXml`
+
+**Return:** C - Raw SOAP XML response.
+
+### GetSoapMsg
+
+Returns the SOAP message that will be or was sent.
+
+**Syntax:** `oWsdl:GetSoapMsg() --> cSoapXml`
+
+**Return:** C - SOAP XML message.
+
+### ListOperations
+
+Lists available operations for the current service port.
+
+**Syntax:** `oWsdl:ListOperations() --> aOperations`
+
+**Return:** A - Array of operation names.
+
+### SetPort
+
+Selects a service port from the WSDL.
+
+**Syntax:** `oWsdl:SetPort( cPort ) --> lSuccess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cPort | C | Port/service name |
+
+**Return:** L - `.T.` if port was selected.
+
+### SetValue
+
+Sets an input parameter value for the operation.
+
+**Syntax:** `oWsdl:SetValue( cParam, cValue ) --> lSuccess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cParam | C | Parameter name |
+| cValue | C | Parameter value |
+
+**Return:** L - `.T.` if value was set.
+
+### Key Properties (TWsdlManager)
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `cError` | C | Last error message |
+| `cFaultCode` | C | SOAP Fault code (check after SendSoapMsg) |
+| `cFaultSubCode` | C | SOAP Fault sub-code |
+| `cFaultString` | C | SOAP Fault description message |
+| `cFaultActor` | C | SOAP Fault actor |
+| `nTimeout` | N | Timeout in seconds (default 120) |
+| `bNoCheckPeerCert` | L | `.T.` to skip SSL certificate validation |
+| `lProcResp` | L | `.T.` to auto-process response (default `.T.`) |
+
+> **IMPORTANT:** SOAP Fault data is accessed via **properties** (`cFaultCode`, `cFaultString`, etc.), NOT via a method. There is NO `GetSoapFault()` method. There is NO `ListServices()` method — use `SetPort()` to select a port and `ListOperations()` to list operations.
+
+**Example:**
+```c
+Local oWsdl := TWsdlManager():New()
+oWsdl:nTimeout := 120
+oWsdl:bNoCheckPeerCert := .T.
+
+If oWsdl:ParseURL(cUrl)
+    oWsdl:SetOperation("OPERACAO")
+    If oWsdl:SendSoapMsg(cEnvelope)
+        If !Empty(oWsdl:cFaultCode)
+            Conout("SOAP Fault: " + oWsdl:cFaultCode + " - " + oWsdl:cFaultString)
+        Else
+            cResp := oWsdl:GetParsedResponse()
+        EndIf
+    EndIf
+EndIf
+```
+
+---
+
 ## Legacy / Compatibility Functions
 
 ### StaticCall (BLOCKED — DO NOT USE)

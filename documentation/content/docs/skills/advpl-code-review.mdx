@@ -47,7 +47,7 @@ Cada achado deve incluir:
 ## Processo de Revisao
 
 1. **Escanear includes e cabecalhos** - Verificar includes obsoletos (`Protheus.ch` vs `TOTVS.CH`), cabecalhos de documentacao faltantes
-2. **Analisar declaracoes de variaveis** - Verificar escopo (`Local` preferido), convencoes de nomenclatura (notacao hungara)
+2. **Analisar declaracoes de variaveis** - Verificar escopo (`Local` preferido), convencoes de nomenclatura (notacao hungara), e que TODAS as declaracoes Local estejam no topo da funcao (nunca dentro de If/While/For)
 3. **Verificar operacoes de banco** - Validar pareamento `RecLock`/`MsUnlock`, uso de `GetArea`/`RestArea`, tratamento de erros em operacoes de DB
 4. **Avaliar queries** - Revisar SQL embutido para `SELECT *`, uso correto de macros (`%exp:`, `%table:`, `%notDel%`), alinhamento de indices
 5. **Inspecionar superficie de seguranca** - Procurar vetores de SQL injection, credenciais hardcoded, dados sensiveis em logs, input REST nao validado
@@ -57,7 +57,7 @@ Cada achado deve incluir:
 
 | Prefixo | Categoria | Exemplo |
 |---------|----------|---------|
-| `BP` | Boas Praticas | `[BP-001]` RecLock sem MsUnlock |
+| `BP` | Boas Praticas | `[BP-001]` RecLock sem MsUnlock, `[BP-002]` Variaveis Local fora do cabecalho da funcao |
 | `PERF` | Performance | `[PERF-001]` SELECT * em SQL embutido |
 | `SEC` | Seguranca | `[SEC-001]` SQL injection via concatenacao de string |
 | `MOD` | Modernizacao | `[MOD-001]` Classe .prw candidata para .tlpp |
