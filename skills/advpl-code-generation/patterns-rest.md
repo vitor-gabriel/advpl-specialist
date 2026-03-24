@@ -104,6 +104,7 @@ Return lRet
 WsMethod POST WsService CUSTOMERS
     Local lRet     := .T.
     Local oJson    := JsonObject():New()
+    Local oResp    := Nil
     Local cBody    := ::GetContent()
     Local nParsed  := 0
     Local aArea    := GetArea()
@@ -152,7 +153,7 @@ WsMethod POST WsService CUSTOMERS
     End Transaction
 
     // Response
-    Local oResp := JsonObject():New()
+    oResp := JsonObject():New()
     oResp["codigo"]  := AllTrim(SA1->A1_COD)
     oResp["loja"]    := AllTrim(SA1->A1_LOJA)
     oResp["nome"]    := AllTrim(SA1->A1_NOME)
@@ -175,6 +176,7 @@ Return lRet
 WsMethod PUT WsReceive cCodigo, cLoja WsService CUSTOMERS
     Local lRet     := .T.
     Local oJson    := JsonObject():New()
+    Local oResp    := Nil
     Local cBody    := ::GetContent()
     Local nParsed  := 0
     Local aArea    := GetArea()
@@ -223,7 +225,7 @@ WsMethod PUT WsReceive cCodigo, cLoja WsService CUSTOMERS
         MsUnlock()
     End Transaction
 
-    Local oResp := JsonObject():New()
+    oResp := JsonObject():New()
     oResp["codigo"]  := AllTrim(SA1->A1_COD)
     oResp["loja"]    := AllTrim(SA1->A1_LOJA)
     oResp["message"] := "Cliente alterado com sucesso"
@@ -243,6 +245,7 @@ Return lRet
 ```advpl
 WsMethod DELETE WsReceive cCodigo, cLoja WsService CUSTOMERS
     Local lRet  := .T.
+    Local oResp := Nil
     Local aArea := GetArea()
 
     If !ValidToken(Self)
@@ -268,7 +271,7 @@ WsMethod DELETE WsReceive cCodigo, cLoja WsService CUSTOMERS
         MsUnlock()
     End Transaction
 
-    Local oResp := JsonObject():New()
+    oResp := JsonObject():New()
     oResp["message"] := "Cliente excluido com sucesso"
 
     ::SetContentType("application/json")
@@ -284,15 +287,16 @@ Return lRet
 
 ```advpl
 Static Function ValidToken(oSelf)
-    Local lValid     := .F.
+    Local lValid      := .F.
     Local cAuthHeader := ""
+    Local cToken      := ""
 
     cAuthHeader := oSelf:GetHeader("Authorization")
 
     If !Empty(cAuthHeader)
         // Exemplo: validar Bearer token
         If Left(cAuthHeader, 7) == "Bearer "
-            Local cToken := SubStr(cAuthHeader, 8)
+            cToken := SubStr(cAuthHeader, 8)
             // Valide o token contra sua base/cache
             lValid := ValidateJWT(cToken) // Implementar conforme necessidade
         EndIf
@@ -328,6 +332,7 @@ API REST de Produtos usando TLPP
 @Get("")
 Function getProducts()
     Local oJson    := JsonObject():New()
+    Local oItem    := Nil
     Local aResult  := {}
     Local aArea    := GetArea()
     Local cPage    := oRest:getQueryString():getValue("page")
@@ -345,7 +350,7 @@ Function getProducts()
         If xFilial("SB1") == SB1->B1_FILIAL
             nSkip--
             If nSkip < 0
-                Local oItem := JsonObject():New()
+                oItem := JsonObject():New()
                 oItem["codigo"]    := AllTrim(SB1->B1_COD)
                 oItem["descricao"] := AllTrim(SB1->B1_DESC)
                 oItem["tipo"]      := AllTrim(SB1->B1_TIPO)
@@ -378,6 +383,7 @@ Return .T.
 @RestService("/api/v1/products")
 @Get("/{codigo}")
 Function getProductById()
+    Local oJson    := Nil
     Local aArea    := GetArea()
     Local cCodigo  := oRest:getPathParamsRequest():getValue("codigo")
 
@@ -391,7 +397,7 @@ Function getProductById()
         Return .T.
     EndIf
 
-    Local oJson := JsonObject():New()
+    oJson := JsonObject():New()
     oJson["codigo"]    := AllTrim(SB1->B1_COD)
     oJson["descricao"] := AllTrim(SB1->B1_DESC)
     oJson["tipo"]      := AllTrim(SB1->B1_TIPO)
@@ -415,6 +421,7 @@ Return .T.
 @Post("")
 Function createProduct()
     Local oJson   := JsonObject():New()
+    Local oResp   := Nil
     Local cBody   := oRest:getBody()
     Local nParsed := oJson:FromJson(cBody)
     Local aArea   := GetArea()
@@ -446,7 +453,7 @@ Function createProduct()
         ConfirmSX8()
     End Transaction
 
-    Local oResp := JsonObject():New()
+    oResp := JsonObject():New()
     oResp["codigo"]    := AllTrim(SB1->B1_COD)
     oResp["descricao"] := AllTrim(SB1->B1_DESC)
     oResp["message"]   := "Produto criado com sucesso"
@@ -467,6 +474,7 @@ Return .T.
 @Put("/{codigo}")
 Function updateProduct()
     Local oJson   := JsonObject():New()
+    Local oResp   := Nil
     Local cBody   := oRest:getBody()
     Local nParsed := oJson:FromJson(cBody)
     Local cCodigo := oRest:getPathParamsRequest():getValue("codigo")
@@ -507,7 +515,7 @@ Function updateProduct()
         MsUnlock()
     End Transaction
 
-    Local oResp := JsonObject():New()
+    oResp := JsonObject():New()
     oResp["message"] := "Produto atualizado com sucesso"
 
     oRest:setResponse(oResp:ToJson())
@@ -559,7 +567,11 @@ Return .T.
 ### 3.1 Creating JSON from ADVPL Data
 
 ```advpl
-Local oJson := JsonObject():New()
+Local oJson  := JsonObject():New()
+Local oItem1 := Nil
+Local oItem2 := Nil
+Local aItens := {}
+Local cJson  := ""
 
 // Simple values
 oJson["nome"]      := "Produto Teste"
@@ -575,13 +587,12 @@ oJson["endereco"]["numero"] := "100"
 oJson["endereco"]["cidade"] := "Sao Paulo"
 
 // Array of objects
-Local aItens := {}
-Local oItem1 := JsonObject():New()
+oItem1 := JsonObject():New()
 oItem1["produto"] := "PROD001"
 oItem1["quant"]   := 10
 aAdd(aItens, oItem1)
 
-Local oItem2 := JsonObject():New()
+oItem2 := JsonObject():New()
 oItem2["produto"] := "PROD002"
 oItem2["quant"]   := 5
 aAdd(aItens, oItem2)
@@ -589,7 +600,7 @@ aAdd(aItens, oItem2)
 oJson["itens"] := aItens
 
 // Convert to string
-Local cJson := oJson:ToJson()
+cJson := oJson:ToJson()
 // Result: {"nome":"Produto Teste","codigo":123,"ativo":true,...}
 
 FreeObj(oJson)
@@ -600,7 +611,13 @@ FreeObj(oJson)
 ```advpl
 Local oJson   := JsonObject():New()
 Local cBody   := '{"nome":"Teste","valor":100,"itens":[{"cod":"001"},{"cod":"002"}]}'
-Local nResult := oJson:FromJson(cBody)
+Local nResult := 0
+Local cNome   := ""
+Local nValor  := 0
+Local aItens  := {}
+Local nI      := 0
+
+nResult := oJson:FromJson(cBody)
 
 If nResult <> 0
     Conout("Erro ao parsear JSON na posicao: " + cValToChar(nResult))
@@ -609,12 +626,11 @@ If nResult <> 0
 EndIf
 
 // Accessing values
-Local cNome  := oJson["nome"]      // "Teste"
-Local nValor := oJson["valor"]     // 100
+cNome  := oJson["nome"]      // "Teste"
+nValor := oJson["valor"]     // 100
 
 // Accessing array
-Local aItens := oJson["itens"]
-Local nI     := 0
+aItens := oJson["itens"]
 For nI := 1 To Len(aItens)
     Conout("Item: " + aItens[nI]["cod"])
 Next nI
@@ -630,16 +646,19 @@ FreeObj(oJson)
 ### 3.3 JSON Array Response
 
 ```advpl
-Local oJsonArr := JsonObject():New()
-Local aResult  := {}
+Local oJsonArr  := JsonObject():New()
+Local oObj1     := Nil
+Local oObj2     := Nil
+Local aResult   := {}
+Local cResponse := ""
 
 // Build array of objects
-Local oObj1 := JsonObject():New()
+oObj1 := JsonObject():New()
 oObj1["id"]   := 1
 oObj1["nome"] := "Item 1"
 aAdd(aResult, oObj1)
 
-Local oObj2 := JsonObject():New()
+oObj2 := JsonObject():New()
 oObj2["id"]   := 2
 oObj2["nome"] := "Item 2"
 aAdd(aResult, oObj2)
@@ -647,7 +666,7 @@ aAdd(aResult, oObj2)
 oJsonArr["data"]  := aResult
 oJsonArr["total"] := Len(aResult)
 
-Local cResponse := oJsonArr:ToJson()
+cResponse := oJsonArr:ToJson()
 // {"data":[{"id":1,"nome":"Item 1"},{"id":2,"nome":"Item 2"}],"total":2}
 
 FreeObj(oJsonArr)
@@ -661,8 +680,9 @@ FreeObj(oJsonArr)
 
 ```advpl
 Static Function ValidToken(oSelf)
-    Local lValid     := .F.
+    Local lValid      := .F.
     Local cAuthHeader := ""
+    Local cToken      := ""
 
     cAuthHeader := oSelf:GetHeader("Authorization")
 
@@ -674,7 +694,7 @@ Static Function ValidToken(oSelf)
         Return .F.
     EndIf
 
-    Local cToken := SubStr(cAuthHeader, 8)
+    cToken := SubStr(cAuthHeader, 8)
 
     // Opcao 1: Validar contra tabela de tokens
     DbSelectArea("SZ9") // Tabela customizada de tokens
@@ -693,19 +713,26 @@ Return lValid
 ```advpl
 Static Function ValidBasicAuth(oSelf)
     Local lValid      := .F.
-    Local cAuthHeader := oSelf:GetHeader("Authorization")
+    Local cAuthHeader := ""
+    Local cBase64     := ""
+    Local cDecoded    := ""
+    Local nPos        := 0
+    Local cUser       := ""
+    Local cPass       := ""
+
+    cAuthHeader := oSelf:GetHeader("Authorization")
 
     If Empty(cAuthHeader) .Or. Left(cAuthHeader, 6) <> "Basic "
         Return .F.
     EndIf
 
-    Local cBase64  := SubStr(cAuthHeader, 7)
-    Local cDecoded := Decode64(cBase64)
-    Local nPos     := At(":", cDecoded)
+    cBase64  := SubStr(cAuthHeader, 7)
+    cDecoded := Decode64(cBase64)
+    nPos     := At(":", cDecoded)
 
     If nPos > 0
-        Local cUser := Left(cDecoded, nPos - 1)
-        Local cPass := SubStr(cDecoded, nPos + 1)
+        cUser := Left(cDecoded, nPos - 1)
+        cPass := SubStr(cDecoded, nPos + 1)
 
         // Validar usuario e senha contra base
         lValid := FWCheckPass(cUser, cPass) // Funcao customizada
@@ -771,6 +798,7 @@ CORSMethods=GET,POST,PUT,DELETE,OPTIONS
 ```advpl
 Static Function GetPaginated(cAlias, nPage, nPageSize, oFilter)
     Local aResult := {}
+    Local oResp   := Nil
     Local nSkip   := (nPage - 1) * nPageSize
     Local nCount  := 0
     Local nTotal  := 0
@@ -800,7 +828,7 @@ Static Function GetPaginated(cAlias, nPage, nPageSize, oFilter)
         DbSkip()
     EndWh
 
-    Local oResp := JsonObject():New()
+    oResp := JsonObject():New()
     oResp["items"]      := aResult
     oResp["page"]       := nPage
     oResp["pageSize"]   := nPageSize
@@ -818,8 +846,9 @@ Return oResp
 WsMethod GET WsReceive cNome, cCidade, cEstado WsService CUSTOMERS
 
     // TLPP approach
-    Local cNome   := oRest:getQueryString():getValue("nome")
-    Local cCidade := oRest:getQueryString():getValue("cidade")
+    Local cNome    := oRest:getQueryString():getValue("nome")
+    Local cCidade  := oRest:getQueryString():getValue("cidade")
+    Local lInclude := .F.
 
     // Build filter
     DbSelectArea("SA1")
@@ -827,7 +856,7 @@ WsMethod GET WsReceive cNome, cCidade, cEstado WsService CUSTOMERS
     DbGoTop()
 
     While !Eof()
-        Local lInclude := .T.
+        lInclude := .T.
 
         If !Empty(cNome) .And. !(AllTrim(cNome) $ Upper(SA1->A1_NOME))
             lInclude := .F.
@@ -908,6 +937,7 @@ Static Function QueryCustomers(cWhere, nPage, nPageSize)
     Local cQuery  := ""
     Local cAlias  := GetNextAlias()
     Local aResult := {}
+    Local oItem   := Nil
 
     cQuery := "SELECT A1_COD, A1_LOJA, A1_NOME, A1_CGC, A1_EMAIL "
     cQuery += "FROM " + RetSqlName("SA1") + " SA1 "
@@ -928,7 +958,7 @@ Static Function QueryCustomers(cWhere, nPage, nPageSize)
     TCQuery cQuery New Alias (cAlias)
 
     While !(cAlias)->(Eof())
-        Local oItem := JsonObject():New()
+        oItem := JsonObject():New()
         oItem["codigo"] := AllTrim((cAlias)->A1_COD)
         oItem["loja"]   := AllTrim((cAlias)->A1_LOJA)
         oItem["nome"]   := AllTrim((cAlias)->A1_NOME)

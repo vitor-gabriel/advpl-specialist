@@ -715,8 +715,9 @@ Return oResult
 
 // Find all with pagination and optional filter
 Method FindAll(nPage, nPageSize, cFiltro) Class ClienteRepository
-    Local aResult := {}
-    Local cQuery  := ""
+    Local aResult   := {}
+    Local oItem     := Nil
+    Local cQuery    := ""
     Local cTmpAlias := GetNextAlias()
 
     Default nPage     := 1
@@ -739,7 +740,7 @@ Method FindAll(nPage, nPageSize, cFiltro) Class ClienteRepository
     TCQuery cQuery New Alias (cTmpAlias)
 
     While !(cTmpAlias)->(Eof())
-        Local oItem := JsonObject():New()
+        oItem := JsonObject():New()
         oItem["codigo"]   := AllTrim((cTmpAlias)->A1_COD)
         oItem["loja"]     := AllTrim((cTmpAlias)->A1_LOJA)
         oItem["nome"]     := AllTrim((cTmpAlias)->A1_NOME)

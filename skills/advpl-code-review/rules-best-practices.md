@@ -53,7 +53,59 @@ Return
 
 ---
 
-## [BP-002] Variables declared as Private or Public instead of Local
+## [BP-002] Local variables declared outside the function header
+
+**Severity:** ERROR
+
+**Description:** In ADVPL/TLPP, ALL `Local` variable declarations MUST appear at the top of the function, immediately after the function signature and before any executable code. Declaring `Local` inside `If`, `While`, `For` blocks, or after any executable statement is a violation that can cause compilation errors or unpredictable behavior.
+
+**What to look for:** `Local` keyword appearing after any executable statement (DbSelectArea, If, While, RecLock, assignments, function calls, etc.).
+
+**Violation:**
+
+```advpl
+User Function ProcessData()
+    Local aArea := GetArea()
+    Local cAlias := "SA1"
+
+    DbSelectArea(cAlias)
+    DbSetOrder(1)
+
+    If DbSeek(xFilial("SA1") + "000001")
+        Local cNome := AllTrim(SA1->A1_NOME)  // WRONG: Local inside If block
+        Local nSaldo := SA1->A1_SALDO         // WRONG: Local after executable code
+    EndIf
+
+    RestArea(aArea)
+Return cNome
+```
+
+**Correct:**
+
+```advpl
+User Function ProcessData()
+    Local aArea  := GetArea()
+    Local cAlias := "SA1"
+    Local cNome  := ""
+    Local nSaldo := 0
+
+    DbSelectArea(cAlias)
+    DbSetOrder(1)
+
+    If DbSeek(xFilial("SA1") + "000001")
+        cNome  := AllTrim(SA1->A1_NOME)
+        nSaldo := SA1->A1_SALDO
+    EndIf
+
+    RestArea(aArea)
+Return cNome
+```
+
+**Why it matters:** ADVPL/TLPP requires all variable declarations at the function header. Declaring variables in the middle of executable code violates the language specification and can lead to compilation errors in strict mode or undefined behavior. Variables that are conditionally needed should be declared at the top with a default value (Nil, "", 0, .F., {}) and assigned later.
+
+---
+
+## [BP-002b] Variables declared as Private or Public instead of Local
 
 **Severity:** WARNING
 

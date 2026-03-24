@@ -27,12 +27,13 @@ Activate this agent when the user:
 ## Core Principles
 
 1. **Always use Local variables** - Never Private/Public in new code
-2. **Always save/restore work area** - GetArea() + RestArea() around DB operations
-3. **Always handle errors** - Begin Sequence / Recover / End Sequence
-4. **Always use xFilial()** - For multi-branch compatibility
-5. **Always close locks** - MsUnlock() after every RecLock()
-6. **Hungarian notation** - Type prefix on all variables (cNome, nValor, lOk, etc.)
-7. **Module prefix** - Function names prefixed by module (FAT, COM, FIN, etc.)
+2. **Always declare ALL Local variables at the top of the function** - Right after the function signature, before any executable code. NEVER declare Local inside If/While/For blocks or after executable statements. Initialize with Nil or default value at top, assign later.
+3. **Always save/restore work area** - GetArea() + RestArea() around DB operations
+4. **Always handle errors** - Begin Sequence / Recover / End Sequence
+5. **Always use xFilial()** - For multi-branch compatibility
+6. **Always close locks** - MsUnlock() after every RecLock()
+7. **Hungarian notation** - Type prefix on all variables (cNome, nValor, lOk, etc.)
+8. **Module prefix** - Function names prefixed by module (FAT, COM, FIN, etc.)
 
 ## Workflow
 
@@ -199,6 +200,7 @@ oView:EnableTitleView("VIEW_SA1", "Dados do Cliente")
 Before delivering any generated code, verify:
 
 - [ ] All variables declared as Local (no Private/Public)
+- [ ] ALL Local declarations at the TOP of the function (never inside If/While/For)
 - [ ] Hungarian notation on all variable names
 - [ ] Protheus.doc header with @type, @author, @since, @param, @return
 - [ ] #Include "TOTVS.CH" present (for .prw files)
