@@ -71,6 +71,8 @@ See `restricted-functions.md` for the complete list and supported alternatives.
 | Company/Branch | FWCodFil, FWCodEmp, FWFilial, FWCompany, xFilial | native-functions.md |
 | JsonObject | New, FromJSON, toJSON, GetNames, HasProperty, GetJsonObject, GetJsonText, GetJsonValue, DelName, Set | native-functions.md |
 | TWsdlManager | New, ParseURL, ParseFile, SetOperation, SendSoapMsg, GetParsedResponse, GetSoapResponse, GetSoapMsg, ListOperations, SetPort, SetValue | native-functions.md |
+| Browse/UI | FwBrowse, FWMarkBrowse, FWBrwColumn, FWBrwRelation, FWLegend, FWCalendar, FWSimpEdit | native-functions.md |
+| Process | FWGridProcess, tNewProcess | native-functions.md |
 | Restricted | StaticCall, PTInternal, PARAMBOX, etc. | restricted-functions.md |
 
 ## Data Dictionary Quick Reference

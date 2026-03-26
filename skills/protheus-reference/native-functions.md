@@ -4827,6 +4827,413 @@ EndIf
 
 ---
 
+## FwBrowse Class
+
+Browsing component for displaying tabular data from tables, queries, or arrays. Supports legends, filters, column customization, and user profiles.
+
+### New (FwBrowse)
+
+Constructor.
+
+**Syntax:** `FWBrowse():New( [oOwner] ) --> oSelf`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| oOwner | O | Owner container object (optional) |
+
+**Return:** O - FwBrowse object.
+
+### Key Methods
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| `Activate()` | `oBrowse:Activate()` | Activates (renders) the browse |
+| `SetAlias(cAlias)` | `oBrowse:SetAlias("SA1")` | Sets the table alias for the browse |
+| `SetQuery(cQuery)` | `oBrowse:SetQuery(cQuery)` | Sets a SQL query as data source |
+| `SetQueryIndex(aIndex)` | `oBrowse:SetQueryIndex(aIdx)` | Sets indexes for query-based browse |
+| `SetDescription(cDesc)` | `oBrowse:SetDescription("Title")` | Sets the browse description/title |
+| `SetFilterDefault(cFilter)` | `oBrowse:SetFilterDefault(cFlt)` | Sets default ADVPL filter expression |
+| `SetProfileID(cID)` | `oBrowse:SetProfileID("BRW01")` | Sets profile identifier for user settings |
+| `SetOwner(oOwner)` | `oBrowse:SetOwner(oDlg)` | Sets the container for the browse |
+| `AddColumn(aColumn)` | `oBrowse:AddColumn(aCol)` | Adds a column to the browse |
+| `AddLegend(xCond, cColor, cTitle)` | `oBrowse:AddLegend(...)` | Adds a color legend |
+| `SetMenuDef(cFuncMenu)` | `oBrowse:SetMenuDef("MyFunc")` | Sets the MenuDef function for actions |
+| `DisableDetails()` | `oBrowse:DisableDetails()` | Disables the details panel |
+| `SetFieldBrowse(cFields)` | `oBrowse:SetFieldBrowse(cFlds)` | Sets which fields to display |
+| `SetColumns(aColumns)` | `oBrowse:SetColumns(aCols)` | Sets columns from array |
+
+**AddLegend parameters:**
+
+| Param | Type | Description |
+|-------|------|-------------|
+| xCondition | C/B | Condition expression or code block |
+| cColor | C | Legend color (e.g., "GREEN", "RED", "YELLOW", "BR_BLUE") |
+| cTitle | C | Legend description text |
+| cID | C | Legend identifier (optional) |
+| lFilter | L | Allow filtering by this legend (optional) |
+
+**Example:**
+```advpl
+Local oBrowse := FWBrowse():New()
+Local oDlg    := Nil
+
+oDlg := TDialog():New(0, 0, 400, 600, "Browse Example")
+
+oBrowse:SetOwner(oDlg)
+oBrowse:SetAlias("SA1")
+oBrowse:SetDescription("Client List")
+oBrowse:SetProfileID("SA1BRW")
+oBrowse:AddLegend("SA1->A1_MSBLQL == '1'", "RED", "Blocked")
+oBrowse:AddLegend("SA1->A1_MSBLQL != '1'", "GREEN", "Active")
+oBrowse:Activate()
+
+oDlg:Activate()
+```
+
+---
+
+## FWMarkBrowse Class
+
+Extended browse component with record selection (marking/checking). Used for batch operations where users select multiple records before processing.
+
+### New (FWMarkBrowse)
+
+Constructor.
+
+**Syntax:** `FWMarkBrowse():New() --> oSelf`
+
+**Return:** O - FWMarkBrowse object.
+
+### Key Methods
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| `SetAlias(cAlias)` | `oMark:SetAlias("SA1")` | Sets the table alias |
+| `SetDescription(cDesc)` | `oMark:SetDescription("Title")` | Sets the browse description |
+| `SetFieldMark(cField)` | `oMark:SetFieldMark("X1_FLAG")` | Sets the temporary field for marking |
+| `SetTemporary(cAlias)` | `oMark:SetTemporary(cTmp)` | Sets the temporary table for mark state |
+| `SetMark(cMark, cFieldMark, cValMark, bSetMark)` | `oMark:SetMark(...)` | Configures mark column behavior |
+| `SetOwner(oOwner)` | `oMark:SetOwner(oDlg)` | Sets the container |
+| `SetProfileID(cID)` | `oMark:SetProfileID("MRK01")` | Sets profile identifier |
+| `SetFilterDefault(cFilter)` | `oMark:SetFilterDefault(cFlt)` | Sets default filter |
+| `AddLegend(xCond, cColor, cTitle)` | `oMark:AddLegend(...)` | Adds a color legend |
+| `AddColumn(aColumn)` | `oMark:AddColumn(aCol)` | Adds a column |
+| `Activate()` | `oMark:Activate()` | Activates the browse |
+| `DisableDetails()` | `oMark:DisableDetails()` | Disables details panel |
+| `SetAction(cAction, bBlock, cTitle)` | `oMark:SetAction(...)` | Sets action buttons |
+| `IsMarked(cAlias)` | `oMark:IsMarked()` | Checks if current record is marked |
+| `MarkAll()` | `oMark:MarkAll()` | Marks all visible records |
+| `UnMarkAll()` | `oMark:UnMarkAll()` | Unmarks all records |
+
+**Example:**
+```advpl
+Local oMark   := FWMarkBrowse():New()
+Local oDlg    := Nil
+
+oDlg := TDialog():New(0, 0, 400, 600, "Select Clients")
+
+oMark:SetOwner(oDlg)
+oMark:SetAlias("SA1")
+oMark:SetDescription("Select Clients to Process")
+oMark:SetProfileID("SA1MRK")
+oMark:Activate()
+
+oDlg:Activate()
+```
+
+---
+
+## FWBrwColumn Class
+
+Represents a single column in a FwBrowse. Used to customize individual column appearance and behavior.
+
+### New (FWBrwColumn)
+
+Constructor.
+
+**Syntax:** `FWBrwColumn():New() --> oColumn`
+
+**Return:** O - FWBrwColumn object.
+
+### Key Methods/Properties
+
+| Method/Property | Description |
+|-----------------|-------------|
+| `SetData(bData)` | Sets the code block that returns the column value |
+| `SetTitle(cTitle)` | Sets the column header title |
+| `SetSize(nSize)` | Sets the column width in pixels |
+| `SetAlign(nAlign)` | Sets text alignment (0=Left, 1=Center, 2=Right) |
+| `SetPicture(cPicture)` | Sets the display format mask |
+| `SetType(cType)` | Sets the data type (C, N, D, L) |
+| `SetVisible(lVisible)` | Shows/hides the column |
+
+**Example:**
+```advpl
+Local oColumn := FWBrwColumn():New()
+
+oColumn:SetData({|| SA1->A1_COD})
+oColumn:SetTitle("Code")
+oColumn:SetSize(80)
+oColumn:SetAlign(0)
+
+oBrowse:AddColumn(oColumn)
+```
+
+---
+
+## FWBrwRelation Class
+
+Manages relationships between two FwBrowse objects, where the detail browse filters based on the master browse's current record (master-detail).
+
+### New (FWBrwRelation)
+
+Constructor.
+
+**Syntax:** `FWBrwRelation():New( oMaster, oDetail ) --> oRelation`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| oMaster | O | Master FwBrowse object |
+| oDetail | O | Detail FwBrowse object |
+
+**Return:** O - FWBrwRelation object.
+
+### Key Methods
+
+| Method | Description |
+|--------|-------------|
+| `SetExpression(cExpr)` | Sets the relationship expression to filter the detail |
+| `Activate()` | Activates the master-detail relationship |
+
+**Example:**
+```advpl
+Local oMaster   := FWBrowse():New()
+Local oDetail   := FWBrowse():New()
+Local oRelation := FWBrwRelation():New(oMaster, oDetail)
+
+oMaster:SetAlias("SC5")
+oDetail:SetAlias("SC6")
+
+oRelation:SetExpression("SC5->C5_NUM == SC6->C6_NUM")
+oRelation:Activate()
+```
+
+---
+
+## FWLegend Class
+
+Creates a color legend panel for use with browses or dialogs. Displays colored boxes with descriptive text.
+
+### New (FWLegend)
+
+Constructor.
+
+**Syntax:** `FWLegend():New( oOwner, nTop, nLeft, nBottom, nRight ) --> oLegend`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| oOwner | O | Owner container object |
+| nTop | N | Top position |
+| nLeft | N | Left position |
+| nBottom | N | Bottom position |
+| nRight | N | Right position |
+
+**Return:** O - FWLegend object.
+
+### Key Methods
+
+| Method | Description |
+|--------|-------------|
+| `Add(cID, cColor, cTitle)` | Adds a legend entry with color and description |
+| `Activate()` | Renders the legend panel |
+
+**Example:**
+```advpl
+Local oLegend := FWLegend():New(oDlg, 10, 10, 80, 200)
+
+oLegend:Add("01", "GREEN", "Active")
+oLegend:Add("02", "RED", "Blocked")
+oLegend:Add("03", "YELLOW", "Pending")
+oLegend:Activate()
+```
+
+---
+
+## FWGridProcess Class
+
+Progress bar dialog for monitoring batch operations. Shows a progress indicator, current step description, and elapsed time.
+
+### New (FWGridProcess)
+
+Constructor.
+
+**Syntax:** `FWGridProcess():New( cTitle, nTotal ) --> oProcess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cTitle | C | Process title displayed in the dialog |
+| nTotal | N | Total number of steps (for percentage calculation) |
+
+**Return:** O - FWGridProcess object.
+
+### Key Methods
+
+| Method | Description |
+|--------|-------------|
+| `SetRegua(nTotal)` | Sets/resets the total step count |
+| `IncRegua(cMessage)` | Increments progress by 1 and displays a message |
+| `SetValue(nCurrent)` | Sets the current progress value directly |
+| `Activate()` | Shows the progress dialog |
+| `Deactivate()` | Closes the progress dialog |
+| `Cancel()` | Checks if the user clicked Cancel |
+
+**Example:**
+```advpl
+Local oProcess := FWGridProcess():New("Processing Invoices", 100)
+
+oProcess:Activate()
+
+For nI := 1 To 100
+    oProcess:IncRegua("Processing invoice " + cValToChar(nI))
+    // ... process logic
+    If oProcess:Cancel()
+        Exit
+    EndIf
+Next nI
+
+oProcess:Deactivate()
+```
+
+---
+
+## tNewProcess Class
+
+Extended process monitoring class with percentage bar, step description, and elapsed/estimated time. Preferred for long-running batch processes.
+
+### New (tNewProcess)
+
+Constructor.
+
+**Syntax:** `tNewProcess():New( bProcess, cTitle, cMsg, lAbortable ) --> oProcess`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| bProcess | B | Code block with the process logic |
+| cTitle | C | Title of the progress dialog |
+| cMsg | C | Initial message |
+| lAbortable | L | `.T.` if user can cancel the process |
+
+**Return:** O - tNewProcess object.
+
+### Key Methods
+
+| Method | Description |
+|--------|-------------|
+| `SetRegua1(nTotal)` | Sets total for the primary progress bar |
+| `SetRegua2(nTotal)` | Sets total for the secondary progress bar |
+| `IncRegua1(cMsg)` | Increments the primary bar and shows message |
+| `IncRegua2(cMsg)` | Increments the secondary bar and shows message |
+| `Activate()` | Starts the process and shows the dialog |
+| `lEnd` | Property - `.T.` if user requested cancel |
+
+**Example:**
+```advpl
+Local oProcess := tNewProcess():New({|oPrc| MyBatchProcess(oPrc)}, ;
+                                     "Processing", ;
+                                     "Starting...", ;
+                                     .T.)
+oProcess:Activate()
+
+Static Function MyBatchProcess(oProcess)
+    Local aItems := GetItems()
+    Local nI     := 0
+
+    oProcess:SetRegua1(Len(aItems))
+
+    For nI := 1 To Len(aItems)
+        oProcess:IncRegua1("Processing item " + cValToChar(nI))
+        // ... process logic
+        If oProcess:lEnd
+            Exit
+        EndIf
+    Next nI
+Return
+```
+
+---
+
+## FWCalendar Class
+
+Calendar dialog component for date selection. Displays a monthly calendar with navigation and date picking.
+
+### New (FWCalendar)
+
+Constructor.
+
+**Syntax:** `FWCalendar():New( oOwner ) --> oCalendar`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| oOwner | O | Owner container object |
+
+**Return:** O - FWCalendar object.
+
+### Key Methods
+
+| Method | Description |
+|--------|-------------|
+| `SetDate(dDate)` | Sets the initially selected date |
+| `GetDate()` | Returns the selected date |
+| `SetBlock(bBlock)` | Sets a code block executed when a date is selected |
+| `SetHolidays(aHolidays)` | Sets array of holiday dates to highlight |
+| `Activate()` | Renders the calendar |
+
+**Example:**
+```advpl
+Local oCalendar := FWCalendar():New(oDlg)
+
+oCalendar:SetDate(Date())
+oCalendar:SetBlock({|dDate| ProcessDate(dDate)})
+oCalendar:Activate()
+```
+
+---
+
+## FWSimpEdit Class
+
+Simple record editing dialog. Provides a quick form for editing fields of a single record without the complexity of MVC.
+
+### New (FWSimpEdit)
+
+Constructor.
+
+**Syntax:** `FWSimpEdit():New( cAlias, aFields, cTitle ) --> oEdit`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cAlias | C | Table alias |
+| aFields | A | Array of field names to edit |
+| cTitle | C | Dialog title |
+
+**Return:** O - FWSimpEdit object.
+
+### Key Methods
+
+| Method | Description |
+|--------|-------------|
+| `SetReadOnly(lRead)` | Sets the form as read-only |
+| `SetCanSave(lSave)` | Enables/disables save button |
+| `Activate()` | Shows the edit dialog |
+
+**Example:**
+```advpl
+Local oEdit := FWSimpEdit():New("SA1", {"A1_COD", "A1_LOJA", "A1_NOME", "A1_END"}, "Edit Client")
+
+oEdit:Activate()
+```
+
+---
+
 ## Legacy / Compatibility Functions
 
 ### StaticCall (BLOCKED — DO NOT USE)
