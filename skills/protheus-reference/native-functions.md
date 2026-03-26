@@ -6215,6 +6215,787 @@ Local aRet := FwComAltInf({'CO_KPP', 'CO_INN'})
 
 ---
 
+## Chart and Tree Classes
+
+### FwChartFactory
+
+Factory class for creating charts. Supports pie, bar, line, funnel, and radar charts with single or multi-series data. Note: `SaveToPng` is deprecated — TOTVS recommends migrating to SmartView.
+
+**Syntax:** `FwChartFactory():New() --> oChart`
+
+**Return:** O - FwChartFactory object.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| SetOwner | `SetOwner( oPanel )` | Sets the panel where the chart will be created |
+| AddSerie | `AddSerie( cTitle, uValue )` | Adds a series. Single: numeric. Multi: array of numerics |
+| SetXAxis | `SetXAxis( aXAxis )` | Sets series descriptions for multi-series charts |
+| SetChartDefault | `SetChartDefault( nChartType )` | Chart type: RADARCHART, FUNNELCHART, COLUMNCHART, NEWPIECHART, NEWLINECHART |
+| SetTitle | `SetTitle( cTitle [, nAlign] )` | Sets chart title. nAlign: CONTROL_ALIGN_LEFT/CENTER/RIGHT |
+| SetLegend | `SetLegend( nAlign )` | Legend position: CONTROL_ALIGN_NONE/LEFT/TOP/RIGHT/BOTTOM |
+| SetAlignSerieLabel | `SetAlignSerieLabel( nAlign )` | Label alignment (funnel chart only) |
+| setMask | `setMask( cMask )` | Tooltip mask (e.g., "R$ *@*") |
+| setPicture | `setPicture( cPicture )` | Value picture (e.g., "@E 999,999.99") |
+| EnableMenu | `EnableMenu( lEnable )` | Enable/disable chart type switching menu |
+| Activate | `Activate()` | Activates and renders the chart |
+| DeActivate | `DeActivate()` | Deactivates for refresh/rebuild |
+
+**Example:**
+```advpl
+Local oDlg, oChart, oPanel
+
+DEFINE DIALOG oDlg TITLE "Chart" SIZE 800,600 PIXEL
+oPanel := TPanel():New(,,, oDlg)
+oPanel:Align := CONTROL_ALIGN_ALLCLIENT
+
+oChart := FWChartFactory():New()
+oChart:SetOwner(oPanel)
+oChart:AddSerie("Sales",    96)
+oChart:AddSerie("Pipeline", 100)
+oChart:AddSerie("Closed",   80)
+oChart:SetChartDefault(COLUMNCHART)
+oChart:SetTitle("Revenue", CONTROL_ALIGN_CENTER)
+oChart:Activate()
+
+ACTIVATE DIALOG oDlg CENTERED
+```
+
+---
+
+### XTree
+
+Creates a treeview (hierarchical tree) object with nodes and items. Supports images, click/double-click/right-click events, and dynamic item manipulation.
+
+**Syntax:** `XTree():New( [nTop], [nLeft], [nWidth], [nHeight], [oOwner], [uChange], [uRClick], [bDblClick] ) --> oTree`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| nTop | N | Top coordinate |
+| nLeft | N | Left coordinate |
+| nWidth | N | Width |
+| nHeight | N | Height |
+| oOwner | O | Owner window or control |
+| uChange | B | Code block executed on state change |
+| uRClick | B | Code block executed on right-click |
+| bDblClick | B | Code block executed on double-click |
+
+**Return:** O - XTree object.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| AddTree | `AddTree( cPrompt, cRes1, cRes2, cCargo [, bAction] [, bRClick] [, bDblClick] )` | Adds a node (level 1). Must be followed by EndTree() |
+| AddTreeItem | `AddTreeItem( cPrompt, cResource, cCargo [, bAction] [, bRClick] [, bDblClick] )` | Adds a child item inside an open node |
+| EndTree | `EndTree()` | Closes the current node construction |
+| AddItem | `AddItem( cPrompt, cCargo, cRes1, cRes2, nType [, bAction] [, bRClick] [, bDblClick] )` | Adds item dynamically. nType: 1=same level, 2=below |
+| TreeSeek | `TreeSeek( cCargo ) --> lFound` | Finds and positions cursor on element by cargo key |
+| GetCargo | `GetCargo() --> cCargo` | Returns the cargo key of selected item |
+| GetPrompt | `GetPrompt() --> cPrompt` | Returns description of selected item |
+| GetFatherNode | `GetFatherNode() --> aFather` | Returns parent node info array |
+| ChangeBmp | `ChangeBmp( cRes1, cRes2, cCargo [, lForce] )` | Changes images of an item |
+| ChangePrompt | `ChangePrompt( cPrompt, cCargo )` | Changes description of an item |
+| DelItem | `DelItem()` | Deletes selected item and sub-items |
+| Reset | `Reset()` | Clears all items |
+| IsEmpty | `IsEmpty() --> lEmpty` | Returns .T. if tree is empty |
+
+**Example:**
+```advpl
+DEFINE DIALOG oDlg TITLE "XTree" FROM 0,0 TO 600,800 PIXEL
+
+oTree := XTree():New(0, 0, 300, 300, oDlg)
+oTree:AddTree("Root", "folder5.png", "folder6.png", "01")
+    oTree:AddTreeItem("Child 1", "folder5.png", "0101")
+    oTree:AddTree("Child 2", "folder5.png", "folder6.png", "0102")
+        oTree:AddTreeItem("Grandchild", "folder5.png", "010201")
+    oTree:EndTree()
+oTree:EndTree()
+
+ACTIVATE DIALOG oDlg CENTERED
+```
+
+---
+
+## Wizard Classes
+
+### ApWizard
+
+Visual wizard (step-by-step assistant) with navigation buttons (Back, Next, Cancel, Finish), header with image, and presentation panel. Include `apwizard.ch` for preprocessor commands.
+
+**Syntax:** `ApWizard():New( chTitle, chMsg, cTitle, cText, bNext, bFinish [, lPanel] [, cResHead] [, bExecute] [, lNoFirst] [, aCoord] )`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| chTitle | C | Header title |
+| chMsg | C | Header message |
+| cTitle | C | Presentation panel title |
+| cText | C | Presentation panel text |
+| bNext | B | Code block to validate "Next" button |
+| bFinish | B | Code block to validate "Finish" button |
+| lPanel | L | Panel mode |
+| cResHead | C | Header image name from repository |
+| bExecute | B | Action executed on Next/Back click |
+| lNoFirst | L | If .T., skips presentation panel |
+| aCoord | A | Screen coordinates |
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| Activate | `Activate( [lCenter], [bValid], [bInit], [bWhen] )` | Shows the wizard dialog |
+| NewPanel | `NewPanel( cTitle, cMsg [, bBack] [, bNext] [, bFinish] [, lPanel] [, bExecute] )` | Creates a new wizard step panel |
+| GetPanel | `GetPanel( nPanel ) --> oPanel` | Returns the panel object |
+| SetPanel | `SetPanel( nPanel )` | Activates a specific panel |
+| SetFinish | `SetFinish()` | Shows the Finish button |
+| SetHeader | `SetHeader( cHeader, nPanel [, lChange] )` | Replaces panel header text |
+| SetMessage | `SetMessage( cMsg, nPanel [, lChange] )` | Replaces panel message text |
+
+**Key properties:** `oDlg` (dialog), `oMPanel` (array of panels), `nPanel` (active panel), `nTPanel` (total panels).
+
+**Example:**
+```advpl
+#include "protheus.ch"
+#include "apwizard.ch"
+
+DEFINE WIZARD oWizard TITLE "Wizard" HEADER "Config Wizard" MESSAGE " " ;
+TEXT "Welcome to the wizard" PANEL ;
+NEXT {|| .T.} FINISH {|| .T.}
+
+CREATE PANEL oWizard HEADER "Step 2" MESSAGE "Configure" PANEL ;
+BACK {|| .T.} NEXT {|| .T.} FINISH {|| .T.} EXEC {|| .T.}
+
+@ 20, 15 SAY oSay VAR "Name:" OF oWizard:oMPanel[2] PIXEL
+@ 20, 35 GET oGet VAR cName PICTURE "@!" OF oWizard:oMPanel[2] SIZE 40,9 PIXEL
+
+ACTIVATE WIZARD oWizard CENTERED VALID {|| .T.}
+```
+
+---
+
+### FWCarolWizard
+
+Wizard for Carol/Techfin integration configuration. Validates connection info, handles login (admin only), and processes per selected company. Max 3 custom steps recommended.
+
+**Syntax:** `FWCarolWizard():New() --> oWizard`
+
+**Return:** O - FWCarolWizard object.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| Activate | `Activate()` | Activates the wizard |
+| AddStep | `AddStep( cDescription, bConstruction [, bNextAction] [, bPrevWhen] [, bCancelWhen] )` | Adds a custom step (max 3 recommended) |
+| AddRequirement | `AddRequirement( cDescription, cContent, bValid, cMessage ) --> lSuccess` | Adds a prerequisite check |
+| AddProcess | `AddProcess( bProcess )` | Adds processing block, executed once per selected company: `Eval(bProcess, cEmpAnt, @cMsg)` |
+| SetWelcomeMessage | `SetWelcomeMessage( cWelcome )` | Customizes welcome message |
+| SetTrialMode | `SetTrialMode( lTrial )` | Trial mode: allows non-admin, no job creation (SmartLink v2.1.0+) |
+| SetExclusiveCompany | `SetExclusiveCompany( lExclusive )` | Exclusive company check (SmartLink v2.4.0+) |
+| SetCountries | `SetCountries( aCountries )` | Allowed countries, e.g., {"BRA"} or {"ALL"} (SmartLink v2.4.9+) |
+| GetSelectedGroups | `GetSelectedGroups() --> aGroups` | Returns selected company groups (SmartLink v2.4.1+) |
+
+**Example:**
+```advpl
+Local oWizard := FWCarolWizard():New()
+
+oWizard:SetWelcomeMessage("Welcome to TechFin Integration")
+oWizard:AddRequirement("RPO Release", GetRpoRelease(), {|| GetRpoRelease() >= "12.1.023"}, "Min RPO 12.1.23")
+oWizard:AddStep("Config", {|oPanel| BuildStep(oPanel)}, {|| ValidStep()})
+oWizard:AddProcess({|cEmp, cMsg| ProcessCompany(cEmp, @cMsg)})
+oWizard:Activate()
+```
+
+---
+
+## Printing Classes
+
+### FWMsPrinter
+
+Class for viewing and printing reports in Protheus. Supports PDF and spool output, text, images, barcodes (EAN13, Code128, QRCode, DataMatrix, PDF417), and geometric shapes.
+
+**Syntax:** `FWMsPrinter():New( cFile [, nDevice] [, lAdjustToLegacy] [, cPath] [, lDisableSetup] [,] [, @oPrintSetup] [, cPrinter] [, lServer] [,,] [, lRaw] [, lViewPDF] [, nQtdCopy] ) --> oPrinter`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cFile | C | Report file name |
+| nDevice | N | Output: IMP_SPOOL (printer) or IMP_PDF (PDF file) |
+| lAdjustToLegacy | L | Recalculate coordinates for TMSPrinter legacy (default: .T.) |
+| cPath | C | Directory for report file |
+| lDisableSetup | L | Skip setup screen (default: .F.) |
+| cPrinter | C | Force specific printer |
+| lServer | L | Server-side printing (default: .F.) |
+| lViewPDF | L | Show PDF after print (default: .T.) |
+| nQtdCopy | N | Number of copies (spool) |
+
+**Return:** O - FWMsPrinter object.
+
+**Key methods — Drawing:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| Say | `Say( nRow, nCol, cText [, oFont] [, nWidth] [, nClrText] [, nAngle] )` | Inserts text |
+| SayAlign | `SayAlign( nRow, nCol, cText [, oFont] [, nW] [, nH] [, nClr] [, nAlignH] [, nAlignV] )` | Text with alignment (0=left,1=right,2=center,3=justified) |
+| SayBitmap | `SayBitmap( nRow, nCol, cBitmap [, nWidth] [, nHeight] )` | Inserts BMP image |
+| Box | `Box( nRow, nCol, nBottom, nRight [, cPixel] )` | Rectangle |
+| Line | `Line( nTop, nLeft, nBottom, nRight [, nColor] [, cPixel] )` | Line |
+| FillRect | `FillRect( aCoords [, oBrush] [, cPixel] )` | Filled rectangle |
+
+**Key methods — Barcodes:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| EAN13 | `EAN13( nRow, nCol, cCode, nTotalWidth, nHeight )` | EAN-13 barcode |
+| Code128 | `Code128( nRow, nCol, cCode, nWidth, nHeight [, lSay] [, oFont] )` | Code 128 barcode |
+| QRCode | `QRCode( nRow, nCol, cCode, nSizeBar )` | QR Code (max ~2930 chars) |
+| DataMatrix | `DataMatrix( nCol, nRow, cCode, nSizeBar )` | Data Matrix (max 1200 chars) |
+| Pdf417 | `Pdf417( nRow, nCol, cCode, nSizeBar, nHeight )` | PDF417 barcode |
+
+**Key methods — Page config:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| SetPortrait | `SetPortrait()` | Portrait orientation |
+| SetLandscape | `SetLandscape()` | Landscape orientation |
+| SetPaperSize | `SetPaperSize( nSize [, nH] [, nW] )` | Paper: 1=Letter, 8=A3, 9=A4 |
+| SetMargin | `SetMargin( nLeft, nTop, nRight, nBottom )` | Report margins |
+| StartPage | `StartPage()` | Start new page |
+| EndPage | `EndPage()` | End current page |
+| Setup | `Setup()` | Printer config dialog |
+| Preview | `Preview()` | Send to printer / preview |
+| Print | `Print()` | Send to printer |
+| SetPassword | `SetPassword( cPassword )` | PDF password (lib 20230807+) |
+
+**Example:**
+```advpl
+#include "RPTDEF.CH"
+#include "protheus.ch"
+
+oPrinter := FWMSPrinter():New("report.rel", IMP_PDF, .F., "\spool", .T.)
+oPrinter:SetPortrait()
+oPrinter:SetPaperSize(DMPAPER_A4)
+oPrinter:SetMargin(60, 60, 60, 60)
+oPrinter:cPathPDF := "c:\reports\"
+
+oPrinter:StartPage()
+oPrinter:Say(20, 30, "Hello World")
+oPrinter:EAN13(180, 280, "876543210987", 100, 95)
+oPrinter:EndPage()
+
+oPrinter:Setup()
+If oPrinter:nModalResult == PD_OK
+    oPrinter:Preview()
+EndIf
+```
+
+---
+
+### PrinterVersion
+
+Static class to retrieve printer.exe versions from AppServer or SmartClient. Available from LIB >= 20201009.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| fromServer | `PrinterVersion():fromServer() --> cVersion` | Printer.exe version from AppServer folder |
+| fromClient | `PrinterVersion():fromClient() --> cVersion` | Printer.exe version from SmartClient folder |
+
+**Example:**
+```advpl
+Local cSrv := PrinterVersion():fromServer()
+Local cClt := PrinterVersion():fromClient()
+Conout("Server: " + cSrv + " / Client: " + cClt)
+```
+
+---
+
+## Bulk Insert and Query Cache Classes
+
+### FWBulk
+
+Performs bulk insert of multiple records into the database in a single command. **30-40% faster** than individual inserts. Requires DBAccess >= 20181212, LIB >= 20201009. Does NOT work with SQLite.
+
+**Syntax:** `FWBulk():New( cTable [, nLimit] ) --> oBulk`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cTable | C | Target table name |
+| nLimit | N | Buffer size for auto-flush (default: 600) |
+
+**Return:** O - FWBulk object.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| SetFields | `SetFields( aFields )` | Sets field structure (same order as AddData). Can use dbstruct() |
+| AddData | `AddData( aData ) --> lOk` | Adds a record. Auto-flushes at limit |
+| Flush | `Flush() --> lOk` | Sends buffered data to database |
+| Close | `Close() --> lOk` | Finalizes bulk insert (auto-flushes remaining data) |
+| Destroy | `Destroy()` | Cleans up the object |
+| Count | `Count() --> nCount` | Records waiting in buffer |
+| GetError | `GetError() --> cError` | Last error message |
+| Reset | `Reset()` | Resets to initial state |
+| CanBulk | `FWBulk():CanBulk() --> lCan` | Static. Checks if bulk is available (not SQLite) |
+
+**Example:**
+```advpl
+Local oBulk := FWBulk():New("SA1010", 500)
+Local aStruct := SA1->(dbstruct())
+
+If FWBulk():CanBulk()
+    oBulk:SetFields(aStruct)
+
+    For nI := 1 To 1000
+        oBulk:AddData({cValToChar(nI), "Customer " + cValToChar(nI), Date(), .T.})
+    Next
+
+    If !oBulk:Close()
+        Conout("Error: " + oBulk:GetError())
+    EndIf
+    oBulk:Destroy()
+EndIf
+```
+
+---
+
+### FWQueryCache
+
+Static class to manually enable/disable DBAccess query cache. Cache is kept in DBAPI memory. Identical queries return from cache. Available from LIB >= 20200908.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| TurnOnCache | `FWQueryCache():TurnOnCache( cLifeTime, cTimeOut )` | Enables cache. cLifeTime/cTimeOut in seconds |
+| TurnOffCache | `FWQueryCache():TurnOffCache()` | Disables cache |
+
+**Example:**
+```advpl
+FWQueryCache():TurnOnCache("120", "60")
+DBUseArea(.T., "TOPCONN", TCGenQry(,, cQuery), cAlias, .T., .T.)
+FWQueryCache():TurnOffCache()
+```
+
+---
+
+### FWExecCachedQuery
+
+Static class that executes queries with automatic DBAccess cache. Available from LIB >= 20200908, DBAccess >= 20.1.1.3.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| OpenQuery | `FWExecCachedQuery():OpenQuery( cQuery, [cAlias], [aSetField], [cDriver], cLifeTime, cTimeOut ) --> cAlias` | Opens query with cache, returns alias |
+| ExecScalar | `FWExecCachedQuery():ExecScalar( cQuery, cColumn, cLifeTime, cTimeOut ) --> xValue` | Returns first column of first row with cache |
+
+**Example:**
+```advpl
+Local cQuery := "SELECT ED_CODIGO FROM " + RetSqlName("SED") + " WHERE D_E_L_E_T_ = ' '"
+Local cAlias := FWExecCachedQuery():OpenQuery(cQuery,,,,  "120", "60")
+
+While !(cAlias)->(Eof())
+    Conout((cAlias)->ED_CODIGO)
+    (cAlias)->(DBSkip())
+EndDo
+(cAlias)->(DBCloseArea())
+
+// Scalar query
+Local cDesc := FWExecCachedQuery():ExecScalar("SELECT ED_DESCRIC FROM " + RetSqlName("SED") + " WHERE ED_CODIGO = 'X'", "ED_DESCRIC", "120", "60")
+```
+
+---
+
+## Dictionary Utility Classes
+
+### FWSX9Util
+
+Utility class for the SX9 table relationship dictionary. Searches relationships between tables up to 3 levels deep (A > B > C).
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| SearchX9Paths | `FWSX9Util():SearchX9Paths( cParentAlias, cChildAlias, @aRelations ) --> lFound` | Finds relationships between parent and child tables via SX9 |
+
+**Example:**
+```advpl
+Local aRelations := {}
+Local lFound := FWSX9Util():SearchX9Paths("SA1", "SC5", @aRelations)
+```
+
+---
+
+### FWSM0Util
+
+Utility class for reading SM0 (Company/Branch) table data with static methods.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| GetSM0Data | `FWSM0Util():GetSM0Data( [cCodEmp], [cCodFil], [aFields] ) --> aReturn` | Returns SM0 fields as { {cField, cValue}, ... } |
+| SetSM0PositionBycFilAnt | `FWSM0Util():SetSM0PositionBycFilAnt()` | Positions SM0 by cEmpAnt/cFilAnt (lib 20210104+) |
+| GetSM0FullName | `FWSM0Util():GetSM0FullName( [cCodEmp], [cCodFil] ) --> cFullName` | Returns full legal name, falls back to commercial name (lib 20210104+) |
+
+**Example:**
+```advpl
+// Get specific fields
+Local aData := FWSM0Util():GetSM0Data("99", "01", {"M0_CODFIL", "M0_CGC"})
+
+// Get full company name
+Local cName := FWSM0Util():GetSM0FullName()
+```
+
+---
+
+### FWSXGUtil
+
+Utility class for the SXG (Field Group) dictionary.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| FieldGroupExists | `FWSXGUtil():FieldGroupExists( cGroupSXG ) --> lExists` | Checks if field group exists in SXG |
+| SXGSize | `FWSXGUtil():SXGSize( cGroupSXG ) --> cSize` | Returns field group size (XG_SIZE) |
+| SXGPic | `FWSXGUtil():SXGPic( cGroupSXG ) --> cPicture` | Returns field group picture (XG_PICTURE) |
+
+**Example:**
+```advpl
+If FWSXGUtil():FieldGroupExists("001")
+    Local cSize := FWSXGUtil():SXGSize("001")
+    Local cPic  := FWSXGUtil():SXGPic("001")
+EndIf
+```
+
+---
+
+## UI and Integration Classes
+
+### FWUIWorkarea
+
+Creates a workarea layout with horizontal panels subdivided into columns (widgets), optional side menu, and automatic widget refresh.
+
+**Syntax:** `FWUIWorkarea():New( oOwner ) --> oWorkarea`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| oOwner | O | Owner object (typically TDialog) |
+
+**Return:** O - FWUIWorkarea object.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| CreateHorizontalBox | `CreateHorizontalBox( cID, nPercHeight, lFixPixel )` | Creates a horizontal box (percent or pixel height) |
+| SetBoxCols | `SetBoxCols( cIDOwner, aCols )` | Defines column layout: aCols = array of widget IDs |
+| Activate | `Activate()` | Activates and renders the layout |
+| GetPanel | `GetPanel( cID ) --> oPanel` | Returns TPanelCss for a widget ID (after Activate) |
+| AddWidget | `AddWidget( oObj )` | Adds widget (must have Refresh method) |
+| RefreshWidgets | `RefreshWidgets()` | Refreshes all widgets |
+| SetMenu | `SetMenu( oFWMenu )` | Sets a side menu |
+| SetMenuWidth | `SetMenuWidth( nWidth )` | Sets menu width in pixels |
+
+**Example:**
+```advpl
+Local oDlg := TDialog():New(0, 0, 800, 800, "Workarea",,,,,,,,,.T.)
+Local oWA  := FWUIWorkarea():New(oDlg)
+
+oWA:CreateHorizontalBox("TOP", 30, .F.)
+oWA:CreateHorizontalBox("BOTTOM", 70, .F.)
+oWA:SetBoxCols("TOP", {"W1", "W2"})
+oWA:SetBoxCols("BOTTOM", {"W3", "W4"})
+oWA:Activate()
+
+TSay():New(1, 1, {|| "Panel 1"}, oWA:GetPanel("W1"))
+TSay():New(1, 1, {|| "Panel 2"}, oWA:GetPanel("W2"))
+
+oDlg:Activate()
+```
+
+---
+
+### MSProject
+
+Class for Microsoft Office Project (.mpp) integration via OLE Automation. Requires MS Project installed. Check with `ApOleClient('MsProject')`.
+
+**Syntax:** `MSProject():New() --> oProject`
+
+**Return:** O - MSProject object.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| FileNew | `FileNew( [lSummaryInfo], [cTemplate] )` | Creates a new project |
+| FileOpen | `FileOpen( cName [, lReadOnly] [, nMerge] )` | Opens a project file |
+| FileSave | `FileSave()` | Saves active project |
+| FileSaveAs | `FileSaveAs( cName [, cFormat] )` | Saves with new name |
+| FileClose | `FileClose( nSave )` | Closes active project |
+| Projects | `Projects( nId ) --> oProject` | Gets project object by ID |
+| TableEdit | `TableEdit( cName, lTaskTable, lCreate, ... )` | Creates/edits a table view |
+| TableApply | `TableApply( cName )` | Applies a table to active view |
+| ViewApply | `ViewApply( cName )` | Sets the active view |
+| LinkTasksEdit | `LinkTasksEdit( nFrom, nTo [, lDelete] [, nType] [, nLag] )` | Edits task dependency links |
+| BCalendarCreate | `BCalendarCreate( cName [, cFrom] )` | Creates a base calendar |
+| Quit | `Quit( nSaveChanges )` | Exits MS Project |
+| Destroy | `Destroy()` | Cleans up OLE objects |
+| SetVisible | `SetVisible( lVisible )` | Shows/hides the application |
+
+**Example:**
+```advpl
+#include "mproject.ch"
+
+If !ApOleClient('MsProject')
+    MsgStop('MS Project not installed')
+    Return
+EndIf
+
+oProject := MSProject():New()
+oProject:SetVisible(.T.)
+oProject:FileNew()
+oProject:Projects(1):Tasks:Add("Task 01")
+oProject:Projects(1):Tasks(1):SetDuration(3)
+oProject:FileSaveAs("myproject")
+oProject:Quit(0)
+oProject:Destroy()
+```
+
+---
+
+### TKeyboard
+
+Virtual keyboard class (alphanumeric or numeric) for touch terminals and kiosks. Functional in Protheus 12 from LIB >= 20190820.
+
+**Syntax:** `TKeyboard():New( [nTop], [nLeft], [nType], [oDlg], [cSource], [lLogin] ) --> oKeyboard`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| nTop | N | Top position |
+| nLeft | N | Left position |
+| nType | N | Keyboard type: 1=Numeric, 2=Alphanumeric |
+| oDlg | O | Dialog where keyboard is created |
+| cSource | C | Image resource prefix (cSource + "key1.png") |
+
+**Return:** O - TKeyboard object.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| KeyNumber | `KeyNumber()` | Sets up numeric keyboard keys |
+| KeyAlfaNumber | `KeyAlfaNumber()` | Sets up alphanumeric keyboard keys |
+| SetVars | `SetVars( oObject, nSize )` | Sets target object for keyboard input |
+| SetEnter | `SetEnter( uEnterAct )` | Sets Enter key action |
+| GetContext | `GetContext() --> cText` | Returns current text content |
+| AddKey | `AddKey( cKey, nTop, nLeft, nWidth, nHeight )` | Adds a custom key |
+
+**Example:**
+```advpl
+Local oDlg, oGet, oKey, cGet := Space(20)
+
+oDlg := TDialog():New(180, 180, 550, 700, "Virtual Keyboard",,,,,,,,,.T.)
+oGet := TGet():New(15, 9, {|u| If(PCount()==0, cGet, cGet:=u)}, oDlg, 70, 10)
+oGet:bGotFocus := {|| oKey:SetVars(oGet, 20)}
+
+oKey := TKeyboard():New(50, 10, 2, oDlg)
+oKey:SetVars(oGet, 20)
+oKey:SetEnter({|| MsgInfo(oKey:GetContext(), "Content")})
+
+oDlg:Activate(,,,.T.)
+```
+
+---
+
+### FWBmpRep
+
+Image repository manipulation class. Open, close, insert, extract, check, and delete images from the Protheus resource repository.
+
+**Syntax:** `FWBmpRep():New() --> oRepo`
+
+**Return:** O - FWBmpRep object.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| OpenRepository | `OpenRepository() --> lOk` | Opens the image repository |
+| CloseRepository | `CloseRepository()` | Closes the repository |
+| ExistBmp | `ExistBmp( cEntry ) --> lExists` | Checks if image exists |
+| InsertBmp | `InsertBmp( cFile [, cEntry], @lOk ) --> cEntry` | Inserts image from file |
+| Extract | `Extract( cEntry, cFile ) --> lOk` | Extracts image to file |
+| DeleteBmp | `DeleteBmp( cEntry )` | Deletes an image |
+| RecordCount | `RecordCount() --> nCount` | Number of items in repository |
+| Pack | `Pack()` | Packs repository (no effect if DB-based) |
+
+**Example:**
+```advpl
+Local oRepo := FWBmpRep():New()
+
+If oRepo:OpenRepository()
+    If !oRepo:ExistBmp("myimage")
+        Local lOk := .F.
+        oRepo:InsertBmp("myimage.jpg",, @lOk)
+    EndIf
+    oRepo:CloseRepository()
+EndIf
+FreeObj(oRepo)
+```
+
+---
+
+### MPFilesBinary
+
+Class for manipulating binary files in the FILES_BINARY database table. Supports register, read, write, delete with UUID references.
+
+**Syntax:** `MPFilesBinary():New() --> oFB`
+
+**Return:** O - MPFilesBinary object.
+
+**Key methods:**
+
+| Method | Syntax | Description |
+|--------|--------|-------------|
+| SetFB | `SetFB( xFiles ) --> lOk` | Sets file or array of files to process |
+| GetFB | `GetFB() --> xFiles` | Gets current file list |
+| SetBlockSize | `SetBlockSize( nSize )` | Block size for read/write (default: 1MB) |
+| Register | `Register( lShowProcess ) --> aRet` | Registers files. Returns { {cPath, cUUID}, ... } |
+| ReadFB | `ReadFB( cUUID, cDir, cFile [, lAskOver] ) --> lOk` | Downloads file by UUID |
+| DeleteFB | `DeleteFB( cUUID ) --> lDeleted` | Physically deletes file from database |
+| SizeFB | `SizeFB( cUUID [, cUnit] [, lRound] [, nRound] ) --> cSize` | File size. cUnit: "B","KB","MB","GB" |
+
+**Example:**
+```advpl
+Local oFB := MPFilesBinary():New()
+oFB:SetFB("c:\data\report.pdf")
+Local aRet := oFB:Register(.T.)
+
+If !Empty(aRet)
+    // Download copy
+    oFB:ReadFB(aRet[1][2], "c:\backup\", "report_copy.pdf")
+    // Check size
+    Local cSize := oFB:SizeFB(aRet[1][2], "KB")
+EndIf
+```
+
+---
+
+## Miscellaneous Functions
+
+### AddMashupAlias
+
+Registers additional work areas for Mashup queries. Used when a screen has multiple cadastros or when the routine changes the current area during Mashup execution.
+
+**Syntax:** `AddMashupAlias( aAreas )`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| aAreas | A | Array of work area aliases, e.g., {"SA1", "SA2", "SB1"} |
+
+**Example:**
+```advpl
+AddMashupAlias({"SA1", "SA2", "SB1"})
+```
+
+---
+
+### AmIIn
+
+Checks if the current routine is running under a specific module license. Accepts up to 20 module numbers.
+
+**Syntax:** `AmIIn( nMd01 [, nMd02, ..., nMd20] ) --> lInModule`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| nMd01..nMd20 | N | Module numbers to check |
+
+**Return:** L - .T. if running in any of the specified modules.
+
+**Example:**
+```advpl
+If AmIIn(5)          // Faturamento
+    // Module-specific logic
+EndIf
+
+If AmIIn(12, 23)     // SigaLoja or SigaFrt
+    // Allowed in either module
+EndIf
+```
+
+---
+
+### ChkAdvplSyntax
+
+Validates an AdvPL expression string for correct syntax without executing it.
+
+**Syntax:** `ChkAdvplSyntax( cExp [, @cMsg] [, lFilter] ) --> lValid`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cExp | C | Expression to validate |
+| cMsg | C | By reference — receives error description if invalid |
+| lFilter | L | If .T., supports extended filter expressions (default: .F.) |
+
+**Return:** L - .T. if the expression is syntactically valid.
+
+**Example:**
+```advpl
+Local cMsg := ""
+
+If ChkAdvplSyntax("1 == 1 .And. .T.", @cMsg)
+    // Valid expression
+EndIf
+
+If !ChkAdvplSyntax("1 === 1", @cMsg)
+    Alert("Invalid: " + cMsg)
+EndIf
+```
+
+---
+
+### MakeSqlExpr
+
+Converts SX1 parameter range values (MV_PAR) into valid SQL expressions (BETWEEN, IN). Modifies MV_PAR variables directly.
+
+**Syntax:** `MakeSqlExpr( cPerg [, aCpoSize] )`
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cPerg | C | SX1 question alias |
+| aCpoSize | A | Optional field size limits: { {"MV_PARnn", nSize}, ... } |
+
+**Example:**
+```advpl
+Pergunte("FATR060", .T.)
+
+// Without size limit: "000-090;150;180" -> BETWEEN '000' AND '090' OR IN('150','180')
+MakeSqlExpr("FATR060")
+
+// With size limit: truncates values to specified size
+MakeSqlExpr("FATR060", {{"MV_PAR04", 2}})
+```
+
+---
+
+### PesqBrw
+
+Opens a search dialog for positioning records in the Browse. Standard search function used in MenuDef/aRotina. No explicit parameters — uses the active Browse context.
+
+**Usage in MenuDef:**
+```advpl
+ADD OPTION aRotina TITLE "Pesquisar" ACTION "PesqBrw" OPERATION 1 ACCESS 0
+
+// Or via array
+aRotina := { { "Pesquisar", "PesqBrw", 0, 1 } }
+```
+
+---
+
 ## Legacy / Compatibility Functions
 
 ### StaticCall (BLOCKED — DO NOT USE)
