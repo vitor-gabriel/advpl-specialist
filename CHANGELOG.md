@@ -6,6 +6,34 @@ Todas as mudancas notaveis deste projeto serao documentadas neste arquivo.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.7] - 2026-03-26
+
+### Added / Adicionado
+- Complete TDN documentation for 74+ classes and functions across 5 phases in native-functions.md
+- Documentacao completa do TDN para 74+ classes e funcoes em 5 fases no native-functions.md
+- Phase 1: 9 UI/Browse classes (FwBrowse, FWMarkBrowse, FWBrwColumn, FWBrwRelation, FWLegend, FWGridProcess, tNewProcess, FWCalendar, FWSimpEdit)
+- Fase 1: 9 classes UI/Browse (FwBrowse, FWMarkBrowse, FWBrwColumn, FWBrwRelation, FWLegend, FWGridProcess, tNewProcess, FWCalendar, FWSimpEdit)
+- Phase 2: 20 daily utility functions (FwGetArea, FwRestArea, FwGetUserName, UsrRetName, FWMsgRun, FWInputBox, FWFreeObj, FWFreeVar, Fw8601ToDate, FWDateTo8601, FWHttpEncode, FWURIDecode, MayIUseCode, MPCriaNumS, MsGetDAuto, SaveInter, RestInter, FWX3Titulo, FWX2CHAVE, FWX2Unico)
+- Fase 2: 20 funcoes utilitarias de uso diario (FwGetArea, FwRestArea, FwGetUserName, UsrRetName, FWMsgRun, FWInputBox, FWFreeObj, FWFreeVar, Fw8601ToDate, FWDateTo8601, FWHttpEncode, FWURIDecode, MayIUseCode, MPCriaNumS, MsGetDAuto, SaveInter, RestInter, FWX3Titulo, FWX2CHAVE, FWX2Unico)
+- Phase 3: 8 security/authentication classes (FWoAuth2Client, FWoAuth2Url, FWSafeVault, FWSecretVault, FwProtectedDataUtil, FwPDFieldRepository, FwPDFieldDetailRepository, FwPDGroupRepository)
+- Fase 3: 8 classes de seguranca/autenticacao (FWoAuth2Client, FWoAuth2Url, FWSafeVault, FWSecretVault, FwProtectedDataUtil, FwPDFieldRepository, FwPDFieldDetailRepository, FwPDGroupRepository)
+- Phase 4: 12 company/branch and scheduling functions (FWLoadSM0, FWModeAccess, FwListBranches, FWJoinFilial, FwCallApp, FWSchdAvaiable, FWSchdByFunction, FWSchdEmpFil, FwExecLocaliz, FwExistLocaliz, FwBranAltInf, FwComAltInf)
+- Fase 4: 12 funcoes de empresa/filial e scheduling (FWLoadSM0, FWModeAccess, FwListBranches, FWJoinFilial, FwCallApp, FWSchdAvaiable, FWSchdByFunction, FWSchdEmpFil, FwExecLocaliz, FwExistLocaliz, FwBranAltInf, FwComAltInf)
+- Phase 5: 25+ niche classes and functions (FwChartFactory, XTree, ApWizard, FWCarolWizard, FWMsPrinter, PrinterVersion, FWBulk, FWQueryCache, FWExecCachedQuery, FWSX9Util, FWSM0Util, FWSXGUtil, FWUIWorkarea, MSProject, TKeyboard, FWBmpRep, MPFilesBinary, AddMashupAlias, AmIIn, ChkAdvplSyntax, MakeSqlExpr, PesqBrw)
+- Fase 5: 25+ classes e funcoes de nicho (FwChartFactory, XTree, ApWizard, FWCarolWizard, FWMsPrinter, PrinterVersion, FWBulk, FWQueryCache, FWExecCachedQuery, FWSX9Util, FWSM0Util, FWSXGUtil, FWUIWorkarea, MSProject, TKeyboard, FWBmpRep, MPFilesBinary, AddMashupAlias, AmIIn, ChkAdvplSyntax, MakeSqlExpr, PesqBrw)
+- Google Analytics 4 integration in documentation site
+- Integracao do Google Analytics 4 no site de documentacao
+- Daily traffic metrics collection workflow
+- Workflow de coleta diaria de metricas de trafego
+
+### Fixed / Corrigido
+- Fixed code generation creating non-existent JsonObject methods for case-insensitive header iteration — now uses `GetNames()` + `Upper()` pattern (thanks [@edusfc15](https://github.com/edusfc15) for reporting [#3](https://github.com/thalysjuvenal/advpl-specialist/issues/3))
+- Corrigida geracao de codigo criando metodos inexistentes do JsonObject para iteracao case-insensitive de headers — agora usa padrao `GetNames()` + `Upper()` (obrigado [@edusfc15](https://github.com/edusfc15) por reportar [#3](https://github.com/thalysjuvenal/advpl-specialist/issues/3))
+- Updated rules count from 24 to 24 and registered corrections in CHANGELOG
+- Atualizada contagem de regras e registradas correcoes no CHANGELOG
+- Moved all Local declarations to function headers
+- Movidas todas as declaracoes Local para o topo das funcoes
+
 ## [1.0.6] - 2026-03-23
 
 ### Added / Adicionado
