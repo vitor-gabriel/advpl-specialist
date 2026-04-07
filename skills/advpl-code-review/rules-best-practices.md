@@ -442,3 +442,79 @@ Return
 | `xFilial(cAlias)` | Returns branch for index composition (respects sharing mode) |
 
 **Why it matters:** Shadowing system Private variables is one of the most dangerous bugs in Protheus because it is silent — the code compiles and appears to work in single-branch testing, but fails in multi-branch production environments where branch context is critical for data isolation.
+
+---
+
+## [BP-009] Bare `Function` keyword in customer code
+
+**Severity:** CRITICAL
+
+**Description:** The bare `Function` keyword (without `User`, `Static`, or a `Class` prefix) is reserved for the TOTVS core RPO. Customer code compiled into a customer RPO **must** use `User Function` (or `Static Function` for internal helpers, or a class `Method` for TLPP classes). Using bare `Function` in customer code causes a compilation failure, and in TLPP REST files it silently breaks the endpoint because the code never reaches the RPO.
+
+**What to look for:** Any line matching `^\s*Function\s+\w+\(` in a `.prw` or `.tlpp` file, where the function is **not** preceded by `User`, `Static`, or inside a `Class ... EndClass` block. Also check TLPP REST files where `@Get`, `@Post`, `@Put`, `@Patch`, or `@Delete` annotations are immediately followed by bare `Function`.
+
+**Violation:**
+
+```advpl
+#Include "TOTVS.CH"
+
+// WRONG — bare Function in a customer .prw file
+Function CalcDiscount(nPrice, nPercent)
+    Local nDiscount := nPrice * (nPercent / 100)
+Return nDiscount
+```
+
+```tlpp
+#include "tlpp-core.th"
+#include "tlpp-rest.th"
+
+// WRONG — bare Function with REST annotation (will not compile in customer RPO)
+@Get("/api/v1/products")
+Function getProducts()
+    // implementation
+return oRest:setResponse(cData)
+```
+
+**Correct:**
+
+```advpl
+#Include "TOTVS.CH"
+
+/*/{Protheus.doc} CalcDiscount
+Calcula o valor do desconto
+@type User Function
+@param nPrice, Numeric, Preco original
+@param nPercent, Numeric, Percentual de desconto
+@return nDiscount, Numeric, Valor do desconto
+/*/
+User Function CalcDiscount(nPrice, nPercent)
+    Local nDiscount := nPrice * (nPercent / 100)
+Return nDiscount
+```
+
+```tlpp
+#include "tlpp-core.th"
+#include "tlpp-rest.th"
+
+// RIGHT — User Function matches the official TOTVS sample rest-mod02.tlpp
+@Get("/api/v1/products")
+User Function getProducts()
+    // implementation
+return oRest:setResponse(cData)
+```
+
+**Rule summary:**
+
+| Keyword | Valid in customer RPO? | Notes |
+|---------|------------------------|-------|
+| `User Function NAME()` | Yes | Default choice; callable as `u_NAME()` |
+| `user function NAME()` (TLPP, lowercase) | Yes | Equivalent to `User Function` (case-insensitive) |
+| `Static Function NAME()` | Yes | Internal helper (file-scoped) |
+| `Method NAME() Class XXX` | Yes | Inside `Class ... EndClass` |
+| `Function NAME()` (bare) | **NO** | Reserved for TOTVS core RPO |
+
+**Exceptions:** The bare `Function` keyword is legitimate only in narrow scenarios outside regular customer code — for example, localization sources consumed by `FwExecLocaliz` (where the lookup mechanism requires the exact function name without the `u_` prefix). These cases should be flagged for human review but not auto-rewritten.
+
+**Why it matters:** This is a silent failure mode. The code may look valid in an editor, but the customer's `appre` compiler will reject it when building the customer RPO, or TLPP REST annotations will never be registered. Users who copy-paste from stale examples (including older plugin-generated code) hit this and are blocked until they rename the keyword. Always default to `User Function` unless there is an explicit, documented reason to use something else.
+
+**Authoritative reference:** TOTVS sample repository `totvs/tlpp-sample-rest`, file `rest-mod02.tlpp` (annotation-based REST with `user function`) and `rest-mod03.tlpp` (class-based REST with annotated methods).

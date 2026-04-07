@@ -118,6 +118,104 @@ Activate this agent when the user:
 - Save file with correct extension (.prw or .tlpp)
 - Explain key decisions to the user
 
+## CRITICAL: User Function vs Function Keyword
+
+This is one of the **most common generation errors** and causes silent compilation failures in customer RPOs. Follow this rule **without exception**.
+
+### The rule
+
+| Keyword | Where valid | Invoked as | Use in generation? |
+|---------|-------------|-----------|-------------------|
+| `User Function NAME()` | Any `.prw` or `.tlpp` file — always compiles in customer RPO | `u_NAME()` | **YES — default choice for ALL customer-callable code** |
+| `user function NAME()` (lowercase) | TLPP files — equivalent to `User Function` | `u_NAME()` | YES in `.tlpp` (TLPP is case-insensitive; both work) |
+| `Static Function NAME()` | Current `.prw` / `.tlpp` file only — internal helper | direct call within file | YES for private helpers inside the same file |
+| `Method NAME() Class XXX` | Inside a TLPP `class ... endclass` block | `oObj:NAME()` | YES for class-based designs |
+| `Function NAME()` (bare) | **RESERVED for TOTVS core RPO** — fails in customer RPO | ❌ | **NEVER** emit bare `Function` in generated code |
+| `function U_NAME()` + `namespace` | TLPP with explicit `namespace custom.xxx` and `U_` prefix | `u_NAME()` | Only when the user explicitly requests a namespaced TLPP file (advanced) |
+
+### Why this matters
+
+Customers compile their ADVPL/TLPP code into their **own RPO** (not the TOTVS core RPO). The bare `Function` keyword is reserved for TOTVS-maintained core/standard routines and is blocked by the compiler in customer RPOs. Customers must be able to call their own code via the `u_` prefix (e.g., `u_getCustomers()`), which requires `User Function`.
+
+### TLPP REST with annotations — the official TOTVS pattern
+
+Both the TDN documentation (`Migração WsRESTful para REST tlppCore`) and the official sample repository `totvs/tlpp-sample-rest` (file `rest-mod02.tlpp`) use `user function` with `@Get/@Post/@Put/@Patch/@Delete` annotations. This is the **authoritative reference** for TLPP REST endpoints — always follow it.
+
+```tlpp
+#include "tlpp-core.th"
+#include "tlpp-rest.th"
+
+@Get("/api/v1/customers")
+User Function getCustomers()
+    // implementation
+return oRest:setResponse(cData)
+
+@Post("/api/v1/customers")
+User Function createCustomer()
+    // implementation
+return oRest:setResponse(cData)
+```
+
+A class-based approach is also officially supported (`rest-mod03.tlpp`):
+
+```tlpp
+class CustomersAPI from LongClassName
+    @Get("/api/v1/customers")
+    public method listAll()
+
+    @Post("/api/v1/customers")
+    public method create()
+endclass
+```
+
+### Exceptions (when bare `Function` IS correct)
+
+The bare `Function` keyword is ONLY correct in these narrow cases, and you should **never** emit them without explicit user request:
+
+1. **Localization sources** consumed by `FwExecLocaliz` — the lookup mechanism requires the exact function name without `u_` prefix (e.g., `Function ExemploBRA(aParam)` in a TOTVS-maintained localized source file)
+2. **TOTVS core/standard routines** — not applicable to customer customization code at all
+
+If in doubt, default to `User Function`.
+
+### Forbidden patterns — NEVER generate these
+
+```advpl
+// WRONG — bare Function in a customer .prw file
+Function MyCustomerCode()
+    // will NOT compile in customer RPO
+Return .T.
+```
+
+```tlpp
+// WRONG — bare Function with TLPP REST annotation
+@Get("/api/v1/products")
+Function getProducts()
+    // will NOT compile in customer RPO
+Return
+```
+
+### Correct patterns — ALWAYS generate these
+
+```advpl
+// RIGHT — customer .prw file
+#Include "TOTVS.CH"
+
+User Function MyCustomerCode()
+    // compiles in customer RPO, callable as u_MyCustomerCode()
+Return .T.
+```
+
+```tlpp
+// RIGHT — TLPP REST endpoint
+#include "tlpp-core.th"
+#include "tlpp-rest.th"
+
+@Get("/api/v1/products")
+User Function getProducts()
+    // compiles in customer RPO
+return oRest:setResponse(cData)
+```
+
 ## CRITICAL: JsonObject Methods
 
 When generating code that uses `JsonObject`, **ONLY use methods that actually exist** in the class. The complete list of valid methods from the TDN is:
@@ -199,6 +297,7 @@ oView:EnableTitleView("VIEW_SA1", "Dados do Cliente")
 
 Before delivering any generated code, verify:
 
+- [ ] **Function keyword is `User Function` (or `Static Function` / `Method` / class annotation) — NEVER bare `Function` in customer code**
 - [ ] All variables declared as Local (no Private/Public)
 - [ ] ALL Local declarations at the TOP of the function (never inside If/While/For)
 - [ ] Hungarian notation on all variable names
@@ -213,3 +312,4 @@ Before delivering any generated code, verify:
 - [ ] JsonObject methods are valid (only use methods from the TDN-documented list above)
 - [ ] TWsdlManager methods are valid (no GetSoapFault, no ListServices)
 - [ ] FWFormView uses EnableTitleView (NOT EnableTitleGroup)
+- [ ] TLPP REST endpoints use `User Function` (or class+method) with annotations, matching `totvs/tlpp-sample-rest` samples

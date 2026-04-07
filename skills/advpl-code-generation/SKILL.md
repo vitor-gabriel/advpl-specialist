@@ -150,10 +150,39 @@ ErrorBlock(bErrorOld)
 | Ponto de Entrada | .prw | patterns-pontos-entrada.md |
 | Web Service SOAP | .prw | patterns-soap.md |
 
+## Function Keyword Rules (CRITICAL)
+
+Customer code compiled into a customer RPO **must** use `User Function` (or `Static Function` for internal helpers, or class `Method` for TLPP classes). The bare `Function` keyword is reserved for the TOTVS core RPO and will fail to compile in customer environments.
+
+| Keyword | Valid in customer RPO? | Callable as | Typical use |
+|---------|------------------------|-------------|-------------|
+| `User Function NAME()` | Yes (always) | `u_NAME()` | Any customer-callable entry point, REST endpoint, job, workflow, entry point (ponto de entrada) |
+| `user function NAME()` | Yes (TLPP, lowercase = same thing) | `u_NAME()` | TLPP REST endpoints with annotations (`@Get`, `@Post`, etc.) |
+| `Static Function NAME()` | Yes | direct call within file | Private helper inside the same `.prw`/`.tlpp` |
+| `Method NAME() Class XXX` | Yes | `oObj:NAME()` | TLPP classes |
+| `Function NAME()` (bare) | **NO — fails in customer RPO** | N/A | Reserved for TOTVS core only |
+
+### TLPP REST with annotations
+
+The official TOTVS pattern (from `totvs/tlpp-sample-rest/rest-mod02.tlpp`) is:
+
+```tlpp
+#include "tlpp-core.th"
+#include "tlpp-rest.th"
+
+@Get("/api/v1/customers")
+User Function getCustomers()
+    // implementation
+return oRest:setResponse(cData)
+```
+
+The class-based variant (`rest-mod03.tlpp`) is also supported — use `class ... from LongClassName` with `@Get/@Post` decorators on methods. Both patterns compile in customer RPOs. Never use bare `Function` with TLPP REST annotations.
+
 ## Common Mistakes
 
 | Mistake | Fix |
 |---------|-----|
+| **Using bare `Function` keyword in customer code** | **Always use `User Function` (customer RPO requires it; invoked as `u_NAME()`)** |
 | Using Private instead of Local | Always declare as Local, pass via parameters |
 | Not saving/restoring area (GetArea/RestArea) | Always wrap DB operations with area save/restore |
 | Missing error handling | Always use Begin Sequence / Recover / End Sequence |
@@ -161,3 +190,4 @@ ErrorBlock(bErrorOld)
 | Hardcoded branch (filial) | Use xFilial(cAlias) for multi-branch compatibility |
 | Missing TOTVS.CH include | Always include at minimum: #Include "TOTVS.CH" |
 | Not validating function parameters | Check ValType() and empty values at function start |
+| TLPP REST endpoint with bare `Function` | Use `User Function` with `@Get/@Post/...` annotation (official `rest-mod02.tlpp` pattern) |

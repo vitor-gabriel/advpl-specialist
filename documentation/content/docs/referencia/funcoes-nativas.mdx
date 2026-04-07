@@ -3369,7 +3369,7 @@ Framework class for building REST API services (server-side).
 #Include "tlpp-rest.th"
 
 @Get("/api/v1/customers")
-Function getCustomers()
+User Function getCustomers()
     Local oJson     := JsonObject():New()
     Local jResponse := JsonObject():New()
     Local jCust     := NIL

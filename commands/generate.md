@@ -54,11 +54,13 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 8. **Present plan** - Show the user a clear plan including:
    - File(s) to be created (name, path, extension)
    - Code structure (functions, classes, methods to implement)
+   - **Explicit declaration of the function keyword** to be used for every function in the plan: `User Function` (default for customer-callable code), `Static Function` (internal helper), or `Method ... Class` (TLPP class). **Never** plan a bare `Function` keyword for customer code — it is reserved for the TOTVS core RPO and will not compile in a customer RPO.
    - Includes and dependencies
    - Key patterns to apply (MVC, REST, SOAP, etc.)
    - Naming conventions to follow (Hungarian notation, module prefix)
    - Error handling and DB operation patterns
    - **For entry points:** TDN documentation found (PARAMIXB parameters, return type, calling routine)
+   - **For REST endpoints (TLPP annotation-based):** confirm the plan uses `User Function` with `@Get/@Post/@Put/@Patch/@Delete` annotations, following the official TOTVS sample `totvs/tlpp-sample-rest/rest-mod02.tlpp`. The class-based variant (`rest-mod03.tlpp`) is also supported — use it when multiple methods share state.
 9. **Wait for approval** - The user must approve the plan before any code is written. If the user requests changes, revise the plan.
 10. **Exit plan mode** - Use `ExitPlanMode` after approval
 

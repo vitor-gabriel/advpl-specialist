@@ -311,6 +311,14 @@ Return lValid
 
 The TLPP approach uses annotations (decorators) to define REST endpoints. This is the modern pattern available in newer Protheus versions.
 
+> **IMPORTANT — Function keyword rule**
+>
+> In TLPP REST endpoints declared with annotations (`@Get`, `@Post`, `@Put`, `@Patch`, `@Delete`), **always** use `User Function` (or lowercase `user function`). The bare `Function` keyword is reserved for the TOTVS core RPO and will **not** compile in a customer RPO.
+>
+> This matches the official TOTVS sample `rest-mod02.tlpp` from the `totvs/tlpp-sample-rest` repository (migrate-FWrest-2-tlpp), which is the authoritative reference for TLPP REST annotation-based endpoints.
+>
+> If you prefer a class-based approach, see section 2.7 below — both are supported officially by TOTVS.
+
 ### 2.1 Complete TLPP REST Service
 
 ```tlpp
@@ -319,7 +327,7 @@ The TLPP approach uses annotations (decorators) to define REST endpoints. This i
 
 /*/{Protheus.doc} ProductsAPI
 API REST de Produtos usando TLPP
-@type Namespace tlpp.rest
+@type User Function
 @author Autor
 @since 01/01/2026
 @version 1.0
@@ -327,10 +335,11 @@ API REST de Produtos usando TLPP
 
 // =============================================================
 // GET /api/v1/products - Lista produtos
+// Callable as: u_getProducts() or automatically dispatched by @Get annotation
 // =============================================================
 @RestService("/api/v1/products")
 @Get("")
-Function getProducts()
+User Function getProducts()
     Local oJson    := JsonObject():New()
     Local oItem    := Nil
     Local aResult  := {}
@@ -382,7 +391,7 @@ Return .T.
 // =============================================================
 @RestService("/api/v1/products")
 @Get("/{codigo}")
-Function getProductById()
+User Function getProductById()
     Local oJson    := Nil
     Local aArea    := GetArea()
     Local cCodigo  := oRest:getPathParamsRequest():getValue("codigo")
@@ -419,7 +428,7 @@ Return .T.
 // =============================================================
 @RestService("/api/v1/products")
 @Post("")
-Function createProduct()
+User Function createProduct()
     Local oJson   := JsonObject():New()
     Local oResp   := Nil
     Local cBody   := oRest:getBody()
@@ -472,7 +481,7 @@ Return .T.
 // =============================================================
 @RestService("/api/v1/products")
 @Put("/{codigo}")
-Function updateProduct()
+User Function updateProduct()
     Local oJson   := JsonObject():New()
     Local oResp   := Nil
     Local cBody   := oRest:getBody()
@@ -532,7 +541,7 @@ Return .T.
 // =============================================================
 @RestService("/api/v1/products")
 @Delete("/{codigo}")
-Function deleteProduct()
+User Function deleteProduct()
     Local cCodigo := oRest:getPathParamsRequest():getValue("codigo")
     Local aArea   := GetArea()
 
@@ -559,6 +568,55 @@ Function deleteProduct()
 
 Return .T.
 ```
+
+### 2.7 Alternative: Class-Based TLPP REST
+
+As an alternative to the function-based pattern above, TLPP also supports a class-based REST approach where methods are annotated with HTTP verbs. This is officially documented in the TOTVS sample `rest-mod03.tlpp`. Both patterns are valid — choose based on team preference and code organization needs.
+
+```tlpp
+#Include "tlpp-core.th"
+#Include "tlpp-rest.th"
+
+class ProductsAPI from LongClassName
+
+    private data cId
+
+    public method New()
+
+    @Get("/api/v1/products")
+    public method listAll()
+
+    @Get("/api/v1/products/:id")
+    public method getById()
+
+    @Post("/api/v1/products")
+    public method create()
+
+    @Put("/api/v1/products/:id")
+    public method update()
+
+    @Delete("/api/v1/products/:id")
+    public method remove()
+
+endclass
+
+method New() class ProductsAPI
+    ::cId := ''
+return Self
+
+method listAll() class ProductsAPI
+    // implementation
+return oRest:setResponse(...)
+```
+
+**When to use each pattern:**
+
+| Pattern | Use when |
+|---------|----------|
+| `User Function` + `@Get/@Post/...` (section 2.1-2.6) | Simple endpoints, quick CRUDs, small services. Matches `rest-mod02.tlpp` sample. |
+| `class` + `public method` + annotations (section 2.7) | Larger services, shared state between operations, OOP-style code organization. Matches `rest-mod03.tlpp` sample. |
+
+Both patterns compile in a customer RPO and are officially supported by TOTVS.
 
 ---
 
