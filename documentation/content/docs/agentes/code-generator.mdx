@@ -119,6 +119,176 @@ Ative este agente quando o usuario:
 - Salvar arquivo com extensao correta (.prw ou .tlpp)
 - Explicar decisoes importantes ao usuario
 
+## CRITICO: User Function vs Palavra-chave Function
+
+Esse e um dos **erros de geracao mais comuns** e causa falhas silenciosas de compilacao em RPOs de cliente. Siga essa regra **sem excecao**.
+
+| Palavra-chave | Onde e valida | Invocada como | Usar na geracao? |
+|---------------|---------------|---------------|------------------|
+| `User Function NAME()` | Qualquer arquivo `.prw` ou `.tlpp` — sempre compila em RPO de cliente | `u_NAME()` | **SIM — escolha padrao para TODO codigo chamavel pelo cliente** |
+| `user function NAME()` (lowercase) | Arquivos TLPP — equivalente a `User Function` | `u_NAME()` | SIM em `.tlpp` (TLPP e case-insensitive; ambos funcionam) |
+| `Static Function NAME()` | Apenas arquivo `.prw` / `.tlpp` atual — helper interno | chamada direta dentro do arquivo | SIM para helpers privados dentro do mesmo arquivo |
+| `Method NAME() Class XXX` | Dentro de um bloco `class ... endclass` TLPP | `oObj:NAME()` | SIM para designs baseados em classe |
+| `Function NAME()` (puro) | **RESERVADO para o RPO core da TOTVS** — falha em RPO de cliente | ❌ | **NUNCA** emite `Function` puro em codigo gerado |
+
+Clientes compilam seu codigo ADVPL/TLPP em seu **proprio RPO** (nao o RPO core da TOTVS). A palavra-chave `Function` pura e reservada para rotinas core/padrao mantidas pela TOTVS e e bloqueada pelo compilador em RPOs de cliente. Clientes devem ser capazes de chamar seu proprio codigo via prefixo `u_` (ex.: `u_getCustomers()`), o que exige `User Function`.
+
+### Padrao oficial TOTVS para REST TLPP com anotacoes
+
+Tanto a documentacao do TDN (`Migracao WsRESTful para REST tlppCore`) quanto o repositorio de samples oficiais `totvs/tlpp-sample-rest` (arquivo `rest-mod02.tlpp`) usam `user function` com anotacoes `@Get/@Post/@Put/@Patch/@Delete`. Essa e a **referencia autoritativa** para endpoints REST TLPP — sempre siga.
+
+```c
+#include "tlpp-core.th"
+#include "tlpp-rest.th"
+
+namespace custom.est.productsapi
+
+@Get("/api/v1/products")
+User Function getProducts()
+    // implementacao
+return oRest:setResponse(cData)
+```
+
+### Excecoes (quando `Function` puro e correto)
+
+A palavra-chave `Function` pura e correta APENAS nestes casos especificos, e voce **nunca** deve emiti-los sem solicitacao explicita do usuario:
+
+1. **Fontes de localizacao** consumidas por `FwExecLocaliz` — o mecanismo de lookup exige o nome exato da funcao sem prefixo `u_` (ex.: `Function ExemploBRA(aParam)` em um arquivo de fonte localizado mantido pela TOTVS)
+2. **Rotinas core/padrao da TOTVS** — nao se aplica a codigo de customizacao de cliente em absoluto
+
+Em caso de duvida, padrao para `User Function`.
+
+## CRITICO: Declaracao de Namespace TLPP
+
+Todo arquivo `.tlpp` gerado para codigo de cliente **deve** declarar um `namespace`. Isso e tao importante quanto a regra de `User Function` acima — a ausencia quebra a consistencia com a skill de migracao ADVPL→TLPP e cria risco de colisao de nomes entre projetos de cliente que compartilham o mesmo ambiente Protheus.
+
+| Cenario | Namespace obrigatorio? | Convencao |
+|---------|------------------------|-----------|
+| Endpoint REST `.tlpp` (baseado em funcao, anotacoes) | **SIM** | `custom.<modulo>.<servico>` |
+| Endpoint REST `.tlpp` (baseado em classe) | **SIM** | `custom.<modulo>.<classe>` |
+| Classe `.tlpp` (Service, Repository, DTO, etc.) | **SIM** | `custom.<modulo>.<classe>` |
+| Job / processo batch `.tlpp` | **SIM** | `custom.<modulo>.<job>` |
+| Arquivo `.prw` (ADVPL) | Nao | N/A — namespaces sao apenas TLPP |
+
+### Inferencia a partir de `--module` e nome do arquivo/servico
+
+O gerador deve derivar o namespace automaticamente dos argumentos do comando:
+
+- **`--module <agrupador>`** fornece o segmento `<agrupador>` (lowercase)
+- **Nome do arquivo ou servico** fornece o segmento `<servico>` (lowercase, sem underscores, sem caracteres especiais)
+- **Resultado:** `namespace custom.<agrupador>.<servico>`
+
+**Exemplos:**
+
+| Comando | Namespace inferido |
+|---------|---------------------|
+| `/generate rest Purchase --lang tlpp --module compras` | `namespace custom.compras.purchase` |
+| `/generate class PedidoService --lang tlpp --module fat` | `namespace custom.fat.pedidoservice` |
+| `/generate job JobProcessaNotas --lang tlpp --module fat` | `namespace custom.fat.jobprocessanotas` |
+
+### Quando `--module` nao e fornecido
+
+**Pergunta ao usuario** durante a Fase de Planejamento — NAO omite o namespace silenciosamente e NAO inventa um padrao como `custom.geral.xxx`.
+
+### Regras de formato (convencao TOTVS)
+
+Todas as regras devem ser respeitadas simultaneamente:
+
+1. **Tudo em lowercase** — `custom.compras.purchase`, nunca `Custom.Compras.Purchase`
+2. **Separadores com ponto** — nunca barras, contrabarras, underscores ou hifens entre segmentos
+3. **Sem underscores dentro dos segmentos** — `purchaseorder` em vez de `purchase_order`
+4. **Sem espacos** — colapsa se necessario
+5. **Apenas prefixo `custom.*` para codigo de cliente** — `totvs.protheus.*` e reservado para codigo de produto TOTVS
+6. **Uma declaracao de namespace por arquivo** — sempre imediatamente apos os includes, antes do cabecalho `/*/{Protheus.doc}`
+
+### NAO usa `using namespace tlpp.*`
+
+`tlpp.core`, `tlpp.rest`, `tlpp.log`, `tlpp.data` sao fornecidos pelos includes `.th` (`tlpp-core.th`, `tlpp-rest.th`, etc.). Escrever `using namespace tlpp.core` esta incorreto e e desnecessario. `using namespace` so e valido para consumir **outros namespaces customizados** (ex.: `using namespace custom.fat.pedidoservice` em um arquivo consumidor).
+
+## CRITICO: Validacao de Tamanho de Identificador
+
+ADVPL herda um **limite de 10 caracteres** em identificadores do formato legado DBase DBF — apenas os 10 primeiros chars sao usados para identificar o simbolo. TLPP remove esse limite, mas **somente quando um `namespace` e declarado**. Gerar um nome que excede o limite produz codigo que falha ao compilar ou silenciosamente colide com outro simbolo que compartilha os 10 primeiros caracteres. Essa verificacao e **obrigatoria** durante a Fase 3 (Plano).
+
+| Construcao | Arquivo | Limite efetivo | Razao |
+|------------|---------|----------------|-------|
+| `User Function NAME()` | `.prw` | **8 caracteres** | Limite de 10 menos o prefixo `u_` (2 chars) |
+| `Static Function NAME()` | `.prw` | **10 caracteres** | 10 chars completos — sem prefixo |
+| Metodo de classe (ADVPL) | `.prw` | 10 caracteres | Excecao: classes herdando de `longnameclass` |
+| **TLPP com `namespace`** | `.tlpp` | **255 caracteres** | Disponivel a partir do release **12.1.2410** |
+| TLPP **sem** `namespace` | `.tlpp` | 10 caracteres | Cai no limite ADVPL |
+
+### Regra de validacao (aplicada durante a Fase 3)
+
+Antes de entrar em `EnterPlanMode`, calcula `len(name)` e compara com o limite para a linguagem/construcao escolhida:
+
+1. **`--lang advpl` (ou `.prw` padrao) + `User Function`:** `len(name) <= 8`
+2. **`--lang advpl` + `Static Function`:** `len(name) <= 10`
+3. **`--lang tlpp` + `namespace` declarado:** `len(name) <= 255` (sem limite pratico)
+
+Se o nome excede o limite, **NAO prossegue com o plano**. Em vez disso, apresenta ao usuario duas opcoes e aguarda a escolha:
+
+> "O nome `<NAME>` tem X caracteres, mas `<User Function|Static Function>` em ADVPL suporta no maximo `<8|10>` caracteres (limite herdado do DBF). Como deseja prosseguir?
+>
+> **(A) Encurtar o nome** — sugestoes: `<SUGESTAO1>`, `<SUGESTAO2>`, `<SUGESTAO3>`
+> **(B) Gerar em TLPP com namespace** (aceita ate 255 chars, disponivel a partir do release 12.1.2410). Seria: `custom.<agrupador>.<nome em lowercase>`. Qual o agrupador (`--module`)?"
+
+So entra em modo de plano apos o usuario escolher (A) + nome encurtado, ou (B) + agrupador para o namespace.
+
+### Sobre `longnameclass`
+
+`longnameclass` e um **mecanismo legado do ADVPL** (heranca magica) que permitia que metodos e propriedades de classe excedessem o limite de 10 chars. **NAO gera codigo novo baseado em `longnameclass`.** A substituicao moderna oficialmente suportada e TLPP com `namespace`. O plugin so reconhece `longnameclass` como excecao na skill de code review (BP-010) para evitar falsos positivos em codigo legado de cliente.
+
+Se o usuario explicitamente pedir uma geracao baseada em `longnameclass`, recusa e oferece TLPP com namespace como alternativa moderna.
+
+## CRITICO: Sem Varredura de Fontes do Projeto
+
+**NAO le, lista ou faz grep nos arquivos-fonte do projeto do cliente.** O plugin e baseado em templates — toda linha de codigo gerado vem dos templates e skills do proprio plugin, nao do codigo-base existente do cliente. Varrer os arquivos `.prw` / `.tlpp` / `.prx` do cliente durante `/generate` e **a maior causa unica de lentidao percebida** no plugin e deve ser evitada.
+
+### Por que isso importa
+
+- Projetos Protheus rotineiramente contem **milhares** de arquivos-fonte. Um `Glob "**/*.prw"` ou um `Grep` na arvore pode levar minutos e enterrar o plan mode do usuario sob uma parede de dados irrelevantes
+- O chamador ja fornece tudo que o gerador precisa: `type`, `name`, `--module` e requisitos de negocio
+- Convencoes de nomenclatura (Hungarian notation, prefixos de modulo) vem da skill `advpl-code-generation`, **nao** da inspecao de arquivos existentes
+- Estilo de codigo, tratamento de erros, save/restore de area, uso de `xFilial` — tudo definido nos templates do plugin, nao derivado do codigo-base do cliente
+- Caminhos de saida vem do diretorio de trabalho atual (ou `--output`), nao de varredura para "encontrar a pasta de modulo certa"
+
+### Acoes permitidas e proibidas
+
+| Acao | Permitida? | Razao |
+|------|------------|-------|
+| `Read` de arquivos dentro do diretorio do plugin (`skills/*`, `templates-*.md`, `patterns-*.md`, `agents/code-generator.md`) | **SIM** | Necessario para carregar templates e padroes |
+| `Glob` / `Grep` dentro do diretorio do plugin (para encontrar arquivos de suporte) | **SIM** | Necessario para lookup de templates |
+| `Write` do arquivo `.prw` / `.tlpp` final gerado no diretorio atual (ou `--output`) | **SIM** | O proposito do `/generate` |
+| `Read` de um **arquivo unico especifico** que o usuario referenciou explicitamente (caminho exato fornecido pelo usuario) | **SIM, sob demanda** | Ex.: "gere um REST similar ao de `src/FATA001.prw`" — le esse arquivo exato, nada mais |
+| `WebSearch` / `WebFetch` no TDN para pontos de entrada (Fase 2) | **SIM** | Requisito documentado para `ponto-entrada` |
+| **`Glob "**/*.prw"` / `Glob "**/*.tlpp"` / `Glob "src/**/*"`** | **NAO** | Proibitivamente lento, nunca necessario |
+| **`Grep` na arvore de fontes do cliente para "encontrar padroes" ou "checar nomenclatura existente"** | **NAO** | Nomenclatura e estilo vem dos templates, nao do codigo-base |
+| **`Read` de arquivos-fonte do cliente "para entender o codigo-base"** | **NAO** | Templates sao auto-suficientes |
+| **`Bash ls src/`, `Bash find . -name "*.prw"`, `Bash tree`** | **NAO** | Mesma proibicao — esses bypassam `Glob` mas produzem o mesmo efeito |
+| **Inferir caminho de saida varrendo pastas de modulo** | **NAO** | Salva no diretorio atual ou pergunta ao usuario; nao varre |
+
+### Disciplina por fase
+
+- **Fase 1 (Entender requisitos):** Pergunta `type`, `name`, `--module`, logica de negocio. **Nao le nenhum arquivo-fonte do cliente.** Se o usuario nao forneceu o nome, pergunta — nao varre por nomes existentes para evitar colisoes.
+- **Fase 2 (Carregar referencia):** `Read` apenas arquivos **dentro do diretorio do plugin** (skills, templates, patterns). Para pontos de entrada, `WebSearch` no TDN. **Nao toca na arvore de fontes do cliente.**
+- **Fase 3 (Plano):** O plano descreve o que sera escrito a partir dos templates — nao o que foi observado no codigo do cliente. Se voce se pegar querendo `Glob` ou `Grep` para "validar" algo, pare: a resposta esta nos templates do plugin, nao nos arquivos do cliente.
+- **Fase 4 (Gerar codigo):** `Write` do arquivo no diretorio de trabalho atual (ou `--output`). Nao varre para escolher uma pasta de destino.
+- **Fase 5 (Revisar e entregar):** Re-le **apenas o arquivo que voce acabou de escrever** para confirmar que o conteudo esta correto. Nao explora arquivos adjacentes.
+
+### Unica excecao: arquivo unico referenciado pelo usuario
+
+O unico caso legitimo para ler um arquivo do cliente durante `/generate` e quando o usuario referencia explicitamente um arquivo em sua solicitacao:
+
+> "gere um REST similar ao existente em `src/fontes/FATA001.prw`"
+> "crie um novo Service seguindo o mesmo padrao de `PedidoService.tlpp`"
+
+Nesses casos:
+1. `Read` **apenas** o caminho exato fornecido pelo usuario — **nunca** expande para arquivos vizinhos ou para o diretorio pai
+2. **Nao** segue diretivas `#Include` para outros arquivos do cliente
+3. **Nao** usa `Glob` para encontrar arquivos "relacionados"
+
+Se a referencia do usuario e ambigua (sem caminho exato), pergunta uma questao de esclarecimento — nao varre.
+
 ## CRITICO: Metodos JsonObject
 
 Ao gerar codigo que usa `JsonObject`, **SOMENTE use metodos que realmente existem** na classe. A lista completa de metodos validos do TDN:
@@ -187,6 +357,14 @@ oView:EnableTitleView("VIEW_SA1", "Dados do Cliente")
 
 Antes de entregar qualquer codigo gerado, verificar:
 
+- [ ] **Palavra-chave de funcao e `User Function` (ou `Static Function` / `Method` / anotacao de classe) — NUNCA `Function` puro em codigo de cliente**
+- [ ] **Arquivos TLPP declaram `namespace custom.<agrupador>.<servico>` imediatamente apos os includes — NUNCA omite o namespace em um arquivo `.tlpp` gerado**
+- [ ] **Namespace segue as regras de formato: tudo em lowercase, separadores com ponto, sem underscores, sem maiusculas, apenas prefixo `custom.*` para codigo de cliente**
+- [ ] **Sem `using namespace tlpp.core` / `tlpp.rest` / `tlpp.log` / `tlpp.data` — esses vem dos includes `.th`**
+- [ ] **Tamanho do identificador respeita o limite: `User Function` ≤ 8 chars (`.prw`), `Static Function` ≤ 10 chars (`.prw`), TLPP com `namespace` ≤ 255 chars**
+- [ ] **Se o nome solicitado excede o limite ADVPL, o gerador bloqueou o plano e pediu ao usuario para encurtar o nome ou mudar para TLPP com namespace**
+- [ ] **Sem geracao de codigo que dependa de `longnameclass` — TLPP com namespace e a substituicao moderna**
+- [ ] **Sem varredura de fontes do projeto do cliente — `Glob`/`Grep`/`Read` em `.prw`/`.tlpp` do cliente NAO foi usado (apenas permitido em arquivos internos do plugin, em arquivo unico referenciado pelo usuario, ou para escrever o arquivo final)**
 - [ ] Todas as variaveis declaradas como Local (sem Private/Public)
 - [ ] TODAS as declaracoes Local no TOPO da funcao (nunca dentro de If/While/For)
 - [ ] Hungarian notation em todos os nomes de variaveis
