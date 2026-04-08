@@ -37,7 +37,7 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 |------|------------|---------|
 | `--module` | Module prefix (COM, FAT, FIN, etc.). For TLPP output, also used as the namespace agrupador: `custom.<module>.<servico>` | Ask user |
 | `--lang` | Language: advpl or tlpp | advpl for function/mvc/pe, tlpp for class |
-| `--output` | Output file path | Auto-generated based on name |
+| `--output` | Output file path | Current directory + name + extension. **Do NOT scan the project to infer a path** — if the user wants a specific location, they must pass `--output` explicitly or answer a question about it. |
 
 > **TLPP namespace (mandatory for `.tlpp` files):** every generated `.tlpp` file declares a `namespace custom.<agrupador>.<servico>` line right after the includes. The generator derives the namespace from `--module` (as agrupador) plus the service/class name (as servico), all lowercase with no underscores. If `--module` is not provided, the generator asks the user for the agrupador during the Planning Phase. See [advpl-code-generation skill — TLPP Namespace Rules](../skills/advpl-code-generation/SKILL.md) for the complete rule.
 
@@ -45,9 +45,37 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 
 **MANDATORY: Always enter planning mode before generating code. Never skip planning.**
 
+### No Project Source Scanning (CRITICAL)
+
+**Do NOT scan the customer's project source files.** The plugin is template-driven — all code is generated from the plugin's own templates and skills. Reading existing `.prw` / `.tlpp` / `.prx` files from the customer's project is **not required** for any `/generate` scenario and must be avoided because:
+
+- Protheus projects routinely have thousands of source files — scanning them is prohibitively slow and wastes the user's time
+- The generated code comes from the plugin's templates, not from the customer's codebase
+- Naming, style and patterns come from the skill (`advpl-code-generation`), not from existing files
+- The caller already provides everything the generator needs: `type`, `name`, `--module`, business requirements
+
+**Allowed uses of `Read` / `Glob` / `Grep`:**
+- Reading files **inside the plugin itself** — `skills/*`, `templates-*.md`, `patterns-*.md`, `agents/code-generator.md`
+- `Write` the final generated `.prw` / `.tlpp` file to disk
+- `Read` a **specific file** the user explicitly referenced in their request (single file, exact path the user provided)
+
+**Forbidden uses:**
+- `Glob "**/*.prw"`, `Glob "**/*.tlpp"`, `Glob "src/**/*"` — never list customer source files
+- `Grep` across the customer's source tree to "find patterns" or "check existing naming"
+- `Read` customer source files "to understand the codebase" — the templates are self-contained
+- `Bash ls`, `Bash find`, `Bash tree` on the customer project root — same prohibition
+
+**Output path rule:** Save the generated file to the **current working directory** using `<name>.<ext>` (or the path passed via `--output`). Never `Glob` to discover module folders, never "guess" the right location by scanning. If the user has a preferred location, either they pass `--output` or the generator asks a direct question.
+
+**Only exception:** The user explicitly references an existing file in their request (e.g., *"gere um REST similar ao que está em `src/fontes/FATA001.prw`"*). In that case, `Read` is allowed **only** on the exact path the user provided — never expanded into a full-project scan.
+
 ### Planning Phase (REQUIRED)
 1. **Parse arguments** - Extract type, name, and flags
 2. **Ask missing details** - If name or module not provided, ask the user. **For TLPP generation (`.tlpp` output), also collect the namespace agrupador: if `--module <agrupador>` is provided, infer `namespace custom.<agrupador>.<servico>` automatically; if `--module` is missing, ask the user explicitly for the agrupador before entering plan mode. Never silently omit the namespace and never invent a default.**
+2a. **Validate identifier length (BLOCKING)** - Compute `len(name)` and compare against the effective limit for the chosen language/construct: `User Function` in `.prw` must be ≤ 8 chars, `Static Function` in `.prw` must be ≤ 10 chars, TLPP with `namespace` accepts up to 255 chars. If the name exceeds the limit, **do NOT enter plan mode**. Present the user with two explicit options and wait for their choice:
+   - **(A) Shorten the name** — suggest 2-3 alternatives following Protheus conventions (module prefix + sequence like `FATA100`, mnemonic abbreviation, or functional abbreviation). Never offer random truncations.
+   - **(B) Switch to TLPP with namespace** — explain that TLPP with namespace supports up to 255 chars (available from Protheus release 12.1.2410). Ask for the agrupador (`--module`) if missing.
+   Only proceed to the next step after the user picks (A) + shortened name, or (B) + namespace agrupador. See the [advpl-code-generation skill — Identifier Length Limits](../skills/advpl-code-generation/SKILL.md) for the complete rule and the [code-generator agent — CRITICAL: Identifier Length Validation](../agents/code-generator.md) for the suggestion heuristics. **Never generate code that depends on `longnameclass` as a workaround — TLPP with namespace is the modern, officially supported alternative.**
 3. **Ask business requirements** - What should the code do?
 4. **Load skill** - Invoke `advpl-code-generation` skill
 5. **Load patterns** - Read appropriate supporting file for the type
@@ -58,6 +86,7 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
    - Code structure (functions, classes, methods to implement)
    - **Explicit declaration of the function keyword** to be used for every function in the plan: `User Function` (default for customer-callable code), `Static Function` (internal helper), or `Method ... Class` (TLPP class). **Never** plan a bare `Function` keyword for customer code — it is reserved for the TOTVS core RPO and will not compile in a customer RPO.
    - **For every `.tlpp` file, the exact `namespace` declaration to be emitted**, following the convention `custom.<agrupador>.<servico>` (all lowercase, dots as separators, no underscores). Show it as a literal line (e.g., `namespace custom.compras.purchase`) derived from `--module` + the service/class name. If `--module` was not provided, this must have been resolved in step 2.
+   - **Identifier length check result** — explicitly confirm in the plan that every function/method name fits the effective limit for the chosen language: `User Function` ≤ 8 chars (`.prw`), `Static Function` ≤ 10 chars (`.prw`), TLPP with `namespace` ≤ 255 chars. If the name was shortened in step 2a, also mention the original name for traceability (e.g., `FATA100 (shortened from ProcessaValidacaoItens)`).
    - Includes and dependencies
    - Key patterns to apply (MVC, REST, SOAP, etc.)
    - Naming conventions to follow (Hungarian notation, module prefix)

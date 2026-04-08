@@ -211,6 +211,35 @@ Every generated `.tlpp` file for customer code **must** declare a `namespace` im
 
 **Do NOT use `using namespace tlpp.*`:** `tlpp.core`, `tlpp.rest`, `tlpp.log`, `tlpp.data` are provided by the `.th` includes. `using namespace` is only valid to consume **other custom namespaces** in consumer files (e.g., `using namespace custom.fat.pedidoservice`).
 
+## Identifier Length Limits (CRITICAL)
+
+ADVPL inherits a **10-character limit** on identifiers (functions, methods, variables, fields) from the legacy DBase DBF format — only the first 10 characters are used to identify the symbol. TLPP removes this limit, but **only when a `namespace` is declared**. Generating a name that exceeds the limit produces code that either fails to compile or silently collides with another symbol sharing the first 10 characters.
+
+| Construct | File | Effective limit | Why |
+|-----------|------|-----------------|-----|
+| `User Function NAME()` | `.prw` | **8 characters** | 10-char limit minus the `u_` prefix (2 chars) |
+| `Static Function NAME()` | `.prw` | **10 characters** | No prefix — full 10 chars available |
+| `Function NAME()` (core) | `.prw` | 10 characters | Reserved for TOTVS core RPO |
+| Class method (ADVPL) | `.prw` | 10 characters | Exception: classes inheriting from `longnameclass` (legacy workaround) |
+| Variable / parameter | `.prw` / `.tlpp` | 10 characters | Same DBF legacy |
+| **TLPP with `namespace`** | `.tlpp` | **255 characters** | Available from Protheus release **12.1.2410** — effectively unlimited |
+| TLPP **without** `namespace` | `.tlpp` | 10 characters | Falls back to the ADVPL limit |
+
+**Generation rule (enforced during Planning Phase):**
+
+1. If `--lang advpl` (or default `.prw`) and the target is `User Function`: **name must be ≤ 8 characters**
+2. If `--lang advpl` and the target is `Static Function`: **name must be ≤ 10 characters**
+3. If `--lang tlpp` and a `namespace` is declared: **name must be ≤ 255 characters** (no practical limit)
+4. If the requested name exceeds the ADVPL limit, the generator **must not generate the file**. Instead, present two options to the user in the plan:
+   - **(A) Shorten the name** — suggest 2-3 abbreviated alternatives (module prefix + mnemonic, e.g., `ProcessaValidacaoItens` → `FATA100`, `VLDITENS`, `PRCVALIT`)
+   - **(B) Switch to TLPP with namespace** — ask for the agrupador if `--module` is missing and generate `custom.<agrupador>.<servico>`
+
+**About `longnameclass`:** it is a legacy ADVPL mechanism (magical inheritance) that historically allowed class methods and properties to exceed the 10-char limit. **Do not generate new code based on `longnameclass`** — TLPP with `namespace` is the modern, officially supported replacement. The plugin only recognizes `longnameclass` as an exception during code review (BP-010) to avoid false positives on legacy code.
+
+**References:**
+- TDN — [Tamanho do nome (identificador) de função](https://tdn.totvs.com/pages/viewpage.action?pageId=172296510)
+- TDN — [Suporte a TLPP no Protheus](https://tdn.totvs.com/display/public/framework/Suporte+a+TLPP+no+Protheus)
+
 ## Common Mistakes
 
 | Mistake | Fix |
@@ -218,6 +247,8 @@ Every generated `.tlpp` file for customer code **must** declare a `namespace` im
 | **Using bare `Function` keyword in customer code** | **Always use `User Function` (customer RPO requires it; invoked as `u_NAME()`)** |
 | **Omitting `namespace` in a generated `.tlpp` file** | **Always declare `namespace custom.<agrupador>.<servico>` after the includes — infer from `--module` + service name, or ask the user** |
 | **Using `using namespace tlpp.core` / `tlpp.rest` / `tlpp.log` / `tlpp.data`** | **Remove it — those namespaces come from `.th` includes automatically** |
+| **`User Function` with more than 8 characters in the name** | **Shorten to ≤ 8 chars (ADVPL limit is 10, minus the `u_` prefix) or switch to TLPP with `namespace`** |
+| **`Static Function` with more than 10 characters in the name** | **Shorten to ≤ 10 chars (ADVPL legacy limit from DBF) or switch to TLPP with `namespace` (supports up to 255 chars)** |
 | Using Private instead of Local | Always declare as Local, pass via parameters |
 | Not saving/restoring area (GetArea/RestArea) | Always wrap DB operations with area save/restore |
 | Missing error handling | Always use Begin Sequence / Recover / End Sequence |

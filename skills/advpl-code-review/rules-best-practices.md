@@ -518,3 +518,133 @@ return oRest:setResponse(cData)
 **Why it matters:** This is a silent failure mode. The code may look valid in an editor, but the customer's `appre` compiler will reject it when building the customer RPO, or TLPP REST annotations will never be registered. Users who copy-paste from stale examples (including older plugin-generated code) hit this and are blocked until they rename the keyword. Always default to `User Function` unless there is an explicit, documented reason to use something else.
 
 **Authoritative reference:** TOTVS sample repository `totvs/tlpp-sample-rest`, file `rest-mod02.tlpp` (annotation-based REST with `user function`) and `rest-mod03.tlpp` (class-based REST with annotated methods).
+
+---
+
+## [BP-010] Identifier name exceeds the effective length limit
+
+**Severity:** CRITICAL
+
+**Description:** ADVPL inherits a **10-character limit** on identifiers (functions, methods, variables, fields) from the legacy DBase DBF format — only the first 10 characters are used to uniquely identify the symbol. TLPP removes this limit, but **only when a `namespace` is declared**. A name that exceeds the limit either fails to compile or silently collides with another symbol sharing the first 10 characters, producing one of the most insidious bugs in Protheus: two different functions/methods invoked as if they were the same.
+
+The effective limits are:
+
+| Construct | File | Effective limit | Reason |
+|-----------|------|-----------------|--------|
+| `User Function NAME()` | `.prw` | **8 characters** | 10-char limit minus the `u_` invocation prefix (2 chars) |
+| `Static Function NAME()` | `.prw` | **10 characters** | Full 10 chars — no prefix |
+| Class method (ADVPL) | `.prw` | 10 characters | Exception: classes inheriting from `longnameclass` (legacy) |
+| Variable / parameter | `.prw` / `.tlpp` without namespace | 10 characters | Same DBF legacy |
+| **TLPP with `namespace`** | `.tlpp` | **255 characters** | Available from Protheus release **12.1.2410** |
+| TLPP **without** `namespace` | `.tlpp` | 10 characters | Falls back to ADVPL limit |
+
+**What to look for:**
+
+1. **`.prw` files:**
+   - `User Function NAME` where `len(NAME) > 8`
+   - `Static Function NAME` where `len(NAME) > 10`
+   - `Method NAME() Class XXX` where `len(NAME) > 10`, **unless** the class declaration contains `from longnameclass` (case-insensitive)
+2. **`.tlpp` files WITHOUT a `namespace` declaration:**
+   - Any function/method/class with `len(name) > 10` — same fallback as ADVPL
+3. **`.tlpp` files WITH a `namespace` declaration:**
+   - Only flag if `len(name) > 255` (extreme edge case, practically unreachable)
+
+Skip the check for variables and parameters during static review (too noisy) — focus exclusively on function, method, and class names, which are the cases that cause real compilation/collision incidents.
+
+**Violation:**
+
+```advpl
+#Include "TOTVS.CH"
+
+// WRONG — User Function with 14 chars (limit is 8)
+User Function ProcessaValidacao()
+    Local lRet := .T.
+Return lRet
+```
+
+```advpl
+#Include "TOTVS.CH"
+
+// WRONG — Static Function with 15 chars (limit is 10)
+Static Function ValidaCadastroItem()
+    Return .T.
+```
+
+```tlpp
+#include "tlpp-core.th"
+#include "tlpp-rest.th"
+
+// WRONG — TLPP file without namespace and 17-char function name
+// Falls back to the 10-char ADVPL limit
+@Post("/api/v1/validacao")
+User Function processaCadastroCliente()
+return
+```
+
+**Correct:**
+
+```advpl
+#Include "TOTVS.CH"
+
+// RIGHT — User Function with 7 chars (respects the 8-char limit)
+User Function FATA100()
+    Local lRet := .T.
+Return lRet
+```
+
+```advpl
+#Include "TOTVS.CH"
+
+// RIGHT — Static Function with 10 chars (at the limit)
+Static Function ValidaItem()
+    Return .T.
+```
+
+```tlpp
+#include "tlpp-core.th"
+#include "tlpp-rest.th"
+
+// RIGHT — TLPP with namespace: long function names are allowed (up to 255 chars)
+namespace custom.fat.processacadastrocliente
+
+@Post("/api/v1/cadastro")
+User Function processaCadastroCliente()
+return
+```
+
+**Exception — `longnameclass`:**
+
+`longnameclass` is a legacy ADVPL mechanism (magical inheritance) that allows class methods and properties to exceed the 10-char limit. When a class declaration contains `from longnameclass`, the reviewer must **NOT** flag its methods for exceeding the 10-char limit. Example:
+
+```advpl
+// OK — methods can exceed 10 chars because of longnameclass inheritance
+Class MinhaClasseCustomizada From LongNameClass
+    Method AtualizaCadastroCliente()  // 23 chars — OK here
+EndClass
+```
+
+However, **do not recommend `longnameclass` as a fix** when generating new code or suggesting refactors. The modern, officially supported replacement is TLPP with `namespace`. Mention `longnameclass` only when reviewing pre-existing legacy code.
+
+**Suggested fixes (in order of preference):**
+
+1. **For `.prw` files** — two equally valid options:
+   - **(A) Shorten the name** to fit within 8 (User Function) or 10 (Static Function) chars. Follow Protheus conventions: module prefix + sequence (`FATA100`), mnemonic abbreviation (`PRCVALIT`), or functional abbreviation (`VLDITENS`).
+   - **(B) Migrate the file to `.tlpp` with a `namespace`** declaration. The namespace lifts the length limit to 255 chars and aligns with the modern TLPP direction.
+2. **For `.tlpp` files without namespace** — add the `namespace custom.<agrupador>.<servico>` declaration right after the includes. This is almost always the correct fix since the file is already `.tlpp`.
+3. **Never** suggest `longnameclass` as a fix for new code or active refactors.
+
+**Rule summary:**
+
+| Scenario | Limit | Fix |
+|----------|-------|-----|
+| `.prw` + `User Function` > 8 chars | 8 | Shorten or migrate to TLPP + namespace |
+| `.prw` + `Static Function` > 10 chars | 10 | Shorten or migrate to TLPP + namespace |
+| `.prw` + class method > 10 chars, no `longnameclass` | 10 | Shorten or migrate to TLPP + namespace |
+| `.tlpp` without namespace + name > 10 chars | 10 | Add `namespace custom.<agrupador>.<servico>` |
+| `.tlpp` with namespace + name > 255 chars | 255 | Shorten (rare) |
+
+**Why it matters:** The 10-char collision is one of the hardest ADVPL bugs to diagnose. Two functions named `ProcessaPedidoCliente` and `ProcessaPedidoFornecedor` are **the same function** to the ADVPL compiler — only the first call to `u_Processa` is reachable, the second is silently shadowed. On TLPP files without namespace, the failure is identical. Adopting TLPP with `namespace` (available since release **12.1.2410**) removes the limit entirely and is the officially documented path forward from TOTVS.
+
+**Authoritative references:**
+- TDN — [Tamanho do nome (identificador) de função](https://tdn.totvs.com/pages/viewpage.action?pageId=172296510)
+- TDN — [Suporte a TLPP no Protheus](https://tdn.totvs.com/display/public/framework/Suporte+a+TLPP+no+Protheus)

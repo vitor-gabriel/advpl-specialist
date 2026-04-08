@@ -59,7 +59,7 @@ Each finding must include:
 
 | Prefix | Category | Example |
 |--------|----------|---------|
-| `BP` | Best Practices | `[BP-001]` RecLock without MsUnlock, `[BP-008]` Reserved system variables |
+| `BP` | Best Practices | `[BP-001]` RecLock without MsUnlock, `[BP-009]` Bare `Function` keyword in customer code, `[BP-010]` Identifier name exceeds the effective length limit |
 | `PERF` | Performance | `[PERF-001]` SELECT * in Embedded SQL |
 | `SEC` | Security | `[SEC-001]` SQL injection, `[SEC-005]` Restricted TOTVS functions |
 | `MOD` | Modernization | `[MOD-001]` .prw class candidate for .tlpp |

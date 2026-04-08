@@ -353,6 +353,206 @@ Class PedidoService
 EndClass
 ```
 
+## CRITICAL: Identifier Length Validation
+
+ADVPL inherits a **10-character limit** on identifiers from the legacy DBase DBF format — only the first 10 chars are used to identify the symbol. TLPP removes this limit, but **only when a `namespace` is declared**. Generating a name that exceeds the limit produces code that fails to compile or silently collides with another symbol sharing the first 10 characters. This check is **mandatory** during Phase 3 (Plan).
+
+### The limits
+
+| Construct | Target file | Effective limit | Reason |
+|-----------|-------------|-----------------|--------|
+| `User Function NAME()` | `.prw` | **8 characters** | 10-char limit minus the `u_` invocation prefix (2 chars) |
+| `Static Function NAME()` | `.prw` | **10 characters** | Full 10 chars — no prefix |
+| Class method (ADVPL) | `.prw` | 10 characters | Exception: classes inheriting from `longnameclass` |
+| Variable / parameter | `.prw` / `.tlpp` without namespace | 10 characters | Same DBF legacy |
+| **TLPP with `namespace`** | `.tlpp` | **255 characters** | Available from Protheus release **12.1.2410** |
+| TLPP **without** `namespace` | `.tlpp` | 10 characters | Falls back to ADVPL limit |
+
+### Validation rule (enforced during Phase 3)
+
+Before entering `EnterPlanMode`, compute `len(name)` and compare against the limit for the chosen language/construct:
+
+1. **`--lang advpl` (or default `.prw`) + `User Function`:** `len(name) <= 8`
+2. **`--lang advpl` + `Static Function`:** `len(name) <= 10`
+3. **`--lang tlpp` + `namespace` declared:** `len(name) <= 255` (no practical limit)
+
+If the name exceeds the limit, **do NOT proceed with the plan**. Instead, present the user with two options and wait for their choice:
+
+> "O nome `<NAME>` tem X caracteres, mas `<User Function|Static Function>` em ADVPL suporta no máximo `<8|10>` caracteres (limite herdado do DBF). Como deseja prosseguir?
+>
+> **(A) Encurtar o nome** — sugestões: `<SUGGESTION1>`, `<SUGGESTION2>`, `<SUGGESTION3>`
+> **(B) Gerar em TLPP com namespace** (aceita até 255 chars, disponível a partir do release 12.1.2410). Seria: `custom.<agrupador>.<nome em lowercase>`. Qual o agrupador (`--module`)?"
+
+Only enter plan mode after the user picks (A) + a shortened name, or (B) + an agrupador for the namespace.
+
+### Suggestion rules (when offering option A)
+
+Generate 2-3 alternatives using these heuristics, in order of preference:
+
+1. **Module prefix + sequence** (when `--module` is present) — follows Protheus convention: `FATA100`, `COMA200`, `ESTA001`. Max 7-8 chars.
+2. **Mnemonic abbreviation** — drop vowels or keep consonants: `ProcessaValidacaoItens` → `PRCVALIT`, `PRVLDITM`, `VLDITENS`.
+3. **Functional abbreviation** — use domain verbs: `AtualizaCadastroCliente` → `ATUCLI`, `UPDCLI`, `CADCLI`.
+
+Always keep suggestions readable and discoverable — never return random truncations like `Process123`.
+
+### About `longnameclass`
+
+`longnameclass` is a **legacy ADVPL mechanism** (magical inheritance) that allowed class methods and properties to exceed the 10-char limit. **Do NOT generate new code based on `longnameclass`.** The modern, officially supported replacement is TLPP with `namespace`. The plugin only recognizes `longnameclass` as an exception in the code review skill (BP-010) to avoid false positives on legacy customer code.
+
+If the user explicitly asks for a `longnameclass`-based generation, refuse and offer TLPP with namespace as the modern alternative.
+
+### Forbidden patterns — NEVER generate these
+
+```advpl
+// WRONG — User Function with 12 chars in a .prw file
+User Function ProcessaValida()
+    // fails: effective limit is 8 chars for User Function
+Return .T.
+```
+
+```advpl
+// WRONG — Static Function with 15 chars in a .prw file
+Static Function ValidaCadastroItem()
+    // fails: effective limit is 10 chars for Static Function
+Return .T.
+```
+
+```tlpp
+// WRONG — TLPP file without namespace but with a 15-char function name
+#include "tlpp-core.th"
+
+User Function ProcessaCadastro()
+    // fails: without namespace, TLPP falls back to the 10-char ADVPL limit
+Return .T.
+```
+
+### Correct patterns — ALWAYS generate these
+
+```advpl
+// RIGHT — User Function respecting the 8-char limit (.prw)
+#Include "TOTVS.CH"
+
+User Function FATA100()
+    // compiles: 7 chars, invoked as u_FATA100()
+Return .T.
+```
+
+```advpl
+// RIGHT — Static Function respecting the 10-char limit (.prw)
+#Include "TOTVS.CH"
+
+Static Function ValidaItem()
+    // compiles: 10 chars, direct call within the same file
+Return .T.
+```
+
+```tlpp
+// RIGHT — TLPP with namespace: long names are allowed
+#include "tlpp-core.th"
+#include "tlpp-rest.th"
+
+namespace custom.fat.processavalidacaoitens
+
+@Post("/api/v1/validacao")
+User Function processaValidacaoItens()
+    // compiles: namespace removes the ADVPL length limit
+Return
+```
+
+### References
+
+- TDN — [Tamanho do nome (identificador) de função](https://tdn.totvs.com/pages/viewpage.action?pageId=172296510)
+- TDN — [Suporte a TLPP no Protheus](https://tdn.totvs.com/display/public/framework/Suporte+a+TLPP+no+Protheus)
+
+## CRITICAL: No Project-Wide Source Scanning
+
+**Do NOT read, list, or grep the customer's project source files.** The plugin is template-driven — every line of generated code comes from the plugin's own templates and skills, not from the customer's existing codebase. Scanning the customer's `.prw` / `.tlpp` / `.prx` files during `/generate` is **the single biggest cause of perceived slowness** in the plugin and must be avoided.
+
+### Why this matters
+
+- Protheus projects routinely contain **thousands** of source files. A `Glob "**/*.prw"` or a `Grep` across the tree can take minutes and bury the user's plan mode behind a wall of irrelevant data
+- The caller already provides everything the generator needs: `type`, `name`, `--module`, and business requirements
+- Naming conventions (Hungarian notation, module prefixes) come from the `advpl-code-generation` skill, **not** from inspecting existing files
+- Code style, error handling, area save/restore, `xFilial` usage — all defined in the plugin templates, not derived from the customer codebase
+- Output paths come from the current working directory (or `--output`), not from scanning to "find the right module folder"
+
+### Allowed and forbidden actions
+
+| Action | Allowed? | Reason |
+|--------|----------|--------|
+| `Read` files inside the plugin directory (`skills/*`, `templates-*.md`, `patterns-*.md`, `agents/code-generator.md`) | **YES** | Required to load templates and patterns |
+| `Glob` / `Grep` inside the plugin directory (to find supporting files) | **YES** | Required for template lookup |
+| `Write` the final generated `.prw` / `.tlpp` file to the current directory (or `--output`) | **YES** | The whole point of `/generate` |
+| `Read` a **single specific file** the user explicitly referenced in their request (exact path provided by the user) | **YES, on demand only** | E.g., "gere um REST similar ao de `src/FATA001.prw`" — read that exact file, nothing else |
+| `WebSearch` / `WebFetch` the TDN for entry points (Phase 2) | **YES** | Documented requirement for `ponto-entrada` |
+| **`Glob "**/*.prw"` / `Glob "**/*.tlpp"` / `Glob "src/**/*"`** | **NO** | Prohibitively slow, never needed |
+| **`Grep` across the customer source tree to "find patterns" or "check existing naming"** | **NO** | Naming and style come from templates, not the codebase |
+| **`Read` customer source files "to understand the codebase"** | **NO** | Templates are self-contained |
+| **`Bash ls src/`, `Bash find . -name "*.prw"`, `Bash tree`** | **NO** | Same prohibition — these bypass `Glob` but produce the same effect |
+| **Inferring output path by scanning module folders** | **NO** | Save to current directory or ask the user; do not scan |
+
+### Phase-by-phase discipline
+
+- **Phase 1 (Understand Requirements):** Ask for `type`, `name`, `--module`, business logic. **Do not read any customer source file.** If the user hasn't provided a name, ask — do not scan for existing names to avoid collisions.
+- **Phase 2 (Load Reference):** `Read` only files **inside the plugin directory** (skills, templates, patterns). For entry points, `WebSearch` the TDN. **Do not touch the customer source tree.**
+- **Phase 3 (Plan):** The plan describes what will be written from templates — not what was observed in the customer code. If you find yourself wanting to `Glob` or `Grep` to "validate" something, stop: the answer is in the plugin templates, not in the customer's files.
+- **Phase 4 (Generate Code):** `Write` the file to the current working directory (or `--output`). Do not scan to pick a destination folder.
+- **Phase 5 (Review and Deliver):** Re-read **only the file you just wrote** to confirm the content is correct. Do not explore adjacent files.
+
+### Only exception: user-provided single file reference
+
+The sole legitimate case for reading a customer file during `/generate` is when the user explicitly references one file in their request:
+
+> "gere um REST similar ao existente em `src/fontes/FATA001.prw`"
+> "crie um novo Service seguindo o mesmo padrão de `PedidoService.tlpp`"
+
+In these cases:
+1. `Read` **only** the exact path the user provided — **never** expand to sibling files or the parent directory
+2. Do **not** follow `#Include` directives into other customer files
+3. Do **not** `Glob` to find "related" files
+
+If the user's reference is ambiguous (no exact path), ask a clarifying question — do not scan.
+
+### Forbidden patterns — NEVER do these
+
+```
+// WRONG — listing all customer sources
+Glob("**/*.prw")
+Glob("**/*.tlpp")
+Glob("src/**/*.{prw,tlpp}")
+
+// WRONG — searching the customer tree
+Grep(pattern: "User Function", path: ".")
+Grep(pattern: "Class \w+", type: "prw")
+
+// WRONG — bash shortcuts to bypass Glob
+Bash("find . -name '*.prw'")
+Bash("ls src/")
+Bash("tree -L 3")
+
+// WRONG — reading a customer file that the user did NOT reference
+Read("/customer-project/src/FATA001.prw")  // user only said "create a new function FATA050"
+```
+
+### Correct patterns — ALWAYS do these
+
+```
+// RIGHT — reading plugin internals (template loading)
+Read("/plugin-path/skills/advpl-code-generation/patterns-rest.md")
+Read("/plugin-path/skills/advpl-code-generation/templates-classes.md")
+
+// RIGHT — writing the generated file to the current directory
+Write("./FATA050.prw", <generated content>)
+
+// RIGHT — reading an explicit file the user referenced
+// User said: "gere similar ao de src/FATA001.prw"
+Read("./src/FATA001.prw")  // the exact path, nothing else
+
+// RIGHT — TDN lookup for entry points
+WebSearch("MT100LOK site:tdn.totvs.com")
+WebFetch("https://tdn.totvs.com/...")
+```
+
 ## CRITICAL: JsonObject Methods
 
 When generating code that uses `JsonObject`, **ONLY use methods that actually exist** in the class. The complete list of valid methods from the TDN is:
@@ -438,6 +638,10 @@ Before delivering any generated code, verify:
 - [ ] **TLPP files declare a `namespace custom.<agrupador>.<servico>` immediately after the includes — NEVER omit the namespace in a generated `.tlpp` file**
 - [ ] **Namespace follows the format rules: all lowercase, dot separators, no underscores, no uppercase, only `custom.*` prefix for customer code**
 - [ ] **No `using namespace tlpp.core` / `tlpp.rest` / `tlpp.log` / `tlpp.data` — those come from `.th` includes**
+- [ ] **Identifier length respects the limit: `User Function` ≤ 8 chars (`.prw`), `Static Function` ≤ 10 chars (`.prw`), TLPP with `namespace` ≤ 255 chars**
+- [ ] **If the requested name exceeds the ADVPL limit, the generator blocked the plan and asked the user to shorten the name or switch to TLPP with namespace**
+- [ ] **No generation of code that depends on `longnameclass` — TLPP with namespace is the modern replacement**
+- [ ] **No customer project source scanning — `Glob`/`Grep`/`Read` on customer `.prw`/`.tlpp` files was NOT used (only allowed on plugin internals, on a specific user-referenced file, or to write the final output)**
 - [ ] All variables declared as Local (no Private/Public)
 - [ ] ALL Local declarations at the TOP of the function (never inside If/While/For)
 - [ ] Hungarian notation on all variable names
