@@ -131,7 +131,7 @@ This is one of the **most common generation errors** and causes silent compilati
 | `Static Function NAME()` | Current `.prw` / `.tlpp` file only — internal helper | direct call within file | YES for private helpers inside the same file |
 | `Method NAME() Class XXX` | Inside a TLPP `class ... endclass` block | `oObj:NAME()` | YES for class-based designs |
 | `Function NAME()` (bare) | **RESERVED for TOTVS core RPO** — fails in customer RPO | ❌ | **NEVER** emit bare `Function` in generated code |
-| `function U_NAME()` + `namespace` | TLPP with explicit `namespace custom.xxx` and `U_` prefix | `u_NAME()` | Only when the user explicitly requests a namespaced TLPP file (advanced) |
+| `function U_NAME()` + explicit `namespace` | TLPP with `namespace custom.xxx` and `U_` prefix inside function name | `u_NAME()` | Rare / legacy — only when explicitly requested. Prefer `User Function` + file-level `namespace` (see "CRITICAL: TLPP Namespace Declaration" below) |
 
 ### Why this matters
 
@@ -210,10 +210,147 @@ Return .T.
 #include "tlpp-core.th"
 #include "tlpp-rest.th"
 
+// Namespace inferred from --module est + service name ProductsAPI
+namespace custom.est.productsapi
+
 @Get("/api/v1/products")
 User Function getProducts()
     // compiles in customer RPO
 return oRest:setResponse(cData)
+```
+
+## CRITICAL: TLPP Namespace Declaration
+
+Every `.tlpp` file generated for customer code **must** declare a `namespace`. This is as important as the `User Function` rule above — missing it breaks consistency with the ADVPL→TLPP migration skill and risks name collisions between customer projects that share the same Protheus environment.
+
+### The rule
+
+| Scenario | Namespace required? | Convention |
+|----------|--------------------|-----------|
+| `.tlpp` REST endpoint (function-based, annotations) | **YES** | `custom.<module>.<servicename>` |
+| `.tlpp` REST endpoint (class-based) | **YES** | `custom.<module>.<classname>` |
+| `.tlpp` Class (Service, Repository, DTO, etc.) | **YES** | `custom.<module>.<classname>` |
+| `.tlpp` Job / batch process | **YES** | `custom.<module>.<jobname>` |
+| `.prw` file (ADVPL) | No | N/A — namespaces are TLPP-only |
+
+### Inference from `--module` and file/service name
+
+The generator must derive the namespace automatically from the command arguments:
+
+- **`--module <agrupador>`** provides the `<agrupador>` segment (lowercase)
+- **File or service name** provides the `<servico>` segment (lowercase, no underscores, no special characters)
+- **Result:** `namespace custom.<agrupador>.<servico>`
+
+**Examples:**
+
+| Command | Inferred namespace |
+|---------|--------------------|
+| `/generate rest Purchase --lang tlpp --module compras` | `namespace custom.compras.purchase` |
+| `/generate rest ProductsAPI --lang tlpp --module est` | `namespace custom.est.productsapi` |
+| `/generate class PedidoService --lang tlpp --module fat` | `namespace custom.fat.pedidoservice` |
+| `/generate class ClienteRepository --lang tlpp --module fat` | `namespace custom.fat.clienterepository` |
+| `/generate job JobProcessaNotas --lang tlpp --module fat` | `namespace custom.fat.jobprocessanotas` |
+
+### When `--module` is not provided
+
+**Ask the user** during the Planning Phase — do NOT silently omit the namespace and do NOT invent a default like `custom.geral.xxx`. Example question:
+
+> "Você não passou `--module`. Qual é o agrupador do namespace? Ex: `compras`, `fat`, `fin`. O namespace do arquivo será `custom.<agrupador>.<servico>`."
+
+Only proceed after the user provides the value.
+
+### Format rules (TOTVS convention)
+
+All rules must hold simultaneously. If any is violated, fix before emitting:
+
+1. **All lowercase** — `custom.compras.purchase`, never `Custom.Compras.Purchase`
+2. **Dot separators** — never slashes, backslashes, underscores or hyphens between segments
+3. **No underscores inside segments** — `purchaseorder` not `purchase_order`
+4. **No spaces** — collapse if needed
+5. **Only `custom.*` prefix for customer code** — `totvs.protheus.*` is reserved for TOTVS product code
+6. **One namespace declaration per file** — always immediately after the includes, before the `/*/{Protheus.doc}` header
+
+### Do NOT use `using namespace tlpp.*`
+
+`tlpp.core`, `tlpp.rest`, `tlpp.log`, `tlpp.data` are provided by the `.th` includes (`tlpp-core.th`, `tlpp-rest.th`, etc.). Writing `using namespace tlpp.core` is incorrect and unnecessary. `using namespace` is only valid to consume **other custom namespaces** (e.g., `using namespace custom.fat.pedidoservice` in a consumer file).
+
+### Canonical file header for generated TLPP
+
+```tlpp
+#Include "tlpp-core.th"
+#Include "tlpp-rest.th"  // only if REST endpoint
+
+// Namespace inferred from --module <agrupador> + service/class name
+namespace custom.<agrupador>.<servico>
+
+/*/{Protheus.doc} <Name>
+...
+/*/
+```
+
+### Forbidden patterns — NEVER generate these
+
+```tlpp
+// WRONG — no namespace in a customer TLPP file
+#include "tlpp-core.th"
+#include "tlpp-rest.th"
+
+@Get("/api/v1/customers")
+User Function getCustomers()
+return oRest:setResponse(cData)
+```
+
+```tlpp
+// WRONG — using namespace tlpp.* (already provided by .th includes)
+#include "tlpp-core.th"
+using namespace tlpp.core
+using namespace tlpp.rest
+
+namespace custom.fat.pedidoservice
+```
+
+```tlpp
+// WRONG — uppercase, underscores, or hyphens in the namespace
+namespace Custom.FAT.Pedido_Service
+```
+
+### Correct patterns — ALWAYS generate these
+
+```tlpp
+// RIGHT — function-based TLPP REST with namespace
+#include "tlpp-core.th"
+#include "tlpp-rest.th"
+
+namespace custom.compras.purchase
+
+@Get("/api/v1/purchases")
+User Function getPurchases()
+return oRest:setResponse(cData)
+```
+
+```tlpp
+// RIGHT — class-based TLPP REST with namespace
+#include "tlpp-core.th"
+#include "tlpp-rest.th"
+
+namespace custom.compras.purchasesapi
+
+class PurchasesAPI from LongClassName
+    @Get("/api/v1/purchases")
+    public method listAll()
+endclass
+```
+
+```tlpp
+// RIGHT — TLPP Service class with namespace
+#include "tlpp-core.th"
+
+namespace custom.fat.pedidoservice
+
+Class PedidoService
+    Method New() Constructor
+    Method CriarPedido(oData)
+EndClass
 ```
 
 ## CRITICAL: JsonObject Methods
@@ -298,6 +435,9 @@ oView:EnableTitleView("VIEW_SA1", "Dados do Cliente")
 Before delivering any generated code, verify:
 
 - [ ] **Function keyword is `User Function` (or `Static Function` / `Method` / class annotation) — NEVER bare `Function` in customer code**
+- [ ] **TLPP files declare a `namespace custom.<agrupador>.<servico>` immediately after the includes — NEVER omit the namespace in a generated `.tlpp` file**
+- [ ] **Namespace follows the format rules: all lowercase, dot separators, no underscores, no uppercase, only `custom.*` prefix for customer code**
+- [ ] **No `using namespace tlpp.core` / `tlpp.rest` / `tlpp.log` / `tlpp.data` — those come from `.th` includes**
 - [ ] All variables declared as Local (no Private/Public)
 - [ ] ALL Local declarations at the TOP of the function (never inside If/While/For)
 - [ ] Hungarian notation on all variable names

@@ -6,10 +6,14 @@ Templates for creating classes in TLPP (TOTVS Language Plus Plus) for TOTVS Prot
 
 ## 1. Basic Class Syntax
 
-A TLPP class declaration includes the class name, properties (`data`), and methods.
+A TLPP class declaration includes the class name, properties (`data`), and methods. Every generated `.tlpp` file must also declare a `namespace` — see section 7 for the rule and inference.
 
 ```tlpp
 #Include "tlpp-core.th"
+
+// Namespace is MANDATORY for generated customer TLPP files
+// Convention: custom.<agrupador>.<servico> (see section 7)
+namespace custom.exemplo.minhaclasse
 
 /*/{Protheus.doc} MinhaClasse
 Descricao da classe
@@ -380,17 +384,26 @@ Local nClamped := MathHelper():Clamp(150, 0, 100) // 100
 
 ---
 
-## 7. Namespace Usage
+## 7. Namespace Usage (MANDATORY for generated TLPP)
 
-Namespaces organize classes and avoid name conflicts.
+Every generated `.tlpp` file for customer code **must** declare a `namespace`. This organizes classes, avoids name conflicts between customer projects that share the same Protheus environment, and keeps generated code consistent with the ADVPL→TLPP migration skill (which already enforces the same rule).
+
+**Convention (TOTVS):** `custom.<agrupador>.<servico>` — all lowercase, dots as separators, no underscores.
+
+**Inference rule used by the generator:**
+- `--module <agrupador>` → `<agrupador>` (lowercase)
+- Class/service name → `<servico>` (lowercase, no underscores)
+- Example: `/generate class PedidoService --lang tlpp --module fat` → `namespace custom.fat.pedidoservice`
+
+If `--module` is not provided, the generator must **ask the user** for the namespace agrupador before producing the file. Never silently omit the namespace.
 
 ```tlpp
 #Include "tlpp-core.th"
 
-// Declaring a namespace
-namespace custom.vendas
+// Namespace inferred from --module fat + class name PedidoService
+namespace custom.fat.pedidoservice
 
-// For REST annotations, add: #Include "tlpp-rest.th"
+// For REST annotations, also add: #Include "tlpp-rest.th"
 // Do NOT use "using namespace tlpp.*" -- use .th includes instead
 // "using namespace" is only for custom/project namespaces (see example below)
 
@@ -421,9 +434,9 @@ Method BuscarPedido(cNumero) Class PedidoService
 Return Nil
 ```
 
-**Using a namespaced class:**
+**Using a namespaced class from a consumer file:**
 ```tlpp
-using namespace custom.vendas
+using namespace custom.fat.pedidoservice
 
 Local oService := PedidoService():New()
 oService:CriarPedido(oData)
@@ -437,6 +450,9 @@ A Service class encapsulates business logic, keeping it separate from controller
 
 ```tlpp
 #Include "tlpp-core.th"
+
+// Namespace inferred from --module fat + class name ClienteService
+namespace custom.fat.clienteservice
 
 /*/{Protheus.doc} ClienteService
 Servico de regras de negocio para clientes
@@ -632,6 +648,9 @@ A Repository class encapsulates data access, providing CRUD operations and query
 
 ```tlpp
 #Include "tlpp-core.th"
+
+// Namespace inferred from --module fat + class name ClienteRepository
+namespace custom.fat.clienterepository
 
 /*/{Protheus.doc} ClienteRepository
 Repositorio de acesso a dados de clientes (SA1)
@@ -908,6 +927,9 @@ A DTO class carries data between layers. It includes serialization (toJson/fromJ
 
 ```tlpp
 #Include "tlpp-core.th"
+
+// Namespace inferred from --module fat + class name ClienteDTO
+namespace custom.fat.clientedto
 
 /*/{Protheus.doc} ClienteDTO
 Data Transfer Object para dados de cliente

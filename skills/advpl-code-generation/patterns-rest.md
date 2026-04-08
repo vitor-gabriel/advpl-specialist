@@ -319,11 +319,28 @@ The TLPP approach uses annotations (decorators) to define REST endpoints. This i
 >
 > If you prefer a class-based approach, see section 2.7 below — both are supported officially by TOTVS.
 
+> **IMPORTANT — Namespace declaration (MANDATORY for customer code)**
+>
+> Every generated `.tlpp` file for customer code **must** declare a `namespace` following the TOTVS convention: `custom.<agrupador>.<servico>` (all lowercase, dots as separators, no underscores). This is the same convention enforced by the ADVPL→TLPP migration skill.
+>
+> **Inference rule used by the generator:**
+> - `--module <agrupador>` → `<agrupador>` (lowercase)
+> - File/service name → `<servico>` (lowercase, no underscores)
+> - Example: `/generate rest Purchase --lang tlpp --module compras` → `namespace custom.compras.purchase`
+>
+> If `--module` is not provided, the generator must **ask the user** for the namespace agrupador before producing the file. Never silently omit the namespace.
+>
+> **Why mandatory:** namespaces prevent name collisions between customer projects sharing the same Protheus environment, enforce logical grouping by module/service, and keep generated code consistent with the plugin's own migration skill. The minimal TOTVS samples (`rest-mod02.tlpp`, `rest-mod03.tlpp`) omit the namespace for brevity, but production customer code should always declare it.
+
 ### 2.1 Complete TLPP REST Service
 
 ```tlpp
 #Include "tlpp-core.th"
 #Include "tlpp-rest.th"
+
+// Namespace convention: custom.<agrupador>.<servico> (lowercase, no underscores)
+// Inferred from --module est + service name ProductsAPI
+namespace custom.est.productsapi
 
 /*/{Protheus.doc} ProductsAPI
 API REST de Produtos usando TLPP
@@ -573,9 +590,14 @@ Return .T.
 
 As an alternative to the function-based pattern above, TLPP also supports a class-based REST approach where methods are annotated with HTTP verbs. This is officially documented in the TOTVS sample `rest-mod03.tlpp`. Both patterns are valid — choose based on team preference and code organization needs.
 
+The same `namespace` rule applies to the class-based pattern.
+
 ```tlpp
 #Include "tlpp-core.th"
 #Include "tlpp-rest.th"
+
+// Namespace inferred from --module est + class name ProductsAPI
+namespace custom.est.productsapi
 
 class ProductsAPI from LongClassName
 

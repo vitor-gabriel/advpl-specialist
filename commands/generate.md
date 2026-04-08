@@ -35,9 +35,11 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 
 | Flag | Description | Default |
 |------|------------|---------|
-| `--module` | Module prefix (COM, FAT, FIN, etc.) | Ask user |
+| `--module` | Module prefix (COM, FAT, FIN, etc.). For TLPP output, also used as the namespace agrupador: `custom.<module>.<servico>` | Ask user |
 | `--lang` | Language: advpl or tlpp | advpl for function/mvc/pe, tlpp for class |
 | `--output` | Output file path | Auto-generated based on name |
+
+> **TLPP namespace (mandatory for `.tlpp` files):** every generated `.tlpp` file declares a `namespace custom.<agrupador>.<servico>` line right after the includes. The generator derives the namespace from `--module` (as agrupador) plus the service/class name (as servico), all lowercase with no underscores. If `--module` is not provided, the generator asks the user for the agrupador during the Planning Phase. See [advpl-code-generation skill — TLPP Namespace Rules](../skills/advpl-code-generation/SKILL.md) for the complete rule.
 
 ## Process
 
@@ -45,7 +47,7 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 
 ### Planning Phase (REQUIRED)
 1. **Parse arguments** - Extract type, name, and flags
-2. **Ask missing details** - If name or module not provided, ask the user
+2. **Ask missing details** - If name or module not provided, ask the user. **For TLPP generation (`.tlpp` output), also collect the namespace agrupador: if `--module <agrupador>` is provided, infer `namespace custom.<agrupador>.<servico>` automatically; if `--module` is missing, ask the user explicitly for the agrupador before entering plan mode. Never silently omit the namespace and never invent a default.**
 3. **Ask business requirements** - What should the code do?
 4. **Load skill** - Invoke `advpl-code-generation` skill
 5. **Load patterns** - Read appropriate supporting file for the type
@@ -55,12 +57,13 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
    - File(s) to be created (name, path, extension)
    - Code structure (functions, classes, methods to implement)
    - **Explicit declaration of the function keyword** to be used for every function in the plan: `User Function` (default for customer-callable code), `Static Function` (internal helper), or `Method ... Class` (TLPP class). **Never** plan a bare `Function` keyword for customer code — it is reserved for the TOTVS core RPO and will not compile in a customer RPO.
+   - **For every `.tlpp` file, the exact `namespace` declaration to be emitted**, following the convention `custom.<agrupador>.<servico>` (all lowercase, dots as separators, no underscores). Show it as a literal line (e.g., `namespace custom.compras.purchase`) derived from `--module` + the service/class name. If `--module` was not provided, this must have been resolved in step 2.
    - Includes and dependencies
    - Key patterns to apply (MVC, REST, SOAP, etc.)
    - Naming conventions to follow (Hungarian notation, module prefix)
    - Error handling and DB operation patterns
    - **For entry points:** TDN documentation found (PARAMIXB parameters, return type, calling routine)
-   - **For REST endpoints (TLPP annotation-based):** confirm the plan uses `User Function` with `@Get/@Post/@Put/@Patch/@Delete` annotations, following the official TOTVS sample `totvs/tlpp-sample-rest/rest-mod02.tlpp`. The class-based variant (`rest-mod03.tlpp`) is also supported — use it when multiple methods share state.
+   - **For REST endpoints (TLPP annotation-based):** confirm the plan uses `User Function` with `@Get/@Post/@Put/@Patch/@Delete` annotations, following the official TOTVS sample `totvs/tlpp-sample-rest/rest-mod02.tlpp`. The class-based variant (`rest-mod03.tlpp`) is also supported — use it when multiple methods share state. **Both variants require the `namespace` declaration.**
 9. **Wait for approval** - The user must approve the plan before any code is written. If the user requests changes, revise the plan.
 10. **Exit plan mode** - Use `ExitPlanMode` after approval
 
@@ -107,7 +110,8 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 
 A complete, compilable source file saved to the project directory with:
 - Protheus.doc documentation header
-- Proper includes/namespace declarations
+- Proper includes (`TOTVS.CH` for `.prw`, `tlpp-core.th` / `tlpp-rest.th` for `.tlpp`)
+- **Mandatory `namespace custom.<agrupador>.<servico>` line for every generated `.tlpp` file**
 - Full implementation following conventions
 - Error handling
 - Area save/restore for DB operations

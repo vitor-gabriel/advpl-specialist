@@ -164,11 +164,13 @@ Customer code compiled into a customer RPO **must** use `User Function` (or `Sta
 
 ### TLPP REST with annotations
 
-The official TOTVS pattern (from `totvs/tlpp-sample-rest/rest-mod02.tlpp`) is:
+The official TOTVS pattern (from `totvs/tlpp-sample-rest/rest-mod02.tlpp`) is `user function` with annotations. The plugin adds one extra requirement on top of the sample: a mandatory `namespace` declaration (see "TLPP Namespace Rules" below).
 
 ```tlpp
 #include "tlpp-core.th"
 #include "tlpp-rest.th"
+
+namespace custom.fat.customersapi
 
 @Get("/api/v1/customers")
 User Function getCustomers()
@@ -176,13 +178,46 @@ User Function getCustomers()
 return oRest:setResponse(cData)
 ```
 
-The class-based variant (`rest-mod03.tlpp`) is also supported — use `class ... from LongClassName` with `@Get/@Post` decorators on methods. Both patterns compile in customer RPOs. Never use bare `Function` with TLPP REST annotations.
+The class-based variant (`rest-mod03.tlpp`) is also supported — use `class ... from LongClassName` with `@Get/@Post` decorators on methods. Both patterns compile in customer RPOs, both require the `namespace` declaration. Never use bare `Function` with TLPP REST annotations.
+
+## TLPP Namespace Rules (CRITICAL)
+
+Every generated `.tlpp` file for customer code **must** declare a `namespace` immediately after the includes. This applies to REST endpoints, classes, jobs — any TLPP generation. Missing the namespace breaks consistency with the ADVPL→TLPP migration skill and risks name collisions between customer projects.
+
+**Convention:** `custom.<agrupador>.<servico>` — all lowercase, dots as separators, no underscores.
+
+**Inference rule:**
+- `--module <agrupador>` → `<agrupador>` (lowercase, no underscores)
+- File/service/class name → `<servico>` (lowercase, no underscores)
+- Result: `namespace custom.<agrupador>.<servico>`
+
+**Examples:**
+
+| Command | Inferred namespace |
+|---------|--------------------|
+| `/generate rest Purchase --lang tlpp --module compras` | `namespace custom.compras.purchase` |
+| `/generate class PedidoService --lang tlpp --module fat` | `namespace custom.fat.pedidoservice` |
+| `/generate job JobProcessaNotas --lang tlpp --module fat` | `namespace custom.fat.jobprocessanotas` |
+
+**Format rules (all must hold):**
+
+1. All lowercase — `custom.compras.purchase`, never `Custom.Compras.Purchase`
+2. Dot separators — never slashes, underscores, or hyphens between segments
+3. No underscores inside segments — `purchaseorder` not `purchase_order`
+4. Only `custom.*` prefix for customer code (`totvs.protheus.*` is reserved for TOTVS)
+5. Exactly one `namespace` line per file, after the includes, before the Protheus.doc header
+
+**When `--module` is missing:** ask the user during the Planning Phase for the agrupador. Never silently omit the namespace and never invent a default like `custom.geral.xxx`.
+
+**Do NOT use `using namespace tlpp.*`:** `tlpp.core`, `tlpp.rest`, `tlpp.log`, `tlpp.data` are provided by the `.th` includes. `using namespace` is only valid to consume **other custom namespaces** in consumer files (e.g., `using namespace custom.fat.pedidoservice`).
 
 ## Common Mistakes
 
 | Mistake | Fix |
 |---------|-----|
 | **Using bare `Function` keyword in customer code** | **Always use `User Function` (customer RPO requires it; invoked as `u_NAME()`)** |
+| **Omitting `namespace` in a generated `.tlpp` file** | **Always declare `namespace custom.<agrupador>.<servico>` after the includes — infer from `--module` + service name, or ask the user** |
+| **Using `using namespace tlpp.core` / `tlpp.rest` / `tlpp.log` / `tlpp.data`** | **Remove it — those namespaces come from `.th` includes automatically** |
 | Using Private instead of Local | Always declare as Local, pass via parameters |
 | Not saving/restoring area (GetArea/RestArea) | Always wrap DB operations with area save/restore |
 | Missing error handling | Always use Begin Sequence / Recover / End Sequence |
