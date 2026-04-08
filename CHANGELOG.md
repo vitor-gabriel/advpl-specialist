@@ -6,6 +6,28 @@ Todas as mudancas notaveis deste projeto serao documentadas neste arquivo.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2026-04-07
+
+### Fixed / Corrigido
+- Fixed code generation using bare `Function` keyword instead of `User Function` in customer RPOs — bare `Function` is reserved for the TOTVS core RPO and fails to compile in customer environments
+- Corrigida geracao de codigo usando palavra-chave `Function` pura em vez de `User Function` em RPOs de cliente — palavra-chave `Function` pura e reservada para o RPO core da TOTVS e falha ao compilar em ambientes de cliente
+- Fixed `/generate` scanning all project source files on every invocation — the plugin is template-based and does not need to read customer `.prw`/`.tlpp` sources to generate code
+- Corrigido `/generate` varrendo todos os arquivos-fonte do projeto a cada invocacao — o plugin e baseado em templates e nao precisa ler fontes `.prw`/`.tlpp` do cliente para gerar codigo
+
+### Added / Adicionado
+- Mandatory `namespace custom.<agrupador>.<servico>` declaration for every generated `.tlpp` file (REST endpoints, classes, jobs) — inferred from `--module` + service name, or prompted from user during Planning Phase
+- Declaracao obrigatoria de `namespace custom.<agrupador>.<servico>` para todo arquivo `.tlpp` gerado (endpoints REST, classes, jobs) — inferido de `--module` + nome do servico, ou perguntado ao usuario durante a Fase de Planejamento
+- New `[BP-009]` code review rule: detects bare `Function` keyword in customer code and suggests conversion to `User Function` / `Static Function` / class `Method`
+- Nova regra de revisao `[BP-009]`: detecta palavra-chave `Function` pura em codigo de cliente e sugere conversao para `User Function` / `Static Function` / `Method` de classe
+- New `[BP-010]` code review rule: detects identifier names exceeding the effective length limit (User Function ≤ 8 chars, Static Function ≤ 10 chars, TLPP with namespace ≤ 255 chars)
+- Nova regra de revisao `[BP-010]`: detecta nomes de identificadores que excedem o limite efetivo de tamanho (User Function ≤ 8 chars, Static Function ≤ 10 chars, TLPP com namespace ≤ 255 chars)
+- Blocking identifier length validation in `/generate` Planning Phase with two-option flow: (A) shorten name following Protheus conventions or (B) switch to TLPP with namespace (available from Protheus release 12.1.2410)
+- Validacao bloqueante de tamanho de identificador na Fase de Planejamento do `/generate` com fluxo de duas opcoes: (A) encurtar nome seguindo convencoes Protheus ou (B) mudar para TLPP com namespace (disponivel a partir do release 12.1.2410 do Protheus)
+- Explicit prohibition of project source scanning in `/generate` — `Glob`/`Grep`/`Read` on customer `.prw`/`.tlpp` files is no longer allowed (only internal plugin files, explicit user-referenced file, or final output write)
+- Proibicao explicita de varredura de fontes do projeto no `/generate` — `Glob`/`Grep`/`Read` em arquivos `.prw`/`.tlpp` do cliente nao e mais permitido (apenas arquivos internos do plugin, arquivo unico referenciado pelo usuario, ou escrita do arquivo final)
+- Documentation on identifier length limits, `longnameclass` legacy workaround, and TLPP namespace as the modern replacement
+- Documentacao sobre limites de tamanho de identificador, workaround legado `longnameclass`, e TLPP com namespace como substituicao moderna
+
 ## [1.0.7] - 2026-03-26
 
 ### Added / Adicionado
