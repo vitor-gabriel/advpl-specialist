@@ -8,6 +8,22 @@ Todas as mudancas notaveis deste projeto sao documentadas neste arquivo.
 O formato e baseado no [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 e este projeto segue o [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2026-04-07
+
+### Corrigido
+
+- Corrigida geracao de codigo usando palavra-chave `Function` pura em vez de `User Function` em RPOs de cliente — palavra-chave `Function` pura e reservada para o RPO core da TOTVS e falha ao compilar em ambientes de cliente
+- Corrigido `/generate` varrendo todos os arquivos-fonte do projeto a cada invocacao — o plugin e baseado em templates e nao precisa ler fontes `.prw`/`.tlpp` do cliente para gerar codigo
+
+### Adicionado
+
+- Declaracao obrigatoria de `namespace custom.<agrupador>.<servico>` para todo arquivo `.tlpp` gerado (endpoints REST, classes, jobs) — inferido de `--module` + nome do servico, ou perguntado ao usuario durante a Fase de Planejamento
+- Nova regra de revisao `[BP-009]`: detecta palavra-chave `Function` pura em codigo de cliente e sugere conversao para `User Function` / `Static Function` / `Method` de classe
+- Nova regra de revisao `[BP-010]`: detecta nomes de identificadores que excedem o limite efetivo de tamanho (User Function ≤ 8 chars, Static Function ≤ 10 chars, TLPP com namespace ≤ 255 chars)
+- Validacao bloqueante de tamanho de identificador na Fase de Planejamento do `/generate` com fluxo de duas opcoes: (A) encurtar nome seguindo convencoes Protheus ou (B) mudar para TLPP com namespace (disponivel a partir do release 12.1.2410 do Protheus)
+- Proibicao explicita de varredura de fontes do projeto no `/generate` — `Glob`/`Grep`/`Read` em arquivos `.prw`/`.tlpp` do cliente nao e mais permitido (apenas arquivos internos do plugin, arquivo unico referenciado pelo usuario, ou escrita do arquivo final)
+- Documentacao sobre limites de tamanho de identificador, workaround legado `longnameclass`, e TLPP com namespace como substituicao moderna
+
 ## [1.0.7] - 2026-03-26
 
 ### Adicionado
