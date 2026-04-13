@@ -123,17 +123,28 @@ Activate this agent when the user:
 | **Total** | **2** | **4** | **5** | **11** |
 ```
 
-#### Fallback com Playwright (se WebSearch falhar)
+#### TDN Lookup (se precisar verificar padrões ou sugerir correções)
 
-Se `WebSearch` retornar erro, timeout ou conteudo vazio/ilegivel na busca TDN ao verificar padroes ou sugerir correcoes, utilize as ferramentas Playwright MCP como fallback:
+##### Tier 2: WebFetch direto na API REST do Confluence
 
-1. `browser_navigate` — abrir `https://tdn.totvs.com`
-2. `browser_fill_form` — preencher o campo de busca com o termo relevante
-3. `browser_click` — clicar no botao de pesquisa para disparar a busca
-4. `browser_snapshot` — ler a lista de resultados
-5. Navegar ate o resultado mais relevante com `browser_click`
-6. `browser_snapshot` — extrair o conteudo da pagina de detalhe; se insuficiente ou ilegivel, usar `browser_take_screenshot` para captura visual e interpretar a imagem
-7. `browser_close` — **sempre** executar ao finalizar para liberar recursos do navegador, independentemente de sucesso ou falha na extracao
+1. URL: `https://tdn.totvs.com/rest/api/search?cql=type%3Dpage%20AND%20title%3D%22<FUNCTION>%22%20AND%20space%20IN%20(%22tec%22%2C%22framework%22)&expand=body.view&limit=3`
+2. Executar `WebFetch` → se JSON válido com `size > 0`, usar diretamente
+3. Se `size == 0` → fuzzy: `title~"<FUNCTION>"`
+4. Se falhar (403 Cloudflare, timeout) → Tier 3
+
+##### Tier 3: Playwright na API REST (JSON)
+
+1. `browser_navigate` → mesma URL do Tier 2
+2. `browser_snapshot` → extrair JSON
+3. Se falhar → Tier 4
+
+##### Tier 4: Playwright na página visual (último recurso)
+
+1. Se tem `url`: `browser_navigate` → `https://tdn.totvs.com{url}` → `browser_snapshot`
+2. Se não tem URL: `browser_navigate` → `https://tdn.totvs.com` → `browser_fill_form` → `browser_click` → `browser_snapshot`
+
+##### Limpeza de recursos
+- **Sempre** executar `browser_close` ao finalizar Tier 3 ou 4.
 
 ## Review Quick Reference
 
