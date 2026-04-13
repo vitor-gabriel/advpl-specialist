@@ -63,22 +63,43 @@ Activate this agent when the user:
 - **For TReport, FWFormBrowse, Jobs, and Workflow types:** If the user requests non-standard methods or class/function usage, validate against the TDN using `WebSearch` (e.g., `"ClassName site:tdn.totvs.com"`) and `WebFetch` to confirm correct signatures, parameters, and behavior.
 - **For entry points (MANDATORY):** ALWAYS search the TDN for the entry point name using `WebSearch` (e.g., `"ENTRY_POINT_NAME site:tdn.totvs.com"`) and `WebFetch` to read the official documentation page. Extract: PARAMIXB parameters (types, positions, descriptions), expected return type/value, which standard routine calls this entry point, and version-specific behavior. The local patterns-pontos-entrada.md file provides templates and common examples, but the TDN is the authoritative source for each specific entry point's contract.
 
-- **Fallback Playwright (se WebSearch/WebFetch falhar para entry points):**
+- **TDN Lookup para Entry Points (MANDATÓRIO):**
 
-  Se `WebSearch` ou `WebFetch` retornarem erro, timeout ou conteúdo vazio/ilegível durante a busca TDN para entry points, utilize as ferramentas Playwright MCP como fallback:
+  A busca no TDN é obrigatória para entry points. O local `patterns-pontos-entrada.md` fornece apenas templates — o TDN é a fonte autoritativa para o contrato de cada entry point.
 
-  #### Cenário A: URL disponível (WebSearch retornou link, mas WebFetch falhou)
-  1. `browser_navigate` — abrir a URL retornada pelo WebSearch
-  2. `browser_snapshot` — extrair o conteúdo textual da página
-  3. Se o conteúdo for insuficiente ou ilegível (tabelas complexas de PARAMIXB, por exemplo), usar `browser_take_screenshot` para captura visual e interpretar a imagem
+  #### Tier 2: WebFetch direto na API REST do Confluence
 
-  #### Cenário B: Sem URL (WebSearch também falhou)
-  1. `browser_navigate` — abrir `https://tdn.totvs.com`
-  2. `browser_fill_form` — preencher o campo de busca com o nome do entry point
-  3. `browser_click` — clicar no botão de pesquisa para disparar a busca
-  4. `browser_snapshot` — ler a lista de resultados
-  5. Navegar até o resultado mais relevante com `browser_click`
-  6. `browser_snapshot` — extrair o conteúdo da página de detalhe; se insuficiente, usar `browser_take_screenshot` para captura visual
+  1. Montar a URL:
+     ```
+     https://tdn.totvs.com/rest/api/search?cql=type%3Dpage%20AND%20title%3D%22<EP_NAME>%22%20AND%20space%20IN%20(%22tec%22%2C%22framework%22)&expand=body.view&limit=3
+     ```
+  2. Executar `WebFetch` na URL
+  3. Se retornar JSON válido com `size > 0`:
+     - Extrair `results[0].content.body.view.value` (HTML do conteúdo)
+     - Parsear o HTML para extrair os dados abaixo
+     - **Usar diretamente** (fim)
+  4. Se `size == 0` → repetir com fuzzy: `type=page AND text~"<EP_NAME>"`
+  5. Se falhar (403 Cloudflare, timeout, HTML em vez de JSON) → Tier 3
+
+  #### Tier 3: Playwright na API REST (JSON via navegador)
+
+  1. `browser_navigate` → mesma URL do Tier 2
+  2. `browser_snapshot` → extrair JSON como texto
+  3. Parsear com mesmo processo do Tier 2
+  4. Se `size == 0` → repetir com fuzzy
+  5. Se falhar → Tier 4
+
+  #### Tier 4: Playwright na página visual (último recurso)
+
+  1. Se tem `url` dos tiers anteriores:
+     - `browser_navigate` → `https://tdn.totvs.com{url}`
+     - `browser_snapshot` → extrair conteúdo textual
+     - Se insuficiente (tabelas de PARAMIXB complexas) → `browser_take_screenshot` para captura visual
+  2. Se não tem URL:
+     - `browser_navigate` → `https://tdn.totvs.com`
+     - `browser_fill_form` → preencher busca com o nome do entry point
+     - `browser_click` → disparar busca
+     - `browser_snapshot` → navegar ao resultado mais relevante
 
   #### Dados a extrair
   - Parâmetros PARAMIXB (tipos, posições, descrições)
@@ -87,7 +108,7 @@ Activate this agent when the user:
   - Comportamento por versão
 
   #### Limpeza de recursos
-  - **Sempre** executar `browser_close` ao finalizar para liberar recursos do navegador, independentemente de sucesso ou falha na extração.
+  - **Sempre** executar `browser_close` ao finalizar Tier 3 ou 4, independentemente de sucesso ou falha na extração.
 
 ### Phase 3: Plan (REQUIRED - do NOT skip)
 - Use `EnterPlanMode` to enter planning mode
