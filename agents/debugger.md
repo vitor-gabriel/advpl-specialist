@@ -44,19 +44,44 @@ Activate this agent when the user:
 - If runtime error: trace execution path, check data types, array bounds
 - If performance: check index usage, query patterns (see performance-tips.md)
 - If lock: check RecLock/MsUnlock pairing, transaction scope
-- If unknown: search TDN with `WebSearch: site:tdn.totvs.com "<error message>"`
+- If unknown: TDN API Lookup:
 
-#### Fallback com Playwright (se WebSearch falhar)
+#### TDN Lookup para erros desconhecidos
 
-Se `WebSearch` retornar erro, timeout ou conteúdo vazio/ilegível na busca TDN, utilize as ferramentas Playwright MCP como fallback:
+##### Tier 2: WebFetch direto na API REST do Confluence
 
-1. `browser_navigate` — abrir `https://tdn.totvs.com`
-2. `browser_fill_form` — preencher o campo de busca com a mensagem de erro
-3. `browser_click` — clicar no botão de pesquisa para disparar a busca
-4. `browser_snapshot` — ler a lista de resultados
-5. Navegar até o resultado mais relevante com `browser_click`
-6. `browser_snapshot` — extrair o conteúdo da página de detalhe; se insuficiente ou ilegível, usar `browser_take_screenshot` para captura visual e interpretar a imagem
-7. `browser_close` — **sempre** executar ao finalizar para liberar recursos do navegador, independentemente de sucesso ou falha na extração
+1. Montar a URL com CQL de texto (mensagens de erro não são títulos de páginas):
+   ```
+   https://tdn.totvs.com/rest/api/search?cql=type%3Dpage%20AND%20text%7E%22<ERRO_GENERICO>%22%20AND%20space%20IN%20(%22tec%22%2C%22framework%22)&expand=body.view&limit=3
+   ```
+   **Nota:** Usar apenas a parte genérica da mensagem de erro (ex: `"Variable does not exist"` sem o nome da variável específica) para aumentar a chance de match.
+2. Executar `WebFetch` na URL
+3. Se retornar JSON válido com `size > 0`:
+   - Extrair `results[0].content.body.view.value` para causa e solução
+   - **Usar diretamente** (fim)
+4. Se `size == 0` → repetir sem filtro de space: `type=page AND text~"<ERRO_GENERICO>"`
+5. Se falhar (403 Cloudflare, timeout) → Tier 3
+
+##### Tier 3: Playwright na API REST (JSON via navegador)
+
+1. `browser_navigate` → mesma URL do Tier 2
+2. `browser_snapshot` → extrair JSON como texto
+3. Parsear com mesmo processo do Tier 2
+4. Se falhar → Tier 4
+
+##### Tier 4: Playwright na página visual (último recurso)
+
+1. Se tem `url` dos tiers anteriores:
+   - `browser_navigate` → `https://tdn.totvs.com{url}`
+   - `browser_snapshot` → extrair conteúdo; se insuficiente, `browser_take_screenshot`
+2. Se não tem URL:
+   - `browser_navigate` → `https://tdn.totvs.com`
+   - `browser_fill_form` → preencher busca com a mensagem de erro
+   - `browser_click` → disparar busca
+   - `browser_snapshot` → navegar ao resultado mais relevante
+
+##### Limpeza de recursos
+- **Sempre** executar `browser_close` ao finalizar Tier 3 ou 4, independentemente de sucesso ou falha.
 
 ### Phase 3: Propose Solution
 - Explain root cause clearly (adapted to user's level)
