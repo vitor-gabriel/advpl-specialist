@@ -1,6 +1,6 @@
 ---
 name: tdn-lookup
-description: Use when searching the TDN (TOTVS Developer Network) for documentation not found in the local reference — provides the standard 3-tier online lookup strategy using Confluence REST API
+description: Use when searching the TDN (TOTVS Developer Network) for documentation not found in the local reference — provides the standard 4-tier online lookup strategy using Confluence REST API, WebSearch and Playwright
 ---
 
 # TDN Lookup — Estratégia de Busca Online
@@ -17,7 +17,7 @@ Estratégia padronizada para buscar documentação no TDN (tdn.totvs.com) quando
 - Processo de negócio não coberto pelos módulos locais
 - Qualquer consulta que exija a documentação oficial da TOTVS
 
-## Estratégia de busca (3 tiers online)
+## Estratégia de busca (4 tiers online)
 
 Do mais econômico ao mais custoso em tokens:
 
@@ -44,22 +44,32 @@ Do mais econômico ao mais custoso em tokens:
 4. Se `size == 0` → repetir com CQL fuzzy
 5. Se falhar (JSON inválido, API fora) → Tier 4
 
-### Tier 4: Playwright na página visual (último recurso)
+### Tier 4: WebSearch + Playwright na URL encontrada
 
-1. Se tem `url` extraído dos tiers anteriores:
-   - `browser_navigate` → `https://tdn.totvs.com{url}`
-   - `browser_snapshot` → extrair conteúdo textual
+O Google indexa o TDN de forma diferente do CQL — pode encontrar páginas que a busca via API não encontra.
+
+1. Executar `WebSearch` com query: `site:tdn.totvs.com "<TERMO>" advpl`
+2. Se retornar resultados com URL do TDN:
+   - `browser_navigate` → URL retornada pelo WebSearch
+   - `browser_snapshot` → extrair conteúdo textual da página
    - Se insuficiente → `browser_take_screenshot` para captura visual
-2. Se não tem URL:
-   - `browser_navigate` → `https://tdn.totvs.com`
-   - `browser_fill_form` → preencher campo de busca com o termo
-   - `browser_click` → disparar busca
-   - `browser_snapshot` → ler resultados e navegar ao mais relevante
-3. Sintetizar resultados no formato da referência local
+   - **Usar diretamente** (fim)
+3. Se WebSearch não retornar resultados → Tier 5
+
+### Tier 5: Playwright busca visual no site TDN (último recurso)
+
+Para quando nem a API REST nem o Google encontram — busca manual no site.
+
+1. `browser_navigate` → `https://tdn.totvs.com`
+2. `browser_fill_form` → preencher campo de busca com o termo
+3. `browser_click` → disparar busca
+4. `browser_snapshot` → ler resultados e navegar ao mais relevante
+5. Se insuficiente → `browser_take_screenshot` para captura visual
+6. Sintetizar resultados no formato da referência local
 
 ### Limpeza de recursos
 
-- **Sempre** executar `browser_close` ao finalizar Tier 3 ou 4, independentemente de sucesso ou falha.
+- **Sempre** executar `browser_close` ao finalizar Tier 3, 4 ou 5, independentemente de sucesso ou falha.
 
 ## CQL Patterns por tipo de consulta
 
@@ -84,7 +94,7 @@ Do mais econômico ao mais custoso em tokens:
 ```
 results[i].content.title       → Título da página
 results[i].excerpt             → Resumo em texto puro
-results[i].url                 → Path relativo (para Tier 4: https://tdn.totvs.com{url})
+results[i].url                 → Path relativo (para Tier 5: https://tdn.totvs.com{url})
 results[i].content.body.view.value → HTML do conteúdo (Descrição, Sintaxe, Parâmetros, Retorno, Exemplo)
 ```
 
@@ -92,9 +102,10 @@ results[i].content.body.view.value → HTML do conteúdo (Descrição, Sintaxe, 
 
 | Tier | Sucesso | Falha → próximo tier |
 |------|---------|---------------------|
-| **2 (WebFetch)** | JSON com `"results"` e `size > 0` | HTTP 403, body com `"Attention Required"` ou `"cf-browser-verification"`, timeout, body vazio, JSON com `size: 0` após fuzzy |
+| **2 (WebFetch API)** | JSON com `"results"` e `size > 0` | HTTP 403, body com `"Attention Required"` ou `"cf-browser-verification"`, timeout, body vazio, JSON com `size: 0` após fuzzy |
 | **3 (Playwright API)** | Snapshot parseável como JSON com `size > 0` | Snapshot é HTML em vez de JSON, snapshot vazio, JSON com `size: 0` após fuzzy |
-| **4 (Playwright HTML)** | Snapshot com conteúdo textual relevante | Página de erro, "page not found", snapshot vazio |
+| **4 (WebSearch + Playwright)** | WebSearch retorna URL do TDN e snapshot tem conteúdo relevante | WebSearch retorna 0 resultados ou nenhuma URL do TDN |
+| **5 (Playwright busca visual)** | Snapshot com conteúdo textual relevante | Página de erro, "page not found", snapshot vazio |
 
 ## Informações técnicas do TDN
 
