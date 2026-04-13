@@ -41,31 +41,48 @@ Activate this agent when the user:
   - MV parameters -> native-functions.md (system functions section)
   - Embedded SQL -> embedded-sql skill (BeginSQL/EndSQL, macros)
 
-### Phase 3: Online Fallback (if not found locally)
-- Use `WebSearch` with query: `site:tdn.totvs.com <search_term> advpl`
-- Use `WebFetch` to extract details from TDN page
-- Synthesize results into the same format as local reference
+### Phase 3: TDN Lookup (se não encontrado localmente)
 
-### Phase 3.1: Fallback com Playwright (se Phase 3 falhar)
+**Estratégia de busca em 3 tiers online (do mais econômico ao mais custoso):**
 
-Se `WebSearch` ou `WebFetch` retornarem erro, timeout ou conteúdo vazio/ilegível, utilize as ferramentas Playwright MCP como fallback.
+#### Tier 2: WebFetch direto na API REST do Confluence
 
-#### Cenário A: URL disponível (WebSearch retornou link, mas WebFetch falhou)
-1. `browser_navigate` — abrir a URL retornada pelo WebSearch
-2. `browser_snapshot` — extrair o conteúdo textual da página
-3. Se o conteúdo for insuficiente ou ilegível, usar `browser_take_screenshot` para captura visual e interpretar a imagem
-4. Sintetizar os resultados no mesmo formato da referência local
+1. Montar a URL com CQL conforme o tipo de query (ver tabela em "Search Patterns"):
+   ```
+   https://tdn.totvs.com/rest/api/search?cql=<CQL_ENCODADO>&expand=body.view&limit=3
+   ```
+2. Executar `WebFetch` na URL
+3. Se retornar JSON válido com `size > 0`:
+   - Extrair `results[0].content.title`, `results[0].excerpt`, `results[0].url`
+   - Extrair `results[0].content.body.view.value` (HTML do conteúdo completo)
+   - Parsear o HTML para extrair: Descrição, Sintaxe, Parâmetros, Retorno, Exemplo
+   - **Usar diretamente** (fim — ir para Phase 4)
+4. Se `size == 0` → repetir com CQL fuzzy (ver coluna "CQL fuzzy" na tabela de Search Patterns)
+5. Se falhar (403 Cloudflare, timeout, HTML em vez de JSON) → Tier 3
 
-#### Cenário B: Sem URL (WebSearch também falhou)
-1. `browser_navigate` — abrir `https://tdn.totvs.com`
-2. `browser_fill_form` — preencher o campo de busca com o termo pesquisado
-3. `browser_click` — clicar no botão de pesquisa para disparar a busca
-4. `browser_snapshot` — ler a lista de resultados
-5. Navegar até o resultado mais relevante com `browser_navigate` ou `browser_click`
-6. `browser_snapshot` — extrair o conteúdo da página de detalhe
+#### Tier 3: Playwright na API REST (JSON via navegador)
+
+1. `browser_navigate` → mesma URL do Tier 2
+2. `browser_snapshot` → extrair o JSON como texto
+3. Parsear o JSON com mesmo processo do Tier 2
+4. Se `size == 0` → repetir com CQL fuzzy
+5. Se falhar (JSON inválido, API fora) → Tier 4
+
+#### Tier 4: Playwright na página visual (último recurso)
+
+1. Se tem `url` extraído dos tiers anteriores:
+   - `browser_navigate` → `https://tdn.totvs.com{url}`
+   - `browser_snapshot` → extrair conteúdo textual
+   - Se insuficiente → `browser_take_screenshot` para captura visual
+2. Se não tem URL:
+   - `browser_navigate` → `https://tdn.totvs.com`
+   - `browser_fill_form` → preencher campo de busca com o termo
+   - `browser_click` → disparar busca
+   - `browser_snapshot` → ler resultados e navegar ao mais relevante
+3. Sintetizar resultados no mesmo formato da referência local
 
 #### Limpeza de recursos
-- **Sempre** executar `browser_close` ao finalizar para liberar recursos do navegador, independentemente de sucesso ou falha na extração.
+- **Sempre** executar `browser_close` ao finalizar Tier 3 ou 4, independentemente de sucesso ou falha.
 
 ### Phase 4: Deliver Answer
 - Present: syntax, parameters table, return type, brief description
@@ -74,13 +91,15 @@ Se `WebSearch` ou `WebFetch` retornarem erro, timeout ou conteúdo vazio/ilegív
 - For MV params: show default value and purpose
 - Suggest related functions/features if relevant
 
-## Search Patterns for TDN
+## Search Patterns for TDN (CQL)
 
-| Query Type | WebSearch Query |
-|-----------|----------------|
-| Function | `site:tdn.totvs.com "<FunctionName>" advpl` |
-| Entry Point | `site:tdn.totvs.com "<EntryPointName>" ponto de entrada` |
-| API | `site:tdn.totvs.com rest api "<endpoint>"` |
-| Parameter | `site:tdn.totvs.com "<MV_PARAM>" parametro` |
-| Table | `site:tdn.totvs.com "<TableAlias>" dicionario` |
-| Concept | `site:tdn.totvs.com "<concept>" protheus advpl` |
+**Endpoint:** `GET https://tdn.totvs.com/rest/api/search?cql=<CQL>&expand=body.view&limit=3`
+
+| Query Type | CQL título exato | CQL fuzzy (fallback) |
+|-----------|------------------|----------------------|
+| Function | `type=page AND title="{FunctionName}" AND space IN ("tec","framework")` | `type=page AND title~"{FunctionName}"` |
+| Entry Point | `type=page AND title="{EntryPointName}" AND space IN ("tec","framework")` | `type=page AND text~"{EntryPointName}"` |
+| API | `type=page AND text~"rest api {endpoint}" AND space IN ("tec","framework")` | `type=page AND text~"rest api {endpoint}"` |
+| Parameter | `type=page AND title="{MV_PARAM}"` | `type=page AND title~"{MV_PARAM}"` |
+| Table | `type=page AND title~"{TableAlias}" AND space="tec"` | `type=page AND text~"{TableAlias} dicionario"` |
+| Concept | `type=page AND text~"{concept} protheus" AND space IN ("tec","framework")` | `type=page AND text~"{concept}"` |
