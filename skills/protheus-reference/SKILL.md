@@ -22,33 +22,40 @@ Reference guide for the TOTVS Protheus ecosystem. Provides quick access to nativ
 ```dot
 digraph lookup {
     "Need function/API info?" [shape=diamond];
-    "Check native-functions.md" [shape=box];
-    "Found?" [shape=diamond];
-    "Return result" [shape=box];
-    "Search TDN online" [shape=box];
-    "WebSearch: site:tdn.totvs.com <term>" [shape=box];
-    "Fetch failed?" [shape=diamond];
-    "Playwright fallback" [shape=box];
+    "Check local reference" [shape=box];
+    "Found locally?" [shape=diamond];
+    "Return result" [shape=doublecircle];
+    "Tier 2: WebFetch TDN API" [shape=box];
+    "JSON ok?" [shape=diamond];
+    "Tier 3: Playwright API (JSON)" [shape=box];
+    "JSON ok? (2)" [shape=diamond];
+    "Tier 4: Playwright HTML (visual)" [shape=box];
+    "Inform user: not found" [shape=box];
 
-    "Need function/API info?" -> "Check native-functions.md";
-    "Check native-functions.md" -> "Found?";
-    "Found?" -> "Return result" [label="yes"];
-    "Found?" -> "Search TDN online" [label="no"];
-    "Search TDN online" -> "WebSearch: site:tdn.totvs.com <term>";
-    "WebSearch: site:tdn.totvs.com <term>" -> "Fetch failed?";
-    "Fetch failed?" -> "Return result" [label="no"];
-    "Fetch failed?" -> "Playwright fallback" [label="yes"];
-    "Playwright fallback" -> "Return result";
+    "Need function/API info?" -> "Check local reference";
+    "Check local reference" -> "Found locally?";
+    "Found locally?" -> "Return result" [label="yes"];
+    "Found locally?" -> "Tier 2: WebFetch TDN API" [label="no"];
+    "Tier 2: WebFetch TDN API" -> "JSON ok?";
+    "JSON ok?" -> "Return result" [label="yes"];
+    "JSON ok?" -> "Tier 3: Playwright API (JSON)" [label="no (Cloudflare/error)"];
+    "Tier 3: Playwright API (JSON)" -> "JSON ok? (2)";
+    "JSON ok? (2)" -> "Return result" [label="yes"];
+    "JSON ok? (2)" -> "Tier 4: Playwright HTML (visual)" [label="no"];
+    "Tier 4: Playwright HTML (visual)" -> "Return result" [label="success"];
+    "Tier 4: Playwright HTML (visual)" -> "Inform user: not found" [label="fail"];
 }
 ```
 
 1. **Local first:** Check supporting files (native-functions.md, sx-dictionary.md, rest-api-reference.md)
-2. **Online fallback:** Search TDN with `WebSearch` using query: `site:tdn.totvs.com <function_name>`
-3. **WebFetch TDN page:** If URL found, use `WebFetch` to extract details
-4. **Playwright fallback:** Se `WebSearch` ou `WebFetch` falhar, use Playwright MCP:
-   - `browser_navigate` para a URL do TDN (se disponível) ou buscar em `https://tdn.totvs.com`
-   - `browser_snapshot` para extrair texto; se insuficiente, `browser_take_screenshot` para captura visual
-   - `browser_close` ao finalizar para liberar recursos
+2. **Tier 2 — WebFetch na API REST do Confluence:** Executar `WebFetch` na URL:
+   ```
+   https://tdn.totvs.com/rest/api/search?cql=type%3Dpage%20AND%20title%3D%22<TERMO>%22%20AND%20space%20IN%20(%22tec%22%2C%22framework%22)&expand=body.view&limit=3
+   ```
+   Se retornar JSON válido com `size > 0`: extrair `results[0].content.title`, `results[0].excerpt`, `results[0].url` e `results[0].content.body.view.value` (HTML do conteúdo). Parsear o HTML para extrair Descrição, Sintaxe, Parâmetros, Retorno, Exemplo. Se `size == 0` → repetir com busca fuzzy: `title~"<TERMO>"` (sem filtro de space). Se falhar (403 Cloudflare, timeout, HTML em vez de JSON) → Tier 3.
+3. **Tier 3 — Playwright na API REST (JSON):** `browser_navigate` → mesma URL do Tier 2. `browser_snapshot` → extrair JSON como texto. Parsear com mesmo processo do Tier 2. Se `size == 0` → repetir com fuzzy. Se falhar → Tier 4.
+4. **Tier 4 — Playwright na página visual (último recurso):** Se tem `url` dos tiers anteriores: `browser_navigate` → `https://tdn.totvs.com{url}`. Se não tem URL: `browser_navigate` → `https://tdn.totvs.com`, `browser_fill_form` → buscar o termo, `browser_click` → disparar busca. `browser_snapshot` → extrair conteúdo. Se insuficiente → `browser_take_screenshot`.
+5. **Limpeza:** Sempre executar `browser_close` ao finalizar Tier 3 ou 4, independentemente de sucesso ou falha.
 
 ## CRITICAL: Restricted Functions Check
 
@@ -110,10 +117,35 @@ Protheus REST APIs follow two main patterns:
 
 See `rest-api-reference.md` for endpoint patterns and authentication.
 
-## Online Search Tips
+## TDN API Reference
 
-When searching TDN (TOTVS Developer Network):
-- Use `WebSearch` with query: `site:tdn.totvs.com <function_name> advpl`
-- For API docs: `site:tdn.totvs.com rest api <endpoint_name>`
-- For release notes: `site:tdn.totvs.com <feature> release notes`
-- TDN base URL: `https://tdn.totvs.com`
+O TDN (tdn.totvs.com) roda sobre Confluence Data Center 7.19 e expõe a API REST v1 publicamente sem autenticação.
+
+**Endpoint principal:**
+```
+GET /rest/api/search?cql=<CQL_ENCODADO>&expand=body.view&limit=3
+```
+
+**CQL patterns por tipo de consulta:**
+
+| Tipo | CQL título exato | CQL fuzzy (fallback) |
+|------|------------------|----------------------|
+| Função | `type=page AND title="FWExecView" AND space IN ("tec","framework")` | `type=page AND title~"FWExecView"` |
+| Parâmetro MV | `type=page AND title="MV_ESTADO"` | `type=page AND title~"MV_ESTADO"` |
+| Tabela SX | `type=page AND title~"SX3" AND space="tec"` | `type=page AND text~"SX3 dicionario"` |
+| API REST | `type=page AND text~"rest api {endpoint}" AND space IN ("tec","framework")` | `type=page AND text~"rest api {endpoint}"` |
+| Entry point | `type=page AND title="{EP_NAME}" AND space IN ("tec","framework")` | `type=page AND text~"{EP_NAME}"` |
+| Erro | `type=page AND text~"{erro}" AND space IN ("tec","framework")` | `type=page AND text~"{erro}"` |
+| Rotina | `type=page AND title~"{MATA410}"` | `type=page AND text~"{MATA410} protheus"` |
+
+**Extração de dados do JSON:**
+```
+results[i].content.title       → Título da página
+results[i].excerpt             → Resumo em texto puro
+results[i].url                 → Path relativo (para Tier 4: https://tdn.totvs.com{url})
+results[i].content.body.view.value → HTML do conteúdo (Descrição, Sintaxe, Parâmetros, Retorno, Exemplo)
+```
+
+**Detecção de Cloudflare:** Se o body contém "Attention Required" ou "cf-browser-verification", ou status HTTP = 403 → ir para Tier 3 (Playwright na API).
+
+**Spaces conhecidos:** `tec` (funções nativas), `framework` (framework MVC/REST).
