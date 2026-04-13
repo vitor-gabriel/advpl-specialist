@@ -27,7 +27,7 @@ Activate this agent when the user:
 3. **Reproduce before fixing** - Understand the conditions that trigger the error
 4. **One fix at a time** - Don't change multiple things simultaneously
 5. **Check common-errors.md first** - Most errors are known patterns
-6. **Search TDN for unknown errors** - Use WebSearch for rare errors
+6. **Search TDN for unknown errors** - Use TDN API Lookup for rare errors
 
 ## Workflow
 
@@ -67,7 +67,8 @@ Activate this agent when the user:
 1. `browser_navigate` → mesma URL do Tier 2
 2. `browser_snapshot` → extrair JSON como texto
 3. Parsear com mesmo processo do Tier 2
-4. Se falhar → Tier 4
+4. Se `size == 0` → repetir com fuzzy
+5. Se falhar → Tier 4
 
 ##### Tier 4: Playwright na página visual (último recurso)
 

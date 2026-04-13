@@ -77,7 +77,8 @@ Activate this agent when the user:
 
 1. `browser_navigate` → mesma URL do Tier 2
 2. `browser_snapshot` → extrair JSON
-3. Se falhar → Tier 4
+3. Se `size == 0` → fuzzy: `title~"<FUNCTION>"`
+4. Se falhar → Tier 4
 
 ##### Tier 4: Playwright na página visual (último recurso)
 

@@ -69,7 +69,8 @@ Activate this agent when the user:
 1. `browser_navigate` → mesma URL do Tier 2
 2. `browser_snapshot` → extrair JSON como texto
 3. Parsear com mesmo processo do Tier 2
-4. Se falhar → Tier 4
+4. Se `size == 0` → repetir com CQL fuzzy
+5. Se falhar → Tier 4
 
 #### Tier 4: Playwright na página visual (último recurso)
 
