@@ -60,8 +60,8 @@ Activate this agent when the user:
   - ProBat test -> load `probat-testing` skill
 - Load `protheus-reference` skill if native function lookup is needed
 - Load `embedded-sql` skill if SQL queries are needed (prefer BeginSQL over TCQuery)
-- **For TReport, FWFormBrowse, Jobs, and Workflow types:** If the user requests non-standard methods or class/function usage, validate against the TDN using `WebSearch` (e.g., `"ClassName site:tdn.totvs.com"`) and `WebFetch` to confirm correct signatures, parameters, and behavior.
-- **For entry points (MANDATORY):** ALWAYS search the TDN for the entry point name using `WebSearch` (e.g., `"ENTRY_POINT_NAME site:tdn.totvs.com"`) and `WebFetch` to read the official documentation page. Extract: PARAMIXB parameters (types, positions, descriptions), expected return type/value, which standard routine calls this entry point, and version-specific behavior. The local patterns-pontos-entrada.md file provides templates and common examples, but the TDN is the authoritative source for each specific entry point's contract.
+- **For TReport, FWFormBrowse, Jobs, and Workflow types:** If the user requests non-standard methods or class/function usage, validate against the TDN using the TDN API Lookup described below (Tier 2/3/4) to confirm correct signatures, parameters, and behavior.
+- **For entry points (MANDATORY):** ALWAYS search the TDN for the entry point name using the TDN API Lookup described below (Tier 2/3/4). Extract: PARAMIXB parameters (types, positions, descriptions), expected return type/value, which standard routine calls this entry point, and version-specific behavior. The local patterns-pontos-entrada.md file provides templates and common examples, but the TDN is the authoritative source for each specific entry point's contract.
 
 - **TDN Lookup para Entry Points (MANDATÓRIO):**
 
@@ -505,7 +505,7 @@ Return
 | `Glob` / `Grep` inside the plugin directory (to find supporting files) | **YES** | Required for template lookup |
 | `Write` the final generated `.prw` / `.tlpp` file to the current directory (or `--output`) | **YES** | The whole point of `/generate` |
 | `Read` a **single specific file** the user explicitly referenced in their request (exact path provided by the user) | **YES, on demand only** | E.g., "gere um REST similar ao de `src/FATA001.prw`" — read that exact file, nothing else |
-| `WebSearch` / `WebFetch` the TDN for entry points (Phase 2) | **YES** | Documented requirement for `ponto-entrada` |
+| `WebFetch` / `Playwright` the TDN API for entry points (Phase 2) | **YES** | Documented requirement for `ponto-entrada` |
 | **`Glob "**/*.prw"` / `Glob "**/*.tlpp"` / `Glob "src/**/*"`** | **NO** | Prohibitively slow, never needed |
 | **`Grep` across the customer source tree to "find patterns" or "check existing naming"** | **NO** | Naming and style come from templates, not the codebase |
 | **`Read` customer source files "to understand the codebase"** | **NO** | Templates are self-contained |
@@ -515,7 +515,7 @@ Return
 ### Phase-by-phase discipline
 
 - **Phase 1 (Understand Requirements):** Ask for `type`, `name`, `--module`, business logic. **Do not read any customer source file.** If the user hasn't provided a name, ask — do not scan for existing names to avoid collisions.
-- **Phase 2 (Load Reference):** `Read` only files **inside the plugin directory** (skills, templates, patterns). For entry points, `WebSearch` the TDN. **Do not touch the customer source tree.**
+- **Phase 2 (Load Reference):** `Read` only files **inside the plugin directory** (skills, templates, patterns). For entry points, TDN API Lookup (WebFetch or Playwright on Confluence REST API). **Do not touch the customer source tree.**
 - **Phase 3 (Plan):** The plan describes what will be written from templates — not what was observed in the customer code. If you find yourself wanting to `Glob` or `Grep` to "validate" something, stop: the answer is in the plugin templates, not in the customer's files.
 - **Phase 4 (Generate Code):** `Write` the file to the current working directory (or `--output`). Do not scan to pick a destination folder.
 - **Phase 5 (Review and Deliver):** Re-read **only the file you just wrote** to confirm the content is correct. Do not explore adjacent files.
@@ -569,9 +569,8 @@ Write("./FATA050.prw", <generated content>)
 // User said: "gere similar ao de src/FATA001.prw"
 Read("./src/FATA001.prw")  // the exact path, nothing else
 
-// RIGHT — TDN lookup for entry points
-WebSearch("MT100LOK site:tdn.totvs.com")
-WebFetch("https://tdn.totvs.com/...")
+// RIGHT — TDN API lookup for entry points
+WebFetch("https://tdn.totvs.com/rest/api/search?cql=type%3Dpage%20AND%20title%3D%22MT100LOK%22%20AND%20space%20IN%20(%22tec%22%2C%22framework%22)&expand=body.view&limit=3")
 ```
 
 ## CRITICAL: JsonObject Methods
