@@ -48,14 +48,7 @@ digraph lookup {
 ```
 
 1. **Local first:** Check supporting files (native-functions.md, sx-dictionary.md, rest-api-reference.md)
-2. **Tier 2 — WebFetch na API REST do Confluence:** Executar `WebFetch` na URL:
-   ```
-   https://tdn.totvs.com/rest/api/search?cql=type%3Dpage%20AND%20title%3D%22<TERMO>%22%20AND%20space%20IN%20(%22tec%22%2C%22framework%22)&expand=body.view&limit=3
-   ```
-   Se retornar JSON válido com `size > 0`: extrair `results[0].content.title`, `results[0].excerpt`, `results[0].url` e `results[0].content.body.view.value` (HTML do conteúdo). Parsear o HTML para extrair Descrição, Sintaxe, Parâmetros, Retorno, Exemplo. Se `size == 0` → repetir com busca fuzzy: `title~"<TERMO>"` (sem filtro de space). Se falhar (403 Cloudflare, timeout, HTML em vez de JSON) → Tier 3.
-3. **Tier 3 — Playwright na API REST (JSON):** `browser_navigate` → mesma URL do Tier 2. `browser_snapshot` → extrair JSON como texto. Parsear com mesmo processo do Tier 2. Se `size == 0` → repetir com fuzzy. Se falhar → Tier 4.
-4. **Tier 4 — Playwright na página visual (último recurso):** Se tem `url` dos tiers anteriores: `browser_navigate` → `https://tdn.totvs.com{url}`. Se não tem URL: `browser_navigate` → `https://tdn.totvs.com`, `browser_fill_form` → buscar o termo, `browser_click` → disparar busca. `browser_snapshot` → extrair conteúdo. Se insuficiente → `browser_take_screenshot`.
-5. **Limpeza:** Sempre executar `browser_close` ao finalizar Tier 3 ou 4, independentemente de sucesso ou falha.
+2. **Online fallback:** Load skill `tdn-lookup` e seguir a estratégia de busca em 3 tiers (Tier 2: WebFetch API → Tier 3: Playwright API JSON → Tier 4: Playwright HTML visual). Consultar a tabela de CQL na seção "TDN API Reference" abaixo.
 
 ## CRITICAL: Restricted Functions Check
 
@@ -119,33 +112,4 @@ See `rest-api-reference.md` for endpoint patterns and authentication.
 
 ## TDN API Reference
 
-O TDN (tdn.totvs.com) roda sobre Confluence Data Center 7.19 e expõe a API REST v1 publicamente sem autenticação.
-
-**Endpoint principal:**
-```
-GET /rest/api/search?cql=<CQL_ENCODADO>&expand=body.view&limit=3
-```
-
-**CQL patterns por tipo de consulta:**
-
-| Tipo | CQL título exato | CQL fuzzy (fallback) |
-|------|------------------|----------------------|
-| Função | `type=page AND title="FWExecView" AND space IN ("tec","framework")` | `type=page AND title~"FWExecView"` |
-| Parâmetro MV | `type=page AND title="MV_ESTADO"` | `type=page AND title~"MV_ESTADO"` |
-| Tabela SX | `type=page AND title~"SX3" AND space="tec"` | `type=page AND text~"SX3 dicionario"` |
-| API REST | `type=page AND text~"rest api {endpoint}" AND space IN ("tec","framework")` | `type=page AND text~"rest api {endpoint}"` |
-| Entry point | `type=page AND title="{EP_NAME}" AND space IN ("tec","framework")` | `type=page AND text~"{EP_NAME}"` |
-| Erro | `type=page AND text~"{erro}" AND space IN ("tec","framework")` | `type=page AND text~"{erro}"` |
-| Rotina | `type=page AND title~"{MATA410}"` | `type=page AND text~"{MATA410} protheus"` |
-
-**Extração de dados do JSON:**
-```
-results[i].content.title       → Título da página
-results[i].excerpt             → Resumo em texto puro
-results[i].url                 → Path relativo (para Tier 4: https://tdn.totvs.com{url})
-results[i].content.body.view.value → HTML do conteúdo (Descrição, Sintaxe, Parâmetros, Retorno, Exemplo)
-```
-
-**Detecção de Cloudflare:** Se o body contém "Attention Required" ou "cf-browser-verification", ou status HTTP = 403 → ir para Tier 3 (Playwright na API).
-
-**Spaces conhecidos:** `tec` (funções nativas), `framework` (framework MVC/REST).
+Consultar skill `tdn-lookup` para a estratégia completa, CQL patterns, extração de dados JSON, detecção de Cloudflare e informações técnicas do TDN.

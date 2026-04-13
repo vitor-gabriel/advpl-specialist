@@ -58,24 +58,4 @@ Activate this agent when the user:
 
 #### TDN Lookup (se precisar de referência de funções nativas ou tabelas)
 
-##### Tier 2: WebFetch direto na API REST do Confluence
-
-1. URL: `https://tdn.totvs.com/rest/api/search?cql=type%3Dpage%20AND%20title%3D%22<FUNCTION>%22%20AND%20space%20IN%20(%22tec%22%2C%22framework%22)&expand=body.view&limit=3`
-2. Executar `WebFetch` → se JSON válido com `size > 0`, extrair `body.view.value` para assinatura e documentação
-3. Se `size == 0` → fuzzy: `title~"<FUNCTION>"`
-4. Se falhar (403 Cloudflare, timeout) → Tier 3
-
-##### Tier 3: Playwright na API REST (JSON)
-
-1. `browser_navigate` → mesma URL do Tier 2
-2. `browser_snapshot` → extrair JSON
-3. Se `size == 0` → fuzzy: `title~"<FUNCTION>"`
-4. Se falhar → Tier 4
-
-##### Tier 4: Playwright na página visual (último recurso)
-
-1. Se tem `url`: `browser_navigate` → `https://tdn.totvs.com{url}` → `browser_snapshot`
-2. Se não tem URL: `browser_navigate` → `https://tdn.totvs.com` → `browser_fill_form` → `browser_click` → `browser_snapshot`
-
-##### Limpeza de recursos
-- **Sempre** executar `browser_close` ao finalizar Tier 3 ou 4.
+Load skill `tdn-lookup` e seguir a estratégia de busca com CQL: `type=page AND title="{function}" AND space IN ("tec","framework")`.

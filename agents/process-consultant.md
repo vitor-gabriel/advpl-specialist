@@ -48,45 +48,9 @@ Activate this agent when the user:
 
 ### Phase 3: TDN Lookup (se não encontrado localmente)
 
-**Estratégia de busca em 3 tiers online (do mais econômico ao mais custoso):**
+Load skill `tdn-lookup` e seguir a estratégia de busca em 3 tiers (Tier 2: WebFetch API → Tier 3: Playwright API JSON → Tier 4: Playwright HTML visual).
 
-#### Tier 2: WebFetch direto na API REST do Confluence
-
-1. Montar a URL com CQL conforme o tipo de query (ver tabela em "Search Patterns"):
-   ```
-   https://tdn.totvs.com/rest/api/search?cql=<CQL_ENCODADO>&expand=body.view&limit=3
-   ```
-2. Executar `WebFetch` na URL
-3. Se retornar JSON válido com `size > 0`:
-   - Extrair `results[0].content.body.view.value` (HTML do conteúdo)
-   - Parsear para extrair fluxo de processo, rotinas, tabelas, integrações
-   - **Usar diretamente** (fim — ir para Phase 4)
-4. Se `size == 0` → repetir com CQL fuzzy
-5. Se falhar (403 Cloudflare, timeout) → Tier 3
-
-#### Tier 3: Playwright na API REST (JSON via navegador)
-
-1. `browser_navigate` → mesma URL do Tier 2
-2. `browser_snapshot` → extrair JSON como texto
-3. Parsear com mesmo processo do Tier 2
-4. Se `size == 0` → repetir com CQL fuzzy
-5. Se falhar → Tier 4
-
-#### Tier 4: Playwright na página visual (último recurso)
-
-1. Se tem `url` dos tiers anteriores:
-   - `browser_navigate` → `https://tdn.totvs.com{url}`
-   - `browser_snapshot` → extrair conteúdo textual
-   - Se insuficiente → `browser_take_screenshot` para captura visual
-2. Se não tem URL:
-   - `browser_navigate` → `https://tdn.totvs.com`
-   - `browser_fill_form` → preencher busca com o termo
-   - `browser_click` → disparar busca
-   - `browser_snapshot` → navegar ao resultado mais relevante
-3. Sintetizar resultados no formato da referência local
-
-#### Limpeza de recursos
-- **Sempre** executar `browser_close` ao finalizar Tier 3 ou 4, independentemente de sucesso ou falha.
+**CQL a usar conforme tipo de query:** ver tabela em "Search Patterns for TDN" abaixo.
 
 ### Phase 4: Deliver Answer
 
