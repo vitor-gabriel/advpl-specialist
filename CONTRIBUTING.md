@@ -35,7 +35,7 @@ Obrigado pelo interesse em contribuir com o **advpl-specialist**! Este guia expl
 |-----------|----------|
 | `commands/` | Comandos invocaveis pelo usuario (`/advpl-specialist:*`) |
 | `agents/` | Agents especializados com workflows definidos |
-| `skills/` | Skills com SKILL.md + arquivos de suporte |
+| `skills/` | References com reference.md + arquivos de suporte |
 | `hooks/` | Hooks de sessao (bash scripts) |
 
 ### Exemplos de codigo ADVPL/TLPP
@@ -49,7 +49,7 @@ Obrigado pelo interesse em contribuir com o **advpl-specialist**! Este guia expl
 
 ### Markdown
 
-- Frontmatter YAML em commands, skills e agents
+- Frontmatter YAML em commands e agents
 - Tabelas para referencia rapida
 - Blocos de codigo com linguagem especificada (` ```advpl ` ou ` ```tlpp `)
 
