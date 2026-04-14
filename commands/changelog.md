@@ -1,6 +1,6 @@
 ---
 description: Generate changelog from ADVPL/TLPP code changes - analyzes diffs and produces structured release notes
-allowed-tools: Read, Glob, Grep, Bash, Agent, Skill
+allowed-tools: Read, Glob, Grep, Bash, Agent
 argument-hint: "[--since commit|date] [--format markdown|txt] [--output path]"
 ---
 
@@ -28,7 +28,7 @@ Generate a structured changelog from code changes in ADVPL/TLPP files.
 ## Process
 
 1. **Parse arguments** — Identify scope, format, and output options
-2. **Load changelog skill** — Invoke `changelog-patterns` skill
+2. **Load changelog reference** — Read `skills/changelog-patterns/reference.md`
 3. **Delegate to changelog-generator agent** — Pass scope and options
 4. **Identify changed files** — Use git diff or provided file list
 5. **Analyze each file** — Classify change type, detect tables, assess impact

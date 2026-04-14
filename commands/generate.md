@@ -1,6 +1,6 @@
 ---
 description: Generate ADVPL/TLPP code - functions, classes, MVC structures, REST APIs, Web Services, and entry points for TOTVS Protheus
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, Skill, WebSearch, WebFetch
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, WebSearch, WebFetch
 argument-hint: "<type> [name] [--module module]"
 ---
 
@@ -39,7 +39,7 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 | `--lang` | Language: advpl or tlpp | advpl for function/mvc/pe, tlpp for class |
 | `--output` | Output file path | Current directory + name + extension. **Do NOT scan the project to infer a path** — if the user wants a specific location, they must pass `--output` explicitly or answer a question about it. |
 
-> **TLPP namespace (mandatory for `.tlpp` files):** every generated `.tlpp` file declares a `namespace custom.<agrupador>.<servico>` line right after the includes. The generator derives the namespace from `--module` (as agrupador) plus the service/class name (as servico), all lowercase with no underscores. If `--module` is not provided, the generator asks the user for the agrupador during the Planning Phase. See [advpl-code-generation skill — TLPP Namespace Rules](../skills/advpl-code-generation/SKILL.md) for the complete rule.
+> **TLPP namespace (mandatory for `.tlpp` files):** every generated `.tlpp` file declares a `namespace custom.<agrupador>.<servico>` line right after the includes. The generator derives the namespace from `--module` (as agrupador) plus the service/class name (as servico), all lowercase with no underscores. If `--module` is not provided, the generator asks the user for the agrupador during the Planning Phase. See [advpl-code-generation — TLPP Namespace Rules](../skills/advpl-code-generation/reference.md) for the complete rule.
 
 ## Process
 
@@ -51,11 +51,11 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 
 - Protheus projects routinely have thousands of source files — scanning them is prohibitively slow and wastes the user's time
 - The generated code comes from the plugin's templates, not from the customer's codebase
-- Naming, style and patterns come from the skill (`advpl-code-generation`), not from existing files
+- Naming, style and patterns come from `skills/advpl-code-generation/reference.md`, not from existing files
 - The caller already provides everything the generator needs: `type`, `name`, `--module`, business requirements
 
 **Allowed uses of `Read` / `Glob` / `Grep`:**
-- Reading files **inside the plugin itself** — `skills/*`, `templates-*.md`, `patterns-*.md`, `agents/code-generator.md`
+- Reading files **inside the plugin itself** — `skills/*`, `templates-*.md`, `patterns-*.md`, `agents/code-generator.md`, `skills/advpl-code-generation/reference.md`
 - `Write` the final generated `.prw` / `.tlpp` file to disk
 - `Read` a **specific file** the user explicitly referenced in their request (single file, exact path the user provided)
 
@@ -75,9 +75,9 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 2a. **Validate identifier length (BLOCKING)** - Compute `len(name)` and compare against the effective limit for the chosen language/construct: `User Function` in `.prw` must be ≤ 8 chars, `Static Function` in `.prw` must be ≤ 10 chars, TLPP with `namespace` accepts up to 255 chars. If the name exceeds the limit, **do NOT enter plan mode**. Present the user with two explicit options and wait for their choice:
    - **(A) Shorten the name** — suggest 2-3 alternatives following Protheus conventions (module prefix + sequence like `FATA100`, mnemonic abbreviation, or functional abbreviation). Never offer random truncations.
    - **(B) Switch to TLPP with namespace** — explain that TLPP with namespace supports up to 255 chars (available from Protheus release 12.1.2410). Ask for the agrupador (`--module`) if missing.
-   Only proceed to the next step after the user picks (A) + shortened name, or (B) + namespace agrupador. See the [advpl-code-generation skill — Identifier Length Limits](../skills/advpl-code-generation/SKILL.md) for the complete rule and the [code-generator agent — CRITICAL: Identifier Length Validation](../agents/code-generator.md) for the suggestion heuristics. **Never generate code that depends on `longnameclass` as a workaround — TLPP with namespace is the modern, officially supported alternative.**
+   Only proceed to the next step after the user picks (A) + shortened name, or (B) + namespace agrupador. See the [advpl-code-generation — Identifier Length Limits](../skills/advpl-code-generation/reference.md) for the complete rule and the [code-generator agent — CRITICAL: Identifier Length Validation](../agents/code-generator.md) for the suggestion heuristics. **Never generate code that depends on `longnameclass` as a workaround — TLPP with namespace is the modern, officially supported alternative.**
 3. **Ask business requirements** - What should the code do?
-4. **Load skill** - Invoke `advpl-code-generation` skill
+4. **Load reference** - Read `skills/advpl-code-generation/reference.md`
 5. **Load patterns** - Read appropriate supporting file for the type
 6. **Search TDN for entry points** - **If the type is `ponto-entrada`**, ALWAYS search the TDN (TOTVS Developer Network) for the entry point name before generating code. Use `WebSearch` to find the official documentation page (e.g., search for `"ENTRY_POINT_NAME site:tdn.totvs.com"`). Extract from the TDN page: PARAMIXB parameters (types, positions, descriptions), expected return type and value, which standard routine calls this entry point, and any caveats or version-specific behavior. This ensures the generated code uses the correct parameters and return type as defined by TOTVS.
 7. **Enter plan mode** - Use `EnterPlanMode` to create a structured implementation plan

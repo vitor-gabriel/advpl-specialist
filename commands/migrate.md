@@ -1,6 +1,6 @@
 ---
 description: Migrate ADVPL procedural code to TLPP object-oriented code with classes, namespaces, and modern patterns
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, Skill, WebSearch, WebFetch
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, WebSearch, WebFetch
 argument-hint: "<file.prw> [--output file.tlpp] [--dry-run]"
 ---
 
@@ -36,7 +36,7 @@ Convert ADVPL procedural code to TLPP with object-oriented patterns.
 3. **Search for callers** - Grep codebase for `u_FunctionName` references
 
 ### Planning Phase (REQUIRED)
-4. **Load skill** - Invoke `advpl-to-tlpp-migration` skill for rules and checklist
+4. **Load reference** - Read `skills/advpl-to-tlpp-migration/reference.md` for rules and checklist
 5. **Enter plan mode** - Use `EnterPlanMode` to create a structured migration plan
 6. **Design class structure** - Map functions to classes and methods
 7. **Present plan** - Show the user a detailed migration plan including:
@@ -53,7 +53,7 @@ Convert ADVPL procedural code to TLPP with object-oriented patterns.
 10. **Exit plan mode** - Use `ExitPlanMode` after approval
 
 ### Implementation Phase (only after approval)
-11. **Execute migration** - Generate .tlpp file(s) following the approved plan and `advpl-to-tlpp-migration` skill
+11. **Execute migration** - Generate .tlpp file(s) following the approved plan and `skills/advpl-to-tlpp-migration/reference.md`
 12. **Generate wrapper** - Create backward compatibility .prw wrapper if --wrapper
 13. **Run checklist** - Validate against migration-checklist.md
 14. **Report** - Show summary of changes

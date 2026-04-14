@@ -1,6 +1,6 @@
 ---
 description: Diagnose errors and problems in ADVPL/TLPP code - compilation errors, runtime errors, performance issues, and log analysis
-allowed-tools: Read, Glob, Grep, Bash, Agent, Skill, WebSearch, WebFetch
+allowed-tools: Read, Glob, Grep, Bash, Agent, WebSearch, WebFetch
 argument-hint: "<file|error-message> [--log logfile]"
 ---
 
@@ -34,7 +34,7 @@ Diagnose and resolve ADVPL/TLPP errors and problems.
 ## Process
 
 1. **Identify mode** - File path, error message, or log file
-2. **Load debugging skill** - Invoke `advpl-debugging` skill
+2. **Load debugging reference** - Read `skills/advpl-debugging/reference.md`
 3. **Analyze input:**
    - **File:** Read code and scan for anti-patterns, missing error handling, lock issues
    - **Error:** Match against common-errors.md, then search TDN if not found
