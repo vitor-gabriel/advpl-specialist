@@ -1,8 +1,3 @@
----
-name: tdn-lookup
-description: Use when searching the TDN (TOTVS Developer Network) for documentation not found in the local reference — provides the standard 4-tier online lookup strategy using Confluence REST API, WebSearch and Playwright
----
-
 # TDN Lookup — Estratégia de Busca Online
 
 ## Overview

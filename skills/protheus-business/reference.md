@@ -1,8 +1,3 @@
----
-name: protheus-business
-description: Use when consulting Protheus ERP business processes, module workflows, routines, integrations, or understanding how business operations work in TOTVS Protheus
----
-
 # Protheus Business Processes
 
 ## Overview

@@ -1,8 +1,3 @@
----
-name: sx-configuration
-description: Use when generating SX dictionary configuration scripts for TOTVS Protheus - SX3 fields, SIX indexes, SX1 questions, SX5 generic tables, SX7 triggers
----
-
 # SX Configuration
 
 ## Overview

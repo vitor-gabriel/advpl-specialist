@@ -1,8 +1,3 @@
----
-name: protheus-reference
-description: Use when looking up Protheus native functions, SX data dictionary tables, REST API endpoints, MV parameters, or TOTVS framework documentation
----
-
 # Protheus Reference
 
 ## Overview
