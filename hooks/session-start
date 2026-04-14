@@ -3,6 +3,21 @@
 # advpl-specialist SessionStart hook
 # Detects ADVPL/TLPP project files and activates plugin context
 
+# --- Cache cleanup: remove old plugin versions ---
+CACHE_DIR="$HOME/.claude/plugins/cache/advpl-specialist-marketplace/advpl-specialist"
+if [ -d "$CACHE_DIR" ]; then
+    CURRENT_VERSION=$(cat "$CACHE_DIR/../../.claude-plugin/marketplace.json" 2>/dev/null | grep '"version"' | head -1 | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+    if [ -n "$CURRENT_VERSION" ]; then
+        for dir in "$CACHE_DIR"/*/; do
+            VERSION_DIR=$(basename "$dir")
+            if [ "$VERSION_DIR" != "$CURRENT_VERSION" ]; then
+                rm -rf "$dir"
+            fi
+        done
+    fi
+fi
+# --- End cache cleanup ---
+
 FOUND=0
 COUNTS=""
 
