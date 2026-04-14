@@ -123,6 +123,32 @@ Activate this agent when the user:
 | **Total** | **2** | **4** | **5** | **11** |
 ```
 
+### Persistência do Plano
+
+Após gerar o relatório de review completo, salvar automaticamente:
+
+1. Criar a pasta se necessário via Bash: `mkdir -p docs/plans`
+2. Nome do arquivo: `YYYY-MM-DD-review-<descricao-slug>.md`
+   - `<descricao-slug>`: derivado dos arquivos revisados (lowercase, hifens, sem acentos, max 50 chars)
+   - Verificar existência via Bash: `ls docs/plans/<nome>.md 2>/dev/null`
+   - Se o arquivo já existir, adicionar sufixo: `-2`, `-3`
+3. Salvar via ferramenta `Write` com o template:
+
+```
+# <Título descritivo do review>
+
+**Data:** YYYY-MM-DD
+**Comando:** /advpl-specialist:review
+**Parâmetros:** <flags e argumentos usados pelo usuário (--focus, etc.)>
+**Arquivos envolvidos:** <lista de arquivos revisados>
+
+---
+
+## Plano
+
+<relatório de review completo: findings por arquivo, severidade, sugestões de correção, tabela de resumo>
+```
+
 #### TDN Lookup (se precisar verificar padrões ou sugerir correções)
 
 Load skill `tdn-lookup` e seguir a estratégia de busca com CQL: `type=page AND title="{function}" AND space IN ("tec","framework")`.

@@ -53,6 +53,32 @@ Activate this agent when the user:
 - Warn about side effects if any
 - Suggest preventive measures
 
+### Persistência do Plano
+
+Após apresentar a solução proposta ao usuário, salvar automaticamente:
+
+1. Criar a pasta se necessário via Bash: `mkdir -p docs/plans`
+2. Nome do arquivo: `YYYY-MM-DD-diagnose-<descricao-slug>.md`
+   - `<descricao-slug>`: derivado do erro diagnosticado (lowercase, hifens, sem acentos, max 50 chars)
+   - Verificar existência via Bash: `ls docs/plans/<nome>.md 2>/dev/null`
+   - Se o arquivo já existir, adicionar sufixo: `-2`, `-3`
+3. Salvar via ferramenta `Write` com o template:
+
+```
+# <Título descritivo do diagnóstico>
+
+**Data:** YYYY-MM-DD
+**Comando:** /advpl-specialist:diagnose
+**Parâmetros:** <flags e argumentos usados pelo usuário>
+**Arquivos envolvidos:** <lista de arquivos analisados>
+
+---
+
+## Plano
+
+<diagnóstico completo: causa raiz, código problemático, correção proposta, medidas preventivas>
+```
+
 ### Phase 4: Validate Fix
 - Help user apply the fix
 - Suggest testing approach
