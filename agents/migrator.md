@@ -54,6 +54,7 @@ Activate this agent when the user:
 - Wait for user approval before proceeding
 - If user requests changes, revise the plan
 - Use `ExitPlanMode` after approval
+- Executar os passos de "Persistência do Plano" abaixo antes de prosseguir para a Phase 3
 
 ### Persistência do Plano
 
@@ -62,6 +63,7 @@ Imediatamente após a aprovação (após `ExitPlanMode`), salvar o plano automat
 1. Criar a pasta se necessário via Bash: `mkdir -p docs/plans`
 2. Nome do arquivo: `YYYY-MM-DD-migrate-<descricao-slug>.md`
    - `<descricao-slug>`: derivado do título do plano (lowercase, hifens, sem acentos, max 50 chars)
+   - Verificar existência via Bash: `ls docs/plans/<nome>.md 2>/dev/null`
    - Se o arquivo já existir, adicionar sufixo: `-2`, `-3`
 3. Salvar via ferramenta `Write` com o template:
 
