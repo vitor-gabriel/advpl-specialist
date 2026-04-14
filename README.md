@@ -1,6 +1,6 @@
 # advpl-specialist
 
-![Version](https://img.shields.io/badge/version-1.0.9-blue)
+![Version](https://img.shields.io/badge/version-1.1.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Claude%20Code-blueviolet)
 ![TOTVS](https://img.shields.io/badge/TOTVS-Protheus-orange)
@@ -17,7 +17,7 @@ Plugin para Claude Code especializado em **ADVPL** e **TLPP** para desenvolvimen
 - [Instalacao](#instalacao)
 - [Commands](#commands)
 - [Agents](#agents)
-- [Skills](#skills)
+- [Referencia Interna](#referencia-interna)
 - [Estrutura do Projeto](#estrutura-do-projeto)
 - [Referencia Embutida](#referencia-embutida)
 - [Contribuindo](#contribuindo)
@@ -174,10 +174,12 @@ Para uma experiencia completa, recomendamos instalar o plugin oficial **superpow
 | `changelog-generator` | Analisa git diff e gera changelog formatado com classificacao de impacto |
 | `sx-configurator` | Gera scripts de dicionario SX a partir de descricao em linguagem natural |
 
-## Skills
+## Referencia Interna
 
-| Skill | Descricao |
-|-------|-----------|
+Os agents e commands carregam automaticamente bases de conhecimento internas (`skills/*/reference.md`) conforme necessario. Estas referencias nao aparecem como skills invocaveis — o usuario interage exclusivamente pelos [Commands](#commands) acima.
+
+| Referencia | Descricao |
+|------------|-----------|
 | `advpl-code-generation` | Padroes e templates para geracao de codigo (MVC, REST, PE, SOAP, TReport, FWFormBrowse, Jobs, Workflow) |
 | `advpl-to-tlpp-migration` | Regras de conversao, checklist e exemplos before/after |
 | `advpl-debugging` | Top 50 erros comuns, metodologia de debug, dicas de performance |
@@ -191,6 +193,7 @@ Para uma experiencia completa, recomendamos instalar o plugin oficial **superpow
 | `documentation-patterns` | Templates para Protheus.doc header, documentacao completa e API REST |
 | `changelog-patterns` | Tipos de mudanca, niveis de impacto e formatos markdown/texto |
 | `sx-configuration` | Definicoes completas SX3/SIX/SX1/SX5/SX7 com validacoes e pictures |
+| `tdn-lookup` | Estrategia de busca online no TDN via API REST do Confluence (4 tiers) |
 
 ## Estrutura do Projeto
 
@@ -228,7 +231,7 @@ advpl-specialist/
 │   ├── document.md
 │   ├── changelog.md
 │   └── sxgen.md
-├── skills/                        # 14 skills com supporting files
+├── skills/                        # 14 referencias internas (reference.md + supporting files)
 │   ├── advpl-code-generation/     # Padroes MVC, REST, SOAP, PE, TReport, FWFormBrowse, Jobs, Workflow
 │   ├── advpl-to-tlpp-migration/   # Regras e checklist de migracao
 │   ├── advpl-debugging/           # Erros comuns e performance
@@ -241,7 +244,8 @@ advpl-specialist/
 │   ├── advpl-refactoring/         # 6 padroes de refatoracao com before/after
 │   ├── documentation-patterns/    # Templates Protheus.doc, documentacao completa, API
 │   ├── changelog-patterns/        # Tipos de mudanca, impacto, formatos
-│   └── sx-configuration/          # Dicionario SX3/SIX/SX1/SX5/SX7 completo
+│   ├── sx-configuration/          # Dicionario SX3/SIX/SX1/SX5/SX7 completo
+│   └── tdn-lookup/                # Busca online no TDN via API Confluence
 ├── hooks/                         # SessionStart hook
 │   ├── hooks.json
 │   └── session-start

@@ -6,6 +6,22 @@ Todas as mudancas notaveis deste projeto serao documentadas neste arquivo.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-04-14
+
+### Changed / Alterado
+- Skills are now internal references — no longer appear as duplicate entries in the Claude Code skills list. Users interact exclusively through the 12 commands (`/advpl-specialist:*`). Agents and commands now load reference files directly via `Read` instead of the `Skill` tool.
+- Skills agora sao referencias internas — nao aparecem mais como entradas duplicadas na lista de skills do Claude Code. Usuarios interagem exclusivamente pelos 12 comandos (`/advpl-specialist:*`). Agents e commands agora carregam arquivos de referencia diretamente via `Read` em vez da ferramenta `Skill`.
+- Renamed `SKILL.md` to `reference.md` in all 14 skill directories to prevent auto-discovery by Claude Code plugin system
+- Renomeado `SKILL.md` para `reference.md` em todos os 14 diretorios de skills para impedir auto-discovery pelo sistema de plugins do Claude Code
+- Removed `Skill` from `allowed-tools` in all 12 command frontmatters
+- Removido `Skill` de `allowed-tools` em todos os 12 frontmatters de commands
+- Updated all 10 agent files to use `Read` for loading reference files instead of `Skill` tool
+- Atualizados todos os 10 arquivos de agents para usar `Read` no carregamento de referencias em vez da ferramenta `Skill`
+- Renamed README "Skills" section to "Referencia Interna" with clarification that references are loaded automatically by agents/commands
+- Renomeada secao "Skills" do README para "Referencia Interna" com esclarecimento de que referencias sao carregadas automaticamente por agents/commands
+- Added `tdn-lookup` reference to README (was missing from the skills table since v1.0.9)
+- Adicionada referencia `tdn-lookup` ao README (estava faltando na tabela de skills desde v1.0.9)
+
 ## [1.0.9] - 2026-04-13
 
 ### Added / Adicionado
