@@ -1,6 +1,6 @@
 ---
 description: Look up Protheus documentation - native functions, SX data dictionary, REST APIs, MV parameters, and framework reference
-allowed-tools: Read, Glob, Grep, Bash, Agent, Skill, WebSearch, WebFetch
+allowed-tools: Read, Glob, Grep, Bash, Agent, WebSearch, WebFetch
 argument-hint: "<term> [--source tdn|local] [--type function|sx|api|param]"
 ---
 
@@ -31,7 +31,7 @@ Look up documentation for Protheus functions, APIs, tables, and parameters.
    - Starts with MV_ -> param
    - Contains API/REST -> api
    - Otherwise -> function
-3. **Search local** - Check protheus-reference skill supporting files
+3. **Search local** - Check `skills/protheus-reference/` supporting files
 4. **Search TDN** - If not found locally or --source tdn, search online
 5. **Present results** - Syntax, parameters, return type, example
 

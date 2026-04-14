@@ -1,6 +1,6 @@
 ---
 description: Explain ADVPL/TLPP code in plain language for developers and functional consultants
-allowed-tools: Read, Glob, Grep, Bash, Agent, Skill
+allowed-tools: Read, Glob, Grep, Bash, Agent
 argument-hint: "<file|code> [--level junior|senior|funcional]"
 ---
 
@@ -29,11 +29,11 @@ If `--level` is not provided, default to `junior`.
 ## Process
 
 1. **Parse arguments** — Identify target file/snippet and level
-2. **Load explanation skill** — Invoke `code-explanation` skill
+2. **Load explanation reference** — Read `skills/code-explanation/reference.md`
 3. **Read target code** — Read the file or interpret the snippet
-4. **Load supporting skills** — Load `protheus-reference`, `protheus-business`, `embedded-sql` as needed
+4. **Load supporting references** — Read `skills/protheus-reference/reference.md`, `skills/protheus-business/reference.md`, `skills/embedded-sql/reference.md` as needed
 5. **Analyze code** — Identify structure, functions, variables, DB operations, business rules
-6. **Generate explanation** — Follow the level-appropriate structure from the skill
+6. **Generate explanation** — Follow the level-appropriate structure from the reference
 7. **Present result** — Clear, structured explanation in the user's language
 
 ## Examples

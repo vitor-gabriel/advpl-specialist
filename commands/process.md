@@ -1,6 +1,6 @@
 ---
 description: Consult Protheus ERP business processes, module workflows, routines and integrations
-allowed-tools: Read, Glob, Grep, WebSearch, WebFetch, Skill, Bash, EnterPlanMode, ExitPlanMode, browser_navigate, browser_snapshot, browser_take_screenshot, browser_fill_form, browser_click, browser_close
+allowed-tools: Read, Glob, Grep, WebSearch, WebFetch, Bash, EnterPlanMode, ExitPlanMode, browser_navigate, browser_snapshot, browser_take_screenshot, browser_fill_form, browser_click, browser_close
 argument-hint: "<process|routine|module> [--type process|routine|module|integration]"
 agent: process-consultant
 ---
@@ -25,14 +25,14 @@ Consult Protheus ERP business processes, module workflows, routines, and integra
 
 ## Process
 
-1. **Load skill** - Invoke `protheus-business` skill
+1. **Load reference** - Read `skills/protheus-business/reference.md`
 2. **Parse query** - Extract search term and options
 3. **Classify query type** - If `--type` not specified, auto-detect:
    - Contains routine code (e.g. MATA410, FINA040) -> routine
    - Contains module name (Compras, Faturamento, Estoque, etc.) -> module
    - Contains two module names or keywords like "integracao" / "integration" -> integration
    - Otherwise -> process
-4. **Search local reference** - Check protheus-business skill module files (modulo-compras.md, modulo-estoque.md, etc.)
+4. **Search local reference** - Check `skills/protheus-business/` module files (modulo-compras.md, modulo-estoque.md, etc.)
 5. **Search TDN** - If not found locally, search TDN online:
    - Process: `site:tdn.totvs.com "<process>" protheus fluxo`
    - Routine: `site:tdn.totvs.com "<ROUTINE_CODE>" rotina`
@@ -76,7 +76,7 @@ Adaptive based on query type:
 
 ## Cross-References
 
-When the user needs more detail, load additional skills:
+When the user needs more detail, read additional references:
 - **protheus-reference** - for native function details (syntax, parameters, return values)
 - **advpl-code-generation** - for code examples and implementation patterns
 - **embedded-sql** - for query examples using Embedded SQL
@@ -108,4 +108,4 @@ When the user needs more detail, load additional skills:
 - Clear, structured explanation adapted to query type
 - References to routines, tables, and entry points
 - Source citation (local reference or TDN)
-- Suggestions for related skills when further detail is needed
+- Suggestions for related references when further detail is needed
