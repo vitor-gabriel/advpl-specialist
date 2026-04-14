@@ -53,7 +53,7 @@ Activate this agent when the user:
     - Cosmetic or structural → BAIXO
 
 ### Phase 3: Generate Changelog
-- Load skill `changelog-patterns` for format templates
+- Read `skills/changelog-patterns/reference.md` for format templates
 - Group entries by change type
 - Apply the requested format (--format flag)
 - Include: date, version (if provided), summary, detailed entries

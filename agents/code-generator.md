@@ -46,7 +46,7 @@ Activate this agent when the user:
 - Determine if ADVPL (.prw) or TLPP (.tlpp) is preferred
 
 ### Phase 2: Load Reference
-- Load skill `advpl-code-generation` for patterns and templates
+- Read `skills/advpl-code-generation/reference.md` for patterns and templates
 - Check the appropriate supporting file:
   - MVC -> patterns-mvc.md
   - REST -> patterns-rest.md
@@ -57,15 +57,15 @@ Activate this agent when the user:
   - FWFormBrowse -> patterns-fwformbrowse.md
   - Job/Scheduler -> patterns-jobs.md
   - Workflow/BPM -> patterns-workflow.md
-  - ProBat test -> load `probat-testing` skill
-- Load `protheus-reference` skill if native function lookup is needed
-- Load `embedded-sql` skill if SQL queries are needed (prefer BeginSQL over TCQuery)
+  - ProBat test -> Read `skills/probat-testing/reference.md`
+- Read `skills/protheus-reference/reference.md` if native function lookup is needed
+- Read `skills/embedded-sql/reference.md` if SQL queries are needed (prefer BeginSQL over TCQuery)
 - **For TReport, FWFormBrowse, Jobs, and Workflow types:** If the user requests non-standard methods or class/function usage, validate against the TDN using the TDN API Lookup described below (Tier 2/3/4) to confirm correct signatures, parameters, and behavior.
 - **For entry points (MANDATORY):** ALWAYS search the TDN for the entry point name using the TDN API Lookup described below (Tier 2/3/4). Extract: PARAMIXB parameters (types, positions, descriptions), expected return type/value, which standard routine calls this entry point, and version-specific behavior. The local patterns-pontos-entrada.md file provides templates and common examples, but the TDN is the authoritative source for each specific entry point's contract.
 
 - **TDN Lookup para Entry Points (MANDATÓRIO):**
 
-  Load skill `tdn-lookup` e seguir a estratégia de busca com CQL: `type=page AND title="{EP_NAME}" AND space IN ("tec","framework")`. Fuzzy: `type=page AND text~"{EP_NAME}"`.
+  Read `skills/tdn-lookup/reference.md` e seguir a estratégia de busca com CQL: `type=page AND title="{EP_NAME}" AND space IN ("tec","framework")`. Fuzzy: `type=page AND text~"{EP_NAME}"`.
 
   **Dados a extrair do resultado:**
   - Parâmetros PARAMIXB (tipos, posições, descrições)
@@ -232,7 +232,7 @@ return oRest:setResponse(cData)
 
 ## CRITICAL: TLPP Namespace Declaration
 
-Every `.tlpp` file generated for customer code **must** declare a `namespace`. This is as important as the `User Function` rule above — missing it breaks consistency with the ADVPL→TLPP migration skill and risks name collisions between customer projects that share the same Protheus environment.
+Every `.tlpp` file generated for customer code **must** declare a `namespace`. This is as important as the `User Function` rule above — missing it breaks consistency with the ADVPL→TLPP migration reference and risks name collisions between customer projects that share the same Protheus environment.
 
 ### The rule
 
@@ -408,7 +408,7 @@ Always keep suggestions readable and discoverable — never return random trunca
 
 ### About `longnameclass`
 
-`longnameclass` is a **legacy ADVPL mechanism** (magical inheritance) that allowed class methods and properties to exceed the 10-char limit. **Do NOT generate new code based on `longnameclass`.** The modern, officially supported replacement is TLPP with `namespace`. The plugin only recognizes `longnameclass` as an exception in the code review skill (BP-010) to avoid false positives on legacy customer code.
+`longnameclass` is a **legacy ADVPL mechanism** (magical inheritance) that allowed class methods and properties to exceed the 10-char limit. **Do NOT generate new code based on `longnameclass`.** The modern, officially supported replacement is TLPP with `namespace`. The plugin only recognizes `longnameclass` as an exception in the code review reference (BP-010) to avoid false positives on legacy customer code.
 
 If the user explicitly asks for a `longnameclass`-based generation, refuse and offer TLPP with namespace as the modern alternative.
 
@@ -483,7 +483,7 @@ Return
 
 - Protheus projects routinely contain **thousands** of source files. A `Glob "**/*.prw"` or a `Grep` across the tree can take minutes and bury the user's plan mode behind a wall of irrelevant data
 - The caller already provides everything the generator needs: `type`, `name`, `--module`, and business requirements
-- Naming conventions (Hungarian notation, module prefixes) come from the `advpl-code-generation` skill, **not** from inspecting existing files
+- Naming conventions (Hungarian notation, module prefixes) come from `skills/advpl-code-generation/reference.md`, **not** from inspecting existing files
 - Code style, error handling, area save/restore, `xFilial` usage — all defined in the plugin templates, not derived from the customer codebase
 - Output paths come from the current working directory (or `--output`), not from scanning to "find the right module folder"
 

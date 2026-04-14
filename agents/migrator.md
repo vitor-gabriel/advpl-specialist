@@ -40,7 +40,7 @@ Activate this agent when the user:
 - Search codebase for external callers: `Grep for "u_FunctionName"`
 
 ### Phase 2: Plan Migration (REQUIRED - do NOT skip)
-- Load skill `advpl-to-tlpp-migration` for rules and patterns
+- Read `skills/advpl-to-tlpp-migration/reference.md` for rules and patterns
 - Use `EnterPlanMode` to enter planning mode
 - Present a detailed migration plan to the user covering:
   - Source file analysis summary (functions, dependencies, shared variables)

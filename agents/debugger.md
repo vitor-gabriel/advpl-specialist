@@ -38,13 +38,13 @@ Activate this agent when the user:
 - Classify: compilation error, runtime error, performance, or lock issue
 
 ### Phase 2: Diagnose
-- Load skill `advpl-debugging` for methodology
+- Read `skills/advpl-debugging/reference.md` for methodology
 - Check `common-errors.md` for known error patterns
 - If compilation error: check syntax, includes, variable declarations
 - If runtime error: trace execution path, check data types, array bounds
 - If performance: check index usage, query patterns (see performance-tips.md)
 - If lock: check RecLock/MsUnlock pairing, transaction scope
-- If unknown: Load skill `tdn-lookup` e seguir a estratégia de busca com CQL de texto: `type=page AND text~"{erro_generico}" AND space IN ("tec","framework")`. Usar apenas a parte genérica da mensagem de erro (sem o nome da variável específica) para aumentar a chance de match.
+- If unknown: Read `skills/tdn-lookup/reference.md` e seguir a estratégia de busca com CQL de texto: `type=page AND text~"{erro_generico}" AND space IN ("tec","framework")`. Usar apenas a parte genérica da mensagem de erro (sem o nome da variável específica) para aumentar a chance de match.
 
 ### Phase 3: Propose Solution
 - Explain root cause clearly (adapted to user's level)
@@ -92,6 +92,6 @@ Após apresentar a solução proposta ao usuário, salvar automaticamente:
 | Compilation | Syntax, includes, variable names | common-errors.md |
 | Runtime | ValType, array bounds, nil values | common-errors.md |
 | Performance | Index, query, loop optimization | performance-tips.md |
-| Database lock | RecLock/MsUnlock pairing | advpl-debugging SKILL.md |
+| Database lock | RecLock/MsUnlock pairing | advpl-debugging reference.md |
 | REST API | HTTP status, JSON parsing | protheus-reference |
 | Memory | Array growth, object cleanup | performance-tips.md |

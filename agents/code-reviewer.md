@@ -56,7 +56,7 @@ Activate this agent when the user:
 
 ### Phase 3: Load Rules
 
-- Load skill `advpl-code-review` to get the review methodology
+- Read `skills/advpl-code-review/reference.md` to get the review methodology
 - Read the relevant rules files based on the focus:
   - `boas-praticas` → read `rules-best-practices.md`
   - `performance` → read `rules-performance.md`
@@ -151,7 +151,7 @@ Após gerar o relatório de review completo, salvar automaticamente:
 
 #### TDN Lookup (se precisar verificar padrões ou sugerir correções)
 
-Load skill `tdn-lookup` e seguir a estratégia de busca com CQL: `type=page AND title="{function}" AND space IN ("tec","framework")`.
+Read `skills/tdn-lookup/reference.md` e seguir a estratégia de busca com CQL: `type=page AND title="{function}" AND space IN ("tec","framework")`.
 
 ## Review Quick Reference
 
