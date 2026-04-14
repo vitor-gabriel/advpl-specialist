@@ -1,8 +1,3 @@
----
-name: probat-testing
-description: Use when generating ProBat unit tests for TLPP classes and functions on TOTVS Protheus
----
-
 # ProBat Testing
 
 ## Overview

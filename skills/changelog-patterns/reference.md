@@ -1,8 +1,3 @@
----
-name: changelog-patterns
-description: Use when generating changelogs from code changes - git diffs, file comparisons, release notes
----
-
 # Changelog Patterns
 
 ## Overview

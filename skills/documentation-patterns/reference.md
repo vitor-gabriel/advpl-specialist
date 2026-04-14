@@ -1,8 +1,3 @@
----
-name: documentation-patterns
-description: Use when generating technical documentation for ADVPL/TLPP code - Protheus.doc headers, routine docs, API docs
----
-
 # Documentation Patterns
 
 ## Overview

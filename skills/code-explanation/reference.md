@@ -1,8 +1,3 @@
----
-name: code-explanation
-description: Use when explaining ADVPL/TLPP code in plain language for developers and functional consultants
----
-
 # Code Explanation
 
 ## Overview

@@ -1,8 +1,3 @@
----
-name: embedded-sql
-description: Use when writing SQL queries in ADVPL/TLPP using BeginSQL/EndSQL blocks, %table%, %notDel%, %xfilial%, %exp% macros, or when choosing between Embedded SQL and TCQuery string concatenation
----
-
 # Embedded SQL in ADVPL/TLPP
 
 ## Overview
