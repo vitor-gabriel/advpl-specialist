@@ -55,6 +55,31 @@ Activate this agent when the user:
 - Wait for user approval
 - Use `ExitPlanMode` after approval
 
+### Persistência do Plano
+
+Imediatamente após a aprovação (após `ExitPlanMode`), salvar o plano automaticamente:
+
+1. Criar a pasta se necessário via Bash: `mkdir -p docs/plans`
+2. Nome do arquivo: `YYYY-MM-DD-refactor-<descricao-slug>.md`
+   - `<descricao-slug>`: derivado do título do plano (lowercase, hifens, sem acentos, max 50 chars)
+   - Se o arquivo já existir, adicionar sufixo: `-2`, `-3`
+3. Salvar via ferramenta `Write` com o template:
+
+```
+# <Título descritivo do plano>
+
+**Data:** YYYY-MM-DD
+**Comando:** /advpl-specialist:refactor
+**Parâmetros:** <flags e argumentos usados pelo usuário>
+**Arquivos envolvidos:** <lista de arquivos que serão criados/modificados>
+
+---
+
+## Plano
+
+<conteúdo exato do plano aprovado pelo usuário>
+```
+
 ### Phase 4: Apply
 - Apply approved refactorings one at a time
 - Use `Edit` tool for precise modifications
