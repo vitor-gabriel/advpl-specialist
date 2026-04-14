@@ -6,6 +6,16 @@ Todas as mudancas notaveis deste projeto serao documentadas neste arquivo.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.9] - 2026-04-13
+
+### Added / Adicionado
+- Automatic plan persistence: all 8 agents with planning/generation phases now save approved plans to `docs/plans/YYYY-MM-DD-<command>-<description>.md` automatically after user approval
+- Persistencia automatica de planos: todos os 8 agents com fases de planejamento/geracao agora salvam os planos aprovados em `docs/plans/YYYY-MM-DD-<comando>-<descricao>.md` automaticamente apos a aprovacao do usuario
+- New TDN lookup strategy using Confluence REST API (4-tier online fallback): WebFetch API → Playwright API JSON → WebSearch + Playwright → Playwright visual search — reduces token consumption by 70-90% compared to HTML scraping
+- Nova estrategia de busca no TDN usando API REST do Confluence (4 tiers online de fallback): WebFetch API → Playwright API JSON → WebSearch + Playwright → Playwright busca visual — reduz consumo de tokens em 70-90% comparado a scraping de HTML
+- Centralized `tdn-lookup` skill replacing duplicated TDN lookup blocks across 8 agents (259 deletions, 133 insertions)
+- Skill centralizada `tdn-lookup` substituindo blocos duplicados de busca no TDN em 8 agents (259 delecoes, 133 insercoes)
+
 ## [1.0.8] - 2026-04-07
 
 ### Fixed / Corrigido
