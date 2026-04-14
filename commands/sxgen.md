@@ -1,6 +1,6 @@
 ---
 description: Generate Protheus SX data dictionary configuration scripts - SX3 fields, SIX indexes, SX1 questions, SX5 generic tables
-allowed-tools: Read, Write, Glob, Grep, Bash, Agent, Skill
+allowed-tools: Read, Write, Glob, Grep, Bash, Agent
 argument-hint: "[--type sx3|six|sx1|sx5] [--output path]"
 ---
 
@@ -49,7 +49,7 @@ The command automatically:
 ## Process
 
 1. **Parse input** — Identify type and field specifications from natural language
-2. **Load SX configuration skill** — Invoke `sx-configuration` skill
+2. **Load SX configuration reference** — Read `skills/sx-configuration/reference.md`
 3. **Delegate to sx-configurator agent** — Pass parsed requirements
 4. **Validate** — Check types, sizes, pictures, validations
 5. **Generate script** — Formatted key-value blocks with all fields
