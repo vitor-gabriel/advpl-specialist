@@ -1,8 +1,3 @@
----
-name: advpl-code-generation
-description: Use when creating ADVPL/TLPP code - functions, classes, MVC structures, REST APIs, Web Services, or entry points for TOTVS Protheus
----
-
 # ADVPL/TLPP Code Generation
 
 ## Overview

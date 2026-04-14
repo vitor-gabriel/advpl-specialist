@@ -1,8 +1,3 @@
----
-name: advpl-debugging
-description: Use when debugging ADVPL/TLPP errors, analyzing Protheus logs, diagnosing performance issues, or troubleshooting compilation and runtime problems
----
-
 # ADVPL/TLPP Debugging
 
 ## Overview

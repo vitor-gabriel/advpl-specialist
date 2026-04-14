@@ -1,8 +1,3 @@
----
-name: advpl-code-review
-description: Use when reviewing ADVPL/TLPP code for best practices, performance, security, and modernization opportunities
----
-
 # ADVPL/TLPP Code Review
 
 ## Overview

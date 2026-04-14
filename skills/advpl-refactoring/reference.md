@@ -1,8 +1,3 @@
----
-name: advpl-refactoring
-description: Use when refactoring ADVPL/TLPP code - extract functions, simplify logic, remove dead code, improve naming
----
-
 # ADVPL/TLPP Refactoring
 
 ## Overview

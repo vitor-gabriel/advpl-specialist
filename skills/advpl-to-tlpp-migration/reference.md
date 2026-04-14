@@ -1,8 +1,3 @@
----
-name: advpl-to-tlpp-migration
-description: Use when migrating ADVPL procedural code to TLPP object-oriented code, converting functions to classes, or modernizing legacy Protheus code
----
-
 # ADVPL to TLPP Migration
 
 ## Overview
