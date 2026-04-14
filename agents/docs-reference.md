@@ -33,17 +33,17 @@ Activate this agent when the user:
 - Classify query type: function | sx | api | param | config | concept
 
 ### Phase 2: Search Local Reference
-- Load skill `protheus-reference`
+- Read `skills/protheus-reference/reference.md`
 - Search in the appropriate supporting file:
   - Functions -> native-functions.md
   - SX tables -> sx-dictionary.md
   - REST APIs -> rest-api-reference.md
   - MV parameters -> native-functions.md (system functions section)
-  - Embedded SQL -> embedded-sql skill (BeginSQL/EndSQL, macros)
+  - Embedded SQL -> `skills/embedded-sql/reference.md` (BeginSQL/EndSQL, macros)
 
 ### Phase 3: TDN Lookup (se não encontrado localmente)
 
-Load skill `tdn-lookup` e seguir a estratégia de busca em 3 tiers (Tier 2: WebFetch API → Tier 3: Playwright API JSON → Tier 4: Playwright HTML visual).
+Read `skills/tdn-lookup/reference.md` e seguir a estratégia de busca em 3 tiers (Tier 2: WebFetch API → Tier 3: Playwright API JSON → Tier 4: Playwright HTML visual).
 
 **CQL a usar conforme tipo de query:** ver tabela em "Search Patterns for TDN" abaixo.
 

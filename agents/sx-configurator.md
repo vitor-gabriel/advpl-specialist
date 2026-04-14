@@ -40,8 +40,8 @@ Activate this agent when the user:
   - For SX5: table code, key-value pairs
 
 ### Phase 2: Validate and Enrich
-- Load skill `sx-configuration` for templates and validation rules
-- Load skill `protheus-reference` for SX dictionary structure
+- Read `skills/sx-configuration/reference.md` for templates and validation rules
+- Read `skills/protheus-reference/reference.md` for SX dictionary structure
 - For each field definition:
   - Validate field name format (ALIAS_XXXXXX)
   - Validate type and size compatibility

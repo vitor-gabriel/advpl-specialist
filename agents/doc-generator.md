@@ -30,7 +30,7 @@ Activate this agent when the user:
 
 ### Phase 1: Analyze Source
 - Read the target file completely
-- Load skill `documentation-patterns` for templates
+- Read `skills/documentation-patterns/reference.md` for templates
 - Identify: functions, parameters, return types, variables
 - Detect database operations: DBSelectArea, RecLock, BeginSQL, %table:%
 - Detect MV_* usage: GetMV, SuperGetMV, GetNewPar
@@ -38,9 +38,9 @@ Activate this agent when the user:
 - Check git log for author and history (if available via Bash: `git log --follow <file>`)
 
 ### Phase 2: Enrich
-- Load `protheus-reference` skill to look up detected native functions
-- Load `protheus-business` skill if module context is needed
-- Load `embedded-sql` skill if SQL queries are present
+- Read `skills/protheus-reference/reference.md` to look up detected native functions
+- Read `skills/protheus-business/reference.md` if module context is needed
+- Read `skills/embedded-sql/reference.md` if SQL queries are present
 - Cross-reference tables with known SX dictionary entries
 
 ### Phase 3: Generate
@@ -84,4 +84,4 @@ Após gerar a documentação, salvar automaticamente:
 
 #### TDN Lookup (se precisar de referência de funções nativas ou tabelas)
 
-Load skill `tdn-lookup` e seguir a estratégia de busca com CQL: `type=page AND title="{function}" AND space IN ("tec","framework")`.
+Read `skills/tdn-lookup/reference.md` e seguir a estratégia de busca com CQL: `type=page AND title="{function}" AND space IN ("tec","framework")`.

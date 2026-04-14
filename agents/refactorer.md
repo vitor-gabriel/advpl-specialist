@@ -31,7 +31,7 @@ Activate this agent when the user:
 
 ### Phase 1: Analyze
 - Read the target file(s) completely
-- Load skill `advpl-refactoring` for patterns and rules
+- Read `skills/advpl-refactoring/reference.md` for patterns and rules
 - Identify all refactoring opportunities
 - Classify each by pattern (RF-001 through RF-006) and complexity
 
@@ -93,4 +93,4 @@ Imediatamente após a aprovação (após `ExitPlanMode`), salvar o plano automat
 
 #### TDN Lookup (se precisar verificar funções externas ou padrões)
 
-Load skill `tdn-lookup` e seguir a estratégia de busca com CQL: `type=page AND title="{function}" AND space IN ("tec","framework")`.
+Read `skills/tdn-lookup/reference.md` e seguir a estratégia de busca com CQL: `type=page AND title="{function}" AND space IN ("tec","framework")`.

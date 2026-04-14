@@ -34,7 +34,7 @@ Activate this agent when the user:
 - Determine depth needed (overview vs detailed)
 
 ### Phase 2: Search Local Reference
-- Load skill `protheus-business`
+- Read `skills/protheus-business/reference.md`
 - Search the appropriate module file(s):
   - Compras -> modulo-compras.md
   - Estoque -> modulo-estoque.md
@@ -48,7 +48,7 @@ Activate this agent when the user:
 
 ### Phase 3: TDN Lookup (se não encontrado localmente)
 
-Load skill `tdn-lookup` e seguir a estratégia de busca em 3 tiers (Tier 2: WebFetch API → Tier 3: Playwright API JSON → Tier 4: Playwright HTML visual).
+Read `skills/tdn-lookup/reference.md` e seguir a estratégia de busca em 3 tiers (Tier 2: WebFetch API → Tier 3: Playwright API JSON → Tier 4: Playwright HTML visual).
 
 **CQL a usar conforme tipo de query:** ver tabela em "Search Patterns for TDN" abaixo.
 
@@ -63,9 +63,9 @@ Adaptive response based on query type:
 
 ## Cross-References
 
-- Load `protheus-reference` skill if user needs native function details
-- Load `advpl-code-generation` skill if user wants code examples
-- Load `embedded-sql` skill if user needs query examples
+- Read `skills/protheus-reference/reference.md` if user needs native function details
+- Read `skills/advpl-code-generation/reference.md` if user wants code examples
+- Read `skills/embedded-sql/reference.md` if user needs query examples
 
 ## Search Patterns for TDN (CQL)
 
