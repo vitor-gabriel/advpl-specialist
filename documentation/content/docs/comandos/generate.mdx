@@ -48,7 +48,7 @@ Gera novo codigo ADVPL ou TLPP seguindo as convencoes e boas praticas do Protheu
 
 - Projetos Protheus rotineiramente possuem milhares de arquivos-fonte — varre-los e proibitivamente lento e desperdica o tempo do usuario
 - O codigo gerado vem dos templates do plugin, nao do codigo-base do cliente
-- Convencoes de nomenclatura, estilo e padroes vem da skill (`advpl-code-generation`), nao de arquivos existentes
+- Convencoes de nomenclatura, estilo e padroes vem da referencia (`advpl-code-generation`), nao de arquivos existentes
 - O chamador ja fornece tudo que o gerador precisa: `type`, `name`, `--module`, requisitos de negocio
 
 **Usos permitidos de `Read` / `Glob` / `Grep`:**
@@ -74,7 +74,7 @@ Gera novo codigo ADVPL ou TLPP seguindo as convencoes e boas praticas do Protheu
    - **(B) Mudar para TLPP com namespace** — explica que TLPP com namespace suporta ate 255 chars (disponivel a partir do release 12.1.2410 do Protheus). Pede o agrupador (`--module`) se ausente.
    So prossegue para o proximo passo apos o usuario escolher (A) + nome encurtado, ou (B) + agrupador de namespace. **Nunca gera codigo que dependa de `longnameclass` como workaround — TLPP com namespace e a alternativa moderna oficialmente suportada.**
 3. **Pedir requisitos de negocio** - O que o codigo deve fazer?
-4. **Carregar skill** - Invocar skill `advpl-code-generation`
+4. **Carregar referencia** - Carregar referencia `advpl-code-generation`
 5. **Carregar padroes** - Ler arquivo de suporte apropriado para o tipo
 6. **Pesquisar TDN para pontos de entrada** - **Se o tipo for `ponto-entrada`**, SEMPRE pesquisa o TDN (TOTVS Developer Network) pelo nome do ponto de entrada antes de gerar codigo. Usa `WebSearch` para encontrar a pagina de documentacao oficial (ex.: pesquisar por `"NOME_PONTO_ENTRADA site:tdn.totvs.com"`). Extrai da pagina do TDN: parametros PARAMIXB (tipos, posicoes, descricoes), tipo e valor de retorno esperado, qual rotina padrao chama esse ponto de entrada e quaisquer ressalvas ou comportamentos especificos de versao.
 7. **Entrar em modo de planejamento** - Usar `EnterPlanMode` para criar um plano estruturado de implementacao

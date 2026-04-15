@@ -39,7 +39,7 @@ Ative este agente quando o usuario:
 - Classificar: erro de compilacao, erro de runtime, performance ou problema de lock
 
 ### Fase 2: Diagnosticar
-- Carregar skill `advpl-debugging` para metodologia
+- Carregar referencia `advpl-debugging` para metodologia
 - Verificar `common-errors.md` para padroes de erro conhecidos
 - Se erro de compilacao: verificar sintaxe, includes, declaracoes de variaveis
 - Se erro de runtime: rastrear caminho de execucao, verificar tipos de dados, limites de array
@@ -74,11 +74,11 @@ Se `WebSearch` retornar erro, timeout ou conteudo vazio/ilegivel na busca TDN, u
 
 ## Referencia rapida de diagnostico de erros
 
-| Categoria do erro | Primeira verificacao | Referencia da skill |
+| Categoria do erro | Primeira verificacao | Referencia |
 |---------------|------------|-----------------|
 | Compilacao | Sintaxe, includes, nomes de variaveis | common-errors.md |
 | Runtime | ValType, limites de array, valores nil | common-errors.md |
 | Performance | Indices, consultas, otimizacao de loops | performance-tips.md |
-| Lock de banco | Pareamento RecLock/MsUnlock | advpl-debugging SKILL.md |
+| Lock de banco | Pareamento RecLock/MsUnlock | advpl-debugging reference.md |
 | REST API | Status HTTP, parsing de JSON | protheus-reference |
 | Memoria | Crescimento de arrays, limpeza de objetos | performance-tips.md |

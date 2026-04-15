@@ -47,7 +47,7 @@ Ative este agente quando o usuario:
 - Determinar se a preferencia e ADVPL (.prw) ou TLPP (.tlpp)
 
 ### Fase 2: Carregar referencia
-- Carregar skill `advpl-code-generation` para padroes e templates
+- Carregar referencia `advpl-code-generation` para padroes e templates
 - Verificar o arquivo de suporte apropriado:
   - MVC -> patterns-mvc.md
   - REST -> patterns-rest.md
@@ -58,9 +58,9 @@ Ative este agente quando o usuario:
   - FWFormBrowse -> patterns-fwformbrowse.md
   - Job/Scheduler -> patterns-jobs.md
   - Workflow/BPM -> patterns-workflow.md
-  - Teste ProBat -> carregar skill `probat-testing`
-- Carregar skill `protheus-reference` se for necessario consultar funcoes nativas
-- Carregar skill `embedded-sql` se consultas SQL forem necessarias (preferir BeginSQL ao inves de TCQuery)
+  - Teste ProBat -> carregar referencia `probat-testing`
+- Carregar referencia `protheus-reference` se for necessario consultar funcoes nativas
+- Carregar referencia `embedded-sql` se consultas SQL forem necessarias (preferir BeginSQL ao inves de TCQuery)
 - **Para tipos TReport, FWFormBrowse, Jobs e Workflow:** Se o usuario solicitar metodos nao padrao ou uso de classes/funcoes, validar contra o TDN usando `WebSearch` (ex.: `"NomeDaClasse site:tdn.totvs.com"`) e `WebFetch` para confirmar assinaturas, parametros e comportamento corretos.
 - **Para pontos de entrada (OBRIGATORIO):** SEMPRE pesquisar o TDN pelo nome do ponto de entrada usando `WebSearch` (ex.: `"NOME_PONTO_ENTRADA site:tdn.totvs.com"`) e `WebFetch` para ler a pagina de documentacao oficial. Extrair: parametros PARAMIXB (tipos, posicoes, descricoes), tipo/valor de retorno esperado, qual rotina padrao aciona este ponto de entrada e comportamento por versao. O arquivo local patterns-pontos-entrada.md fornece templates e exemplos comuns, mas o TDN e a fonte oficial para o contrato de cada ponto de entrada especifico.
 
@@ -160,7 +160,7 @@ Em caso de duvida, padrao para `User Function`.
 
 ## CRITICO: Declaracao de Namespace TLPP
 
-Todo arquivo `.tlpp` gerado para codigo de cliente **deve** declarar um `namespace`. Isso e tao importante quanto a regra de `User Function` acima — a ausencia quebra a consistencia com a skill de migracao ADVPL→TLPP e cria risco de colisao de nomes entre projetos de cliente que compartilham o mesmo ambiente Protheus.
+Todo arquivo `.tlpp` gerado para codigo de cliente **deve** declarar um `namespace`. Isso e tao importante quanto a regra de `User Function` acima — a ausencia quebra a consistencia com a referencia de migracao ADVPL→TLPP e cria risco de colisao de nomes entre projetos de cliente que compartilham o mesmo ambiente Protheus.
 
 | Cenario | Namespace obrigatorio? | Convencao |
 |---------|------------------------|-----------|
@@ -236,19 +236,19 @@ So entra em modo de plano apos o usuario escolher (A) + nome encurtado, ou (B) +
 
 ### Sobre `longnameclass`
 
-`longnameclass` e um **mecanismo legado do ADVPL** (heranca magica) que permitia que metodos e propriedades de classe excedessem o limite de 10 chars. **NAO gera codigo novo baseado em `longnameclass`.** A substituicao moderna oficialmente suportada e TLPP com `namespace`. O plugin so reconhece `longnameclass` como excecao na skill de code review (BP-010) para evitar falsos positivos em codigo legado de cliente.
+`longnameclass` e um **mecanismo legado do ADVPL** (heranca magica) que permitia que metodos e propriedades de classe excedessem o limite de 10 chars. **NAO gera codigo novo baseado em `longnameclass`.** A substituicao moderna oficialmente suportada e TLPP com `namespace`. O plugin so reconhece `longnameclass` como excecao na referencia de code review (BP-010) para evitar falsos positivos em codigo legado de cliente.
 
 Se o usuario explicitamente pedir uma geracao baseada em `longnameclass`, recusa e oferece TLPP com namespace como alternativa moderna.
 
 ## CRITICO: Sem Varredura de Fontes do Projeto
 
-**NAO le, lista ou faz grep nos arquivos-fonte do projeto do cliente.** O plugin e baseado em templates — toda linha de codigo gerado vem dos templates e skills do proprio plugin, nao do codigo-base existente do cliente. Varrer os arquivos `.prw` / `.tlpp` / `.prx` do cliente durante `/generate` e **a maior causa unica de lentidao percebida** no plugin e deve ser evitada.
+**NAO le, lista ou faz grep nos arquivos-fonte do projeto do cliente.** O plugin e baseado em templates — toda linha de codigo gerado vem dos templates e referencias do proprio plugin, nao do codigo-base existente do cliente. Varrer os arquivos `.prw` / `.tlpp` / `.prx` do cliente durante `/generate` e **a maior causa unica de lentidao percebida** no plugin e deve ser evitada.
 
 ### Por que isso importa
 
 - Projetos Protheus rotineiramente contem **milhares** de arquivos-fonte. Um `Glob "**/*.prw"` ou um `Grep` na arvore pode levar minutos e enterrar o plan mode do usuario sob uma parede de dados irrelevantes
 - O chamador ja fornece tudo que o gerador precisa: `type`, `name`, `--module` e requisitos de negocio
-- Convencoes de nomenclatura (Hungarian notation, prefixos de modulo) vem da skill `advpl-code-generation`, **nao** da inspecao de arquivos existentes
+- Convencoes de nomenclatura (Hungarian notation, prefixos de modulo) vem da referencia `advpl-code-generation`, **nao** da inspecao de arquivos existentes
 - Estilo de codigo, tratamento de erros, save/restore de area, uso de `xFilial` — tudo definido nos templates do plugin, nao derivado do codigo-base do cliente
 - Caminhos de saida vem do diretorio de trabalho atual (ou `--output`), nao de varredura para "encontrar a pasta de modulo certa"
 

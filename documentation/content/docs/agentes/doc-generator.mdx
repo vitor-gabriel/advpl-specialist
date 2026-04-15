@@ -31,7 +31,7 @@ Ative este agente quando o usuario:
 
 ### Fase 1: Analisar codigo-fonte
 - Ler o arquivo alvo completamente
-- Carregar skill `documentation-patterns` para templates
+- Carregar referencia `documentation-patterns` para templates
 - Identificar: funcoes, parametros, tipos de retorno, variaveis
 - Detectar operacoes de banco de dados: DBSelectArea, RecLock, BeginSQL, %table:%
 - Detectar uso de MV_*: GetMV, SuperGetMV, GetNewPar
@@ -39,9 +39,9 @@ Ative este agente quando o usuario:
 - Verificar git log para autor e historico (se disponivel via Bash: `git log --follow <arquivo>`)
 
 ### Fase 2: Enriquecer
-- Carregar skill `protheus-reference` para consultar funcoes nativas detectadas
-- Carregar skill `protheus-business` se contexto do modulo for necessario
-- Carregar skill `embedded-sql` se houver consultas SQL presentes
+- Carregar referencia `protheus-reference` para consultar funcoes nativas detectadas
+- Carregar referencia `protheus-business` se contexto do modulo for necessario
+- Carregar referencia `embedded-sql` se houver consultas SQL presentes
 - Cruzar tabelas com entradas conhecidas do dicionario SX
 
 ### Fase 3: Gerar

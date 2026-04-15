@@ -1,5 +1,5 @@
 {
-  "title": "Skills",
+  "title": "Referencia Interna",
   "pages": [
     "advpl-code-generation",
     "advpl-code-review",
@@ -13,6 +13,7 @@
     "probat-testing",
     "protheus-business",
     "protheus-reference",
-    "sx-configuration"
+    "sx-configuration",
+    "tdn-lookup"
   ]
 }

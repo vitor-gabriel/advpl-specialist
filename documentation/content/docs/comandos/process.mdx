@@ -21,14 +21,14 @@ Consulta processos de negocio do Protheus ERP, workflows de modulos, rotinas e i
 
 ## Processo
 
-1. **Carregar skill** - Invocar skill `protheus-business`
+1. **Carregar referencia** - Carregar referencia `protheus-business`
 2. **Analisar consulta** - Extrair termo de busca e opcoes
 3. **Classificar tipo de consulta** - Se `--type` nao especificado, auto-detectar:
    - Contem codigo de rotina (ex.: MATA410, FINA040) -> routine
    - Contem nome de modulo (Compras, Faturamento, Estoque, etc.) -> module
    - Contem dois nomes de modulo ou palavras-chave como "integracao" / "integration" -> integration
    - Caso contrario -> process
-4. **Pesquisar referencia local** - Verificar arquivos de modulos do skill protheus-business (modulo-compras.md, modulo-estoque.md, etc.)
+4. **Pesquisar referencia local** - Verificar arquivos de modulos da referencia protheus-business (modulo-compras.md, modulo-estoque.md, etc.)
 5. **Pesquisar TDN** - Se nao encontrado localmente, pesquisar TDN online:
    - Processo: `site:tdn.totvs.com "<processo>" protheus fluxo`
    - Rotina: `site:tdn.totvs.com "<CODIGO_ROTINA>" rotina`
@@ -72,7 +72,7 @@ Adaptativo baseado no tipo de consulta:
 
 ## Referencias Cruzadas
 
-Quando o usuario precisa de mais detalhes, carregar skills adicionais:
+Quando o usuario precisa de mais detalhes, carregar referencias adicionais:
 - **protheus-reference** - para detalhes de funcoes nativas (sintaxe, parametros, valores de retorno)
 - **advpl-code-generation** - para exemplos de codigo e padroes de implementacao
 - **embedded-sql** - para exemplos de consultas usando Embedded SQL
@@ -104,4 +104,4 @@ Quando o usuario precisa de mais detalhes, carregar skills adicionais:
 - Explicacao clara e estruturada adaptada ao tipo de consulta
 - Referencias a rotinas, tabelas e pontos de entrada
 - Citacao de fonte (referencia local ou TDN)
-- Sugestoes de skills relacionados quando mais detalhes forem necessarios
+- Sugestoes de referencias relacionadas quando mais detalhes forem necessarios

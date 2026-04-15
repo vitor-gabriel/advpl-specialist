@@ -182,7 +182,7 @@ A variante baseada em classe (`rest-mod03.tlpp`) tambem e suportada — usa `cla
 
 ## Regras de Namespace TLPP (CRITICO)
 
-Todo arquivo `.tlpp` gerado para codigo de cliente **deve** declarar um `namespace` imediatamente apos os includes. Isso se aplica a endpoints REST, classes, jobs — qualquer geracao TLPP. A ausencia do namespace quebra a consistencia com a skill de migracao ADVPL→TLPP e cria risco de colisao de nomes entre projetos de cliente.
+Todo arquivo `.tlpp` gerado para codigo de cliente **deve** declarar um `namespace` imediatamente apos os includes. Isso se aplica a endpoints REST, classes, jobs — qualquer geracao TLPP. A ausencia do namespace quebra a consistencia com a referencia de migracao ADVPL→TLPP e cria risco de colisao de nomes entre projetos de cliente.
 
 **Convencao:** `custom.<agrupador>.<servico>` — tudo em lowercase, pontos como separadores, sem underscores.
 
@@ -259,7 +259,7 @@ ADVPL herda um **limite de 10 caracteres** em identificadores (funcoes, metodos,
 
 ## Arquivos de Suporte
 
-Esta skill inclui os seguintes arquivos de suporte com templates e padroes detalhados:
+Esta referencia inclui os seguintes arquivos de suporte com templates e padroes detalhados:
 
 - **patterns-fwformbrowse.md** - Padroes para telas FWFormBrowse/FWExecView
 - **patterns-jobs.md** - Padroes para jobs batch e processos agendados

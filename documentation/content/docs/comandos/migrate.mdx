@@ -33,7 +33,7 @@ Converte codigo ADVPL procedural para TLPP com padroes orientados a objetos.
 3. **Buscar chamadores** - Pesquisar na base de codigo por referencias `u_NomeFuncao`
 
 ### Fase de Planejamento (OBRIGATORIA)
-4. **Carregar skill** - Invocar skill `advpl-to-tlpp-migration` para regras e checklist
+4. **Carregar referencia** - Carregar referencia `advpl-to-tlpp-migration` para regras e checklist
 5. **Entrar em modo de planejamento** - Usar `EnterPlanMode` para criar um plano estruturado de migracao
 6. **Projetar estrutura de classes** - Mapear funcoes para classes e metodos
 7. **Apresentar plano** - Mostrar ao usuario um plano detalhado de migracao incluindo:
@@ -50,7 +50,7 @@ Converte codigo ADVPL procedural para TLPP com padroes orientados a objetos.
 10. **Sair do modo de planejamento** - Usar `ExitPlanMode` apos aprovacao
 
 ### Fase de Implementacao (somente apos aprovacao)
-11. **Executar migracao** - Gerar arquivo(s) .tlpp seguindo o plano aprovado e skill `advpl-to-tlpp-migration`
+11. **Executar migracao** - Gerar arquivo(s) .tlpp seguindo o plano aprovado e referencia `advpl-to-tlpp-migration`
 12. **Gerar wrapper** - Criar wrapper .prw de compatibilidade retroativa se --wrapper
 13. **Executar checklist** - Validar contra migration-checklist.md
 14. **Relatar** - Mostrar resumo das alteracoes
