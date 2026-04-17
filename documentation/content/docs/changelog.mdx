@@ -8,6 +8,19 @@ Todas as mudancas notaveis deste projeto sao documentadas neste arquivo.
 O formato e baseado no [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 e este projeto segue o [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-04-16
+
+### Corrigido
+
+- Corrigido desalinhamento de versao entre `plugin.json` (1.1.0) e `marketplace.json` (1.0.9). Ambos agora alinhados em 1.1.1.
+- Corrigido path quebrado do cache cleanup em `hooks/session-start` — lia `marketplace.json` dois diretorios acima da raiz do cache, resultando em `CURRENT_VERSION` vazio e cleanup nunca rodando. Agora usa `$CLAUDE_PLUGIN_ROOT` corretamente.
+- Corrigido `allowed-tools` de `commands/process.md` listando ferramentas `browser_*` sem prefixo MCP. Agora usa `mcp__playwright__browser_*`.
+
+### Alterado
+
+- Adicionado frontmatter `tools:` e `model:` explicitos em todos os 10 agents. Agents read-only (`code-reviewer`, `debugger`, `docs-reference`, `process-consultant`) agora declaram conjuntos minimos de ferramentas, reduzindo superficie de ataque e melhorando qualidade da revisao.
+- Adicionado campo `version` no nivel raiz de `marketplace.json` para melhor compatibilidade de invalidacao de cache.
+
 ## [1.1.0] - 2026-04-14
 
 ### Alterado
