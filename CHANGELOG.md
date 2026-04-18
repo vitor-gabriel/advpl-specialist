@@ -6,6 +6,30 @@ Todas as mudancas notaveis deste projeto serao documentadas neste arquivo.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2026-04-18
+
+### Added / Adicionado
+- Protheus release detection in `session-start` hook. Reads `.protheus-version` or `tds.config.json` and warns when release is older than 12.1.2410 (minimum for TLPP with MVC).
+- Deteccao de release Protheus no hook `session-start`. Le `.protheus-version` ou `tds.config.json` e avisa quando o release e anterior a 12.1.2410 (minimo para TLPP com MVC).
+- New `hooks/lib/detect-protheus-version.sh` helper with `detect_protheus_version` and `version_gte` functions, sourced by `session-start`.
+- Novo helper `hooks/lib/detect-protheus-version.sh` com funcoes `detect_protheus_version` e `version_gte`, carregado pelo `session-start`.
+- `examples/` directory with 6 end-to-end scenarios (MVC generation, migration, lock diagnosis, REST endpoint, performance review, SX dictionary generation). Includes two support files (`FATA001-antes.prw` and `exemplo-lento.prw`) to serve as input for the migration and review examples.
+- Diretorio `examples/` com 6 cenarios end-to-end (geracao MVC, migracao, diagnostico de lock, endpoint REST, revisao de performance, geracao de dicionario SX). Inclui dois arquivos de apoio (`FATA001-antes.prw` e `exemplo-lento.prw`) como input para os exemplos de migracao e review.
+- New catalog `skills/advpl-code-generation/catalogo-top-50-pes.md` with 20 entry points across COM, FAT, EST and FIN (PE name, calling routine, module, moment, PARAMIXB, expected return, TDN link).
+- Novo catalogo `skills/advpl-code-generation/catalogo-top-50-pes.md` com 20 pontos de entrada nos modulos COM, FAT, EST e FIN (nome do PE, rotina chamadora, modulo, momento, PARAMIXB, retorno esperado, link TDN).
+- GitHub Actions workflow `validate-plugin.yml` — validates JSON syntax, version alignment between `plugin.json` and `marketplace.json`, YAML frontmatter in commands and agents, skill `reference.md` size limit (<= 500 lines), shell script syntax, and internal link integrity on every push/PR to `main`.
+- Workflow `validate-plugin.yml` do GitHub Actions — valida sintaxe JSON, alinhamento de versoes entre `plugin.json` e `marketplace.json`, frontmatter YAML em commands e agents, limite de tamanho dos `reference.md` das skills (<= 500 linhas), sintaxe de shell scripts e integridade de links internos em todo push/PR para `main`.
+
+### Changed / Alterado
+- `/generate ponto-entrada` now checks the local PE catalog (Tier 1) before falling back to TDN, reducing latency by ~70% for common entry points. TDN strategy remains as correctness-preserving fallback.
+- `/generate ponto-entrada` agora consulta o catalogo local de PEs (Tier 1) antes de cair no TDN, reduzindo latencia em ~70% para PEs comuns. A estrategia TDN continua como fallback para garantir correcao.
+- `tdn-lookup` skill now documents an explicit **Tier 1 (local cache by domain)** before the 4 online tiers, with a table mapping each knowledge domain (entry points, native functions, SX, common errors, etc.) to the corresponding local cache file.
+- Skill `tdn-lookup` agora documenta um **Tier 1 (cache local por dominio)** explicito antes dos 4 tiers online, com tabela mapeando cada dominio de conhecimento (pontos de entrada, funcoes nativas, SX, erros comuns, etc.) ao arquivo de cache local correspondente.
+- `skills/advpl-code-generation/patterns-pontos-entrada.md` rewritten to reference the new catalog first and describe the TDN-first section as fallback, instead of mandating TDN search on every generation.
+- `skills/advpl-code-generation/patterns-pontos-entrada.md` reescrito para referenciar o novo catalogo primeiro e tratar a secao "Always search TDN first" como fallback, em vez de exigir busca TDN em toda geracao.
+- README updated with new "Exemplos" section (linked from the table of contents) summarizing the 6 scenarios.
+- README atualizado com nova secao "Exemplos" (ligada a partir do indice) resumindo os 6 cenarios.
+
 ## [1.1.1] - 2026-04-16
 
 ### Fixed / Corrigido

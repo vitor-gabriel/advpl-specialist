@@ -1,6 +1,6 @@
 # advpl-specialist
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue)
+![Version](https://img.shields.io/badge/version-1.1.2-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Claude%20Code-blueviolet)
 ![TOTVS](https://img.shields.io/badge/TOTVS-Protheus-orange)
@@ -16,6 +16,7 @@ Plugin para Claude Code especializado em **ADVPL** e **TLPP** para desenvolvimen
 - [Funcionalidades](#funcionalidades)
 - [Instalacao](#instalacao)
 - [Commands](#commands)
+- [Exemplos](#exemplos)
 - [Agents](#agents)
 - [Referencia Interna](#referencia-interna)
 - [Estrutura do Projeto](#estrutura-do-projeto)
@@ -158,6 +159,19 @@ Para uma experiencia completa, recomendamos instalar o plugin oficial **superpow
 # Gerar script de dicionario SX3
 /advpl-specialist:sxgen --type sx3
 ```
+
+## Exemplos
+
+Consulte a pasta [examples/](examples/) para seis cenarios end-to-end prontos para executar, com prompts exatos, output esperado e variacoes.
+
+| # | Cenario | Comando principal |
+|---|---------|-------------------|
+| 01 | Gerar MVC completo para tabela customizada ZA1 | `/advpl-specialist:generate` |
+| 02 | Migrar ADVPL procedural (FATA001) para TLPP | `/advpl-specialist:migrate` |
+| 03 | Diagnosticar erro de lock infinito em `RecLock` | `/advpl-specialist:diagnose` |
+| 04 | Criar endpoint REST em TLPP com namespace | `/advpl-specialist:generate` |
+| 05 | Revisar codigo focando em performance | `/advpl-specialist:review` |
+| 06 | Gerar dicionario SX3 + SIX + SX1 para nova tabela | `/advpl-specialist:sxgen` |
 
 ## Agents
 

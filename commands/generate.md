@@ -79,7 +79,11 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 3. **Ask business requirements** - What should the code do?
 4. **Load reference** - Read `skills/advpl-code-generation/reference.md`
 5. **Load patterns** - Read appropriate supporting file for the type
-6. **Search TDN for entry points** - **If the type is `ponto-entrada`**, ALWAYS search the TDN (TOTVS Developer Network) for the entry point name before generating code. Use `WebSearch` to find the official documentation page (e.g., search for `"ENTRY_POINT_NAME site:tdn.totvs.com"`). Extract from the TDN page: PARAMIXB parameters (types, positions, descriptions), expected return type and value, which standard routine calls this entry point, and any caveats or version-specific behavior. This ensures the generated code uses the correct parameters and return type as defined by TOTVS.
+6. **Resolve entry point metadata** - **If the type is `ponto-entrada`**, resolve PARAMIXB, return type, calling routine and execution moment in this order:
+   1. **Tier 1 — local cache first:** read [`skills/advpl-code-generation/catalogo-top-50-pes.md`](../skills/advpl-code-generation/catalogo-top-50-pes.md) and search for the exact PE name. If found with complete metadata, extract PARAMIXB, return type, calling routine and moment directly from the catalog. **Skip TDN search.** Initial coverage: 20 PEs across COM, FAT, EST and FIN.
+   2. **Tier 2+ — TDN fallback:** if the PE is not in the local catalog, apply the full lookup strategy documented in [`skills/tdn-lookup/reference.md`](../skills/tdn-lookup/reference.md) (WebFetch on Confluence REST API, then Playwright fallbacks). Extract the same metadata from the TDN page.
+
+   This cache-first strategy reduces latency by ~70% for the most common entry points and keeps TDN search as a correctness-preserving fallback. The generated code must cite the source used (catalog or TDN URL) in a code comment so reviewers can trace where the PARAMIXB came from.
 7. **Enter plan mode** - Use `EnterPlanMode` to create a structured implementation plan
 8. **Present plan** - Show the user a clear plan including:
    - File(s) to be created (name, path, extension)

@@ -4,24 +4,31 @@ Reference for the most commonly used entry points in TOTVS Protheus, organized b
 
 ---
 
-## IMPORTANT: Always Search TDN First
+## Catálogo de PEs conhecidos (Tier 1 local)
 
-**Before generating code for ANY entry point, you MUST search the TDN (TOTVS Developer Network) for the official documentation of that specific entry point.**
+Antes de gerar código para um PE específico, consulte primeiro o **[catalogo-top-50-pes.md](catalogo-top-50-pes.md)**. Esse catálogo local cobre PARAMIXB, momento de execução, rotina chamadora e retorno esperado para os PEs mais usados (cobertura inicial: 20 PEs em COM, FAT, EST, FIN).
 
-The examples in this file cover only the most common entry points. There are **hundreds** of entry points in Protheus, each with its own specific PARAMIXB parameters and expected return type. Using wrong parameters or return types will cause runtime errors or unexpected behavior.
+Se o PE estiver catalogado, use os metadados direto dali — **não é necessário consultar o TDN** para esses casos. Isso reduz latência em ~70% para PEs comuns.
 
-**Mandatory steps:**
-1. Use `WebSearch` to find: `"ENTRY_POINT_NAME site:tdn.totvs.com"`
-2. Use `WebFetch` to read the TDN page found
-3. Extract from the page:
-   - **PARAMIXB** — parameter positions, types, and descriptions
-   - **Expected return** — type and meaning (Logical, Array, Character, Nil, etc.)
-   - **Calling routine** — which standard program triggers this entry point
-   - **When it fires** — at what moment in the standard flow
-   - **Caveats** — version-specific behavior or known limitations
-4. Use this information to generate accurate code
+Se o PE **não** estiver catalogado, siga a estratégia completa da skill [`tdn-lookup`](../tdn-lookup/reference.md) (tiers 2-5 via API do TDN e Playwright).
 
-If the TDN page is not found or is incomplete, inform the user and generate code based on the local reference below, clearly noting that the parameters should be validated.
+---
+
+## IMPORTANT: Quando o catálogo não cobre, busque no TDN
+
+Os PEs catalogados cobrem apenas os mais comuns. Existem **centenas** de pontos de entrada em Protheus, cada um com seu PARAMIXB e retorno próprios. Usar parâmetros ou retornos errados causa erros em runtime ou comportamento inesperado.
+
+**Quando o PE não está em `catalogo-top-50-pes.md`, passos obrigatórios:**
+1. Aplicar a estratégia de busca em `skills/tdn-lookup/reference.md` (tiers 2-5)
+2. Extrair da página TDN:
+   - **PARAMIXB** — posições, tipos e descrições dos parâmetros
+   - **Retorno esperado** — tipo e significado (Logical, Array, Character, Nil, etc.)
+   - **Rotina chamadora** — qual programa padrão dispara este PE
+   - **Momento** — em que ponto do fluxo padrão o PE executa
+   - **Caveats** — comportamento dependente de versão ou limitações conhecidas
+3. Usar essas informações para gerar código correto
+
+Se a página do TDN não for encontrada ou estiver incompleta, informe o usuário e gere código baseado na referência local abaixo, marcando claramente que os parâmetros devem ser validados manualmente.
 
 ---
 

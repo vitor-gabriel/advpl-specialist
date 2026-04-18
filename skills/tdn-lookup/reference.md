@@ -12,9 +12,26 @@ Estratégia padronizada para buscar documentação no TDN (tdn.totvs.com) quando
 - Processo de negócio não coberto pelos módulos locais
 - Qualquer consulta que exija a documentação oficial da TOTVS
 
-## Estratégia de busca (4 tiers online)
+## Estratégia de busca (Tier 1 local + 4 tiers online)
 
-Do mais econômico ao mais custoso em tokens:
+Do mais econômico ao mais custoso em tokens. Sempre consultar Tier 1 antes de qualquer chamada online.
+
+### Tier 1: Cache local por domínio
+
+Antes de qualquer busca online, **consultar o catálogo local específico do domínio** — resposta instantânea, custo zero em tokens de rede.
+
+| Domínio | Arquivo de cache local |
+|---------|------------------------|
+| Pontos de entrada | [`skills/advpl-code-generation/catalogo-top-50-pes.md`](../advpl-code-generation/catalogo-top-50-pes.md) |
+| Funções nativas | [`skills/protheus-reference/native-functions.md`](../protheus-reference/native-functions.md) |
+| Dicionário SX | [`skills/protheus-reference/sx-dictionary.md`](../protheus-reference/sx-dictionary.md) |
+| Campos SX3 comuns | [`skills/protheus-reference/sx3-common-fields.md`](../protheus-reference/sx3-common-fields.md) |
+| Erros conhecidos | [`skills/advpl-debugging/common-errors.md`](../advpl-debugging/common-errors.md) |
+| Funções restritas | [`skills/protheus-reference/restricted-functions.md`](../protheus-reference/restricted-functions.md) |
+| Processos de negócio | [`skills/protheus-business/modulo-*.md`](../protheus-business/) |
+
+**Sucesso Tier 1:** termo encontrado no catálogo com metadados completos → usar diretamente, não avançar para tiers online.
+**Falha Tier 1:** termo não listado, ou listado com informações parciais que exigem complemento → avançar para Tier 2.
 
 ### Tier 2: WebFetch direto na API REST do Confluence
 
@@ -97,6 +114,7 @@ results[i].content.body.view.value → HTML do conteúdo (Descrição, Sintaxe, 
 
 | Tier | Sucesso | Falha → próximo tier |
 |------|---------|---------------------|
+| **1 (Cache local)** | Termo encontrado no arquivo de cache do domínio com metadados completos | Termo não catalogado ou informações insuficientes |
 | **2 (WebFetch API)** | JSON com `"results"` e `size > 0` | HTTP 403, body com `"Attention Required"` ou `"cf-browser-verification"`, timeout, body vazio, JSON com `size: 0` após fuzzy |
 | **3 (Playwright API)** | Snapshot parseável como JSON com `size > 0` | Snapshot é HTML em vez de JSON, snapshot vazio, JSON com `size: 0` após fuzzy |
 | **4 (WebSearch + Playwright)** | WebSearch retorna URL do TDN e snapshot tem conteúdo relevante | WebSearch retorna 0 resultados ou nenhuma URL do TDN |
