@@ -52,26 +52,23 @@ Se o plugin responder com a documentacao da funcao `FWExecView`, a instalacao fo
 
 O plugin detecta automaticamente projetos Protheus ao iniciar uma sessao. Ele procura por arquivos com as extensoes `.prw`, `.tlpp`, `.prx` e `.ch` no diretorio atual. Quando encontra, ativa todo o contexto especializado.
 
-## Recomendado: Playwright MCP
+## Plugins e MCPs recomendados
 
-O plugin utiliza o **Playwright MCP** como fallback quando o acesso direto a documentacao do TDN falha (timeout, erro ou conteudo vazio). Com ele, o plugin abre a pagina em um navegador real para extrair o conteudo.
-
-Para instalar:
+Para uma experiencia completa, recomendamos instalar o **Playwright MCP** (usado como fallback quando o TDN bloqueia `WebFetch`) e o plugin **superpowers** (skills de planejamento, debugging sistematico e verificacao):
 
 ```bash
+# Playwright MCP — fallback para documentacao do TDN
 claude mcp add playwright -- npx @anthropic-ai/mcp-playwright@latest
-```
 
-## Recomendado: Plugin superpowers
-
-Para uma experiencia completa, recomendamos instalar tambem o plugin oficial **superpowers**, que adiciona skills de planejamento, brainstorming, debugging sistematico e code review:
-
-```bash
+# Plugin superpowers — planejamento, brainstorming, debugging
 /plugin marketplace add anthropics/claude-code-plugins
 /plugin install superpowers@anthropics-claude-code-plugins
 ```
 
+A pagina [Plugins complementares](/docs/plugins-complementares) cobre o combo completo (context-mode, error-memory, taskmanager, prd-builder, docs-specialist) com o pareamento detalhado de cada um com os comandos do `advpl-specialist`.
+
 ## Proximos passos
 
 - [Primeiro comando](/docs/primeiro-comando) — Tutorial rapido para comecar a usar
+- [Plugins complementares](/docs/plugins-complementares) — Outros plugins que potencializam o advpl-specialist
 - [Comandos](/docs/comandos) — Lista completa de comandos disponiveis
