@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { HomeLayout } from 'fumadocs-ui/layouts/home';
 import { baseOptions } from '@/lib/layout.shared';
+import pluginManifest from '../../.claude-plugin/plugin.json';
+
+const PLUGIN_VERSION = `v${pluginManifest.version}`;
 
 export default function Home() {
   return (
@@ -9,7 +12,7 @@ export default function Home() {
       <section className="flex flex-col items-center text-center px-4 py-20 md:py-32 gap-6 max-w-4xl mx-auto">
         <div className="flex gap-2 flex-wrap justify-center">
           <span className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium text-fd-muted-foreground">
-            v1.0.5
+            {PLUGIN_VERSION}
           </span>
           <span className="inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium text-fd-muted-foreground">
             MIT License
