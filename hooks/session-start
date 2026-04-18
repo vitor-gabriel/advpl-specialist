@@ -50,8 +50,8 @@ if [ "$FOUND" -eq 1 ]; then
     if [ ! -d "$SUPERPOWERS_DIR" ]; then
         echo ""
         echo "Recommended: Install the 'superpowers' plugin for better planning, debugging and code review:"
-        echo "  /plugin marketplace add anthropics/claude-code-plugins"
-        echo "  /plugin install superpowers@anthropics-claude-code-plugins"
+        echo "  /plugin marketplace add anthropics/claude-plugins-official"
+        echo "  /plugin install superpowers@claude-plugins-official"
     fi
 
     # Check if Playwright MCP is available (used as fallback for web documentation access)

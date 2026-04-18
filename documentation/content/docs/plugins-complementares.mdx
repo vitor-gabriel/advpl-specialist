@@ -21,11 +21,11 @@ Estes quatro plugins + o `advpl-specialist` cobrem ~90% dos cenarios de desenvol
 | `test-driven-development` | Antes de rodar `/advpl-specialist:test` — escreve o teste ProBat primeiro |
 | `verification-before-completion` | Antes de compilar o `.prw` gerado — valida que a mudanca faz o que deveria |
 
-Instalacao (oficial Anthropic):
+Instalacao (marketplace oficial Anthropic):
 
 ```bash
-/plugin marketplace add anthropics/claude-code-plugins
-/plugin install superpowers@anthropics-claude-code-plugins
+/plugin marketplace add anthropics/claude-plugins-official
+/plugin install superpowers@claude-plugins-official
 ```
 
 ### context-mode
@@ -41,17 +41,40 @@ Projetos Protheus reais inflam o contexto muito rapido:
 
 Com `context-mode`, ferramentas como `ctx_batch_execute` e `ctx_execute_file` processam tudo num sandbox isolado e devolvem apenas o resumo para o contexto da conversa — evita estouro e mantem a sessao produtiva por muito mais tempo.
 
+Instalacao:
+
+```bash
+/plugin marketplace add mksglu/context-mode
+/plugin install context-mode@context-mode
+```
+
 ### error-memory
 
 **Quando usar:** sempre que `/advpl-specialist:diagnose` resolver um erro **nao trivial**.
 
 Erros ADVPL/TLPP raros (deadlock entre PEs, `Function not found` por RPO fora de sincronia, erro de compilacao obscuro em TLPP com namespace) demoram pra diagnosticar da primeira vez. Loguar a solucao via `/error-memory:log` economiza 30-60 minutos quando o mesmo erro acontecer em outro projeto ou dali a meses.
 
+Instalacao (marketplace mwguerra):
+
+```bash
+/plugin marketplace add mwguerra/claude-code-plugins
+/plugin install error-memory@mwguerra-marketplace
+```
+
 ### taskmanager
 
 **Quando usar:** para rastrear a execucao dos planos que o `advpl-specialist` persiste em `docs/plans/`.
 
 Os comandos `/advpl-specialist:generate`, `/migrate` e `/refactor` salvam o plano aprovado em `docs/plans/YYYY-MM-DD-<comando>-<descricao>.md`. O taskmanager transforma esses planos em tasks executaveis com dependencias — util quando a customizacao atravessa varias sessoes ou quando ha mais de um desenvolvedor envolvido.
+
+Instalacao (mesmo marketplace do `error-memory`):
+
+```bash
+# Se ainda nao adicionou o marketplace da mwguerra:
+/plugin marketplace add mwguerra/claude-code-plugins
+
+/plugin install taskmanager@mwguerra-marketplace
+```
 
 ## Valor situacional
 
@@ -67,6 +90,15 @@ Exemplos:
 
 Fluxo: `/prd-builder:prd` monta o documento de requisitos em entrevista estruturada, `/advpl-specialist:generate` consome o PRD como contexto e gera codigo alinhado ao escopo.
 
+Instalacao (marketplace mwguerra):
+
+```bash
+# Se ainda nao adicionou o marketplace da mwguerra:
+/plugin marketplace add mwguerra/claude-code-plugins
+
+/plugin install prd-builder@mwguerra-marketplace
+```
+
 ### docs-specialist
 
 **Quando usar:** quando a documentacao do projeto vive em sistemas externos (Confluence, GitBook, Notion) e voce precisa manter sincronia com o codigo ADVPL/TLPP.
@@ -74,6 +106,15 @@ Fluxo: `/prd-builder:prd` monta o documento de requisitos em entrevista estrutur
 O `docs-specialist` faz **drift detection** — compara o que esta documentado com o que o codigo realmente faz, apontando divergencias antes que virem problema em auditoria ou handover.
 
 Para documentacao interna no proprio repositorio, o `/advpl-specialist:document` ja cobre (gera cabecalho Protheus.doc e documentacao de API); este plugin e util em camadas acima.
+
+Instalacao (marketplace mwguerra):
+
+```bash
+# Se ainda nao adicionou o marketplace da mwguerra:
+/plugin marketplace add mwguerra/claude-code-plugins
+
+/plugin install docs-specialist@mwguerra-marketplace
+```
 
 ## MCP essencial (nao e plugin, mas relacionado)
 
