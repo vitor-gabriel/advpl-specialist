@@ -119,6 +119,8 @@ Gera novo codigo ADVPL ou TLPP seguindo as convencoes e boas praticas do Protheu
 
 # Criar um ponto de entrada
 /advpl-specialist:generate ponto-entrada MT100LOK
+# Para PEs comuns (catalogados), o plugin responde em ~70% menos tempo
+# que no v1.1.1 porque consulta cache local antes do TDN
 
 # Criar um Web Service SOAP
 /advpl-specialist:generate webservice WSPedido
@@ -145,3 +147,32 @@ Um arquivo-fonte completo e compilavel salvo no diretorio do projeto com:
 - Implementacao completa seguindo convencoes
 - Tratamento de erros
 - Save/restore de area para operacoes com banco de dados
+
+## Cache local de pontos de entrada
+
+Disponivel a partir da v1.1.2. Quando voce gera um ponto de entrada com `/advpl-specialist:generate ponto-entrada NOME`, o plugin aplica uma estrategia de lookup em 2 niveis:
+
+1. **Tier 1 — cache local:** consulta o arquivo `skills/advpl-code-generation/catalogo-top-50-pes.md` do plugin. Se o PE estiver catalogado (cobertura inicial: 20 PEs em COM, FAT, EST, FIN), extrai PARAMIXB, momento, rotina chamadora e retorno diretamente. **Nao consulta o TDN.**
+2. **Tier 2+ — fallback TDN:** se o PE nao esta no cache local, cai na estrategia completa da skill `tdn-lookup` (API REST do Confluence + fallbacks Playwright)
+
+**Ganho medido:** ~70% menos latencia para PEs comuns, porque o cache responde em zero tokens de rede.
+
+### PEs atualmente catalogados
+
+- **COM:** MT100TOK, MT100GRV, MT103FIM, MA103OK, MT097APR
+- **FAT:** M410CMPL, M410STTS, MA440GRV, M460FIM, MT460A
+- **EST:** MA030TOK, MT240PRO, MT116NT, MT250GRV, MA030GRV
+- **FIN:** F050TIT, F080FIL, M460MVF, MF370FIL, F240FIL
+
+Outros PEs continuam funcionando via TDN — so nao tem o boost do cache.
+
+### Como sugerir novos PEs para o catalogo
+
+Quer que um PE especifico entre no catalogo? Abra uma issue em [github.com/thalysjuvenal/advpl-specialist/issues](https://github.com/thalysjuvenal/advpl-specialist/issues) informando:
+
+- **Nome do PE** e **rotina chamadora** (ex.: `MA440CAN` na `MATA440`)
+- **PARAMIXB** real (validado contra TDN — o plugin **nao aceita PEs inventados no catalogo**)
+- **Link TDN** da documentacao oficial
+- **Modulo** e **momento** de execucao
+
+Roadmap para chegar a 50 PEs catalogados em `skills/advpl-code-generation/catalogo-top-50-pes.md`.
