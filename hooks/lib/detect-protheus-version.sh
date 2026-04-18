@@ -6,24 +6,21 @@
 #   VERSION=$(detect_protheus_version)
 #   version_gte "$VERSION" "12.1.2410" && echo "supports TLPP+MVC"
 #
-# Detection tiers (in order):
-#   1. .protheus-version file (explicit user convention)
-#   2. tds.config.json (TDS-VSCode project config)
+# Detection:
+#   Reads `.protheus-version` file in the project root (explicit user convention).
+#   The file must contain a release string like "12.1.2410" — one value per line.
+#
+# TDS-VSCode's `.totvsls/servers.json` was evaluated but its `buildVersion` field
+# is the AppServer LIB build (e.g. "7.00.210324P"), not the Protheus release
+# (e.g. "12.1.2410"), so automatic detection from it would require a brittle
+# build-to-release mapping table. Explicit `.protheus-version` is the simpler
+# and reliable contract.
 #
 # Returns the detected version string on stdout, or empty string if unknown.
 
 detect_protheus_version() {
-    # Tier 1: .protheus-version (explicit, wins over everything)
     if [ -f ".protheus-version" ]; then
         cat .protheus-version | tr -d '[:space:]'
-        return 0
-    fi
-
-    # Tier 2: tds.config.json (TDS-VSCode)
-    if [ -f "tds.config.json" ]; then
-        grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' tds.config.json \
-            | head -1 \
-            | sed 's/.*"\([^"]*\)"$/\1/'
         return 0
     fi
 

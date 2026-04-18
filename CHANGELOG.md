@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.2] - 2026-04-18
 
 ### Added / Adicionado
-- Protheus release detection in `session-start` hook. Reads `.protheus-version` or `tds.config.json` and warns when release is older than 12.1.2410 (minimum for TLPP with MVC).
-- Deteccao de release Protheus no hook `session-start`. Le `.protheus-version` ou `tds.config.json` e avisa quando o release e anterior a 12.1.2410 (minimo para TLPP com MVC).
+- Protheus release detection in `session-start` hook. Reads a `.protheus-version` file at the project root and warns when the release is older than 12.1.2410 (minimum for TLPP with MVC).
+- Deteccao de release Protheus no hook `session-start`. Le um arquivo `.protheus-version` na raiz do projeto e avisa quando o release e anterior a 12.1.2410 (minimo para TLPP com MVC).
 - New `hooks/lib/detect-protheus-version.sh` helper with `detect_protheus_version` and `version_gte` functions, sourced by `session-start`.
 - Novo helper `hooks/lib/detect-protheus-version.sh` com funcoes `detect_protheus_version` e `version_gte`, carregado pelo `session-start`.
 - `examples/` directory with 6 end-to-end scenarios (MVC generation, migration, lock diagnosis, REST endpoint, performance review, SX dictionary generation). Includes two support files (`FATA001-antes.prw` and `exemplo-lento.prw`) to serve as input for the migration and review examples.

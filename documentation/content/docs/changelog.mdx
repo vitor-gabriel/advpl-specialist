@@ -12,7 +12,7 @@ e este projeto segue o [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ### Adicionado
 
-- Deteccao de release Protheus no hook `session-start`. Le `.protheus-version` ou `tds.config.json` e avisa quando o release e anterior a 12.1.2410 (minimo para TLPP com MVC).
+- Deteccao de release Protheus no hook `session-start`. Le um arquivo `.protheus-version` na raiz do projeto e avisa quando o release e anterior a 12.1.2410 (minimo para TLPP com MVC).
 - Novo helper `hooks/lib/detect-protheus-version.sh` com funcoes `detect_protheus_version` e `version_gte`, carregado pelo `session-start`.
 - Diretorio `examples/` com 6 cenarios end-to-end (geracao MVC, migracao, diagnostico de lock, endpoint REST, revisao de performance, geracao de dicionario SX). Inclui dois arquivos de apoio (`FATA001-antes.prw` e `exemplo-lento.prw`) como input para os exemplos de migracao e review.
 - Novo catalogo `skills/advpl-code-generation/catalogo-top-50-pes.md` com 20 pontos de entrada nos modulos COM, FAT, EST e FIN (nome do PE, rotina chamadora, modulo, momento, PARAMIXB, retorno esperado, link TDN).

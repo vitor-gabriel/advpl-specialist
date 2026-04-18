@@ -62,11 +62,6 @@ Para habilitar a deteccao, crie um arquivo **`.protheus-version`** na raiz do se
 echo "12.1.2410" > .protheus-version
 ```
 
-Ordem de deteccao (primeiro encontrado vence):
-
-1. **`.protheus-version`** — convencao explicita recomendada (funciona com qualquer IDE)
-2. **`tds.config.json`** — arquivo de configuracao do TDS-VSCode, campo `version`
-
 Quando o release e anterior a `12.1.2410`, o plugin exibe no inicio da sessao:
 
 ```
@@ -75,9 +70,13 @@ WARNING: TLPP with MVC requires release 12.1.2410 or newer.
 Generation commands will default to ADVPL (.prw) for compatibility.
 ```
 
-Se nenhum marcador for encontrado, o plugin exibe uma dica sugerindo a criacao do arquivo. Nesse caso, `/generate` ira perguntar a linguagem (ADVPL ou TLPP) em tempo de execucao.
+Se o arquivo nao existir, o plugin exibe uma dica sugerindo a criacao. Nesse caso, `/generate` ira perguntar a linguagem (ADVPL ou TLPP) em tempo de execucao.
 
 > **Dica:** adicione `.protheus-version` ao repositorio do projeto (commit no git) para que toda a equipe tenha a mesma deteccao consistente.
+
+### Por que nao detectamos direto do TDS-VSCode?
+
+O TDS-VSCode armazena a configuracao de servidores em `.totvsls/servers.json` com o campo `buildVersion` (ex.: `"7.00.210324P"`). Porem, esse valor e o **build do AppServer LIB**, nao o release do Protheus (`12.1.2410`). Como nao existe mapeamento oficial estavel entre build LIB e release, optamos pela convencao explicita `.protheus-version` para evitar falsos positivos e dependencia de uma tabela de mapeamento mantida manualmente.
 
 ## Recomendado: Playwright MCP
 
