@@ -31,15 +31,33 @@ jobs:
           PLUGIN_VER=$(jq -r '.version' .claude-plugin/plugin.json)
           MARKET_VER=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)
           MARKET_ROOT_VER=$(jq -r '.version // empty' .claude-plugin/marketplace.json)
-          echo "plugin.json: $PLUGIN_VER"
-          echo "marketplace.json[0]: $MARKET_VER"
-          echo "marketplace.json root: $MARKET_ROOT_VER"
+          SITE_VER=$(grep -oE "PLUGIN_VERSION = 'v[0-9]+\.[0-9]+\.[0-9]+'" documentation/app/page.tsx | grep -oE "[0-9]+\.[0-9]+\.[0-9]+" | head -1)
+          README_VER=$(grep -oE "version-[0-9]+\.[0-9]+\.[0-9]+-blue" README.md | grep -oE "[0-9]+\.[0-9]+\.[0-9]+" | head -1)
+          INDEX_VER=$(grep -oE "version-[0-9]+\.[0-9]+\.[0-9]+-blue" documentation/content/docs/index.mdx | grep -oE "[0-9]+\.[0-9]+\.[0-9]+" | head -1)
+          echo "plugin.json:             $PLUGIN_VER"
+          echo "marketplace.json[0]:     $MARKET_VER"
+          echo "marketplace.json root:   $MARKET_ROOT_VER"
+          echo "documentation landing:   $SITE_VER"
+          echo "README.md badge:         $README_VER"
+          echo "docs index.mdx badge:    $INDEX_VER"
           if [ "$PLUGIN_VER" != "$MARKET_VER" ]; then
             echo "ERROR: version mismatch between plugin.json and marketplace.json plugins[0]"
             exit 1
           fi
           if [ -n "$MARKET_ROOT_VER" ] && [ "$MARKET_ROOT_VER" != "$PLUGIN_VER" ]; then
             echo "ERROR: root version in marketplace.json mismatches plugin.json"
+            exit 1
+          fi
+          if [ -n "$SITE_VER" ] && [ "$SITE_VER" != "$PLUGIN_VER" ]; then
+            echo "ERROR: documentation/app/page.tsx PLUGIN_VERSION ($SITE_VER) mismatches plugin.json ($PLUGIN_VER)"
+            exit 1
+          fi
+          if [ -n "$README_VER" ] && [ "$README_VER" != "$PLUGIN_VER" ]; then
+            echo "ERROR: README.md version badge ($README_VER) mismatches plugin.json ($PLUGIN_VER)"
+            exit 1
+          fi
+          if [ -n "$INDEX_VER" ] && [ "$INDEX_VER" != "$PLUGIN_VER" ]; then
+            echo "ERROR: documentation/content/docs/index.mdx version badge ($INDEX_VER) mismatches plugin.json ($PLUGIN_VER)"
             exit 1
           fi
 

@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { HomeLayout } from 'fumadocs-ui/layouts/home';
 import { baseOptions } from '@/lib/layout.shared';
-import pluginManifest from '../../.claude-plugin/plugin.json';
 
-const PLUGIN_VERSION = `v${pluginManifest.version}`;
+// IMPORTANT: manter esta versao em sync com .claude-plugin/plugin.json .
+// validate-plugin.yml falha se este valor divergir de plugin.json.
+const PLUGIN_VERSION = 'v1.1.2';
 
 export default function Home() {
   return (
