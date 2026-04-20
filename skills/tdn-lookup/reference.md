@@ -12,13 +12,13 @@ Estratégia padronizada para buscar documentação no TDN (tdn.totvs.com) quando
 - Processo de negócio não coberto pelos módulos locais
 - Qualquer consulta que exija a documentação oficial da TOTVS
 
-## Estratégia de busca (Tier 1 local + 4 tiers online)
+## Estratégia de busca (local + online)
 
-Do mais econômico ao mais custoso em tokens. Sempre consultar Tier 1 antes de qualquer chamada online.
+Sempre consultar a referência local antes de qualquer busca online.
 
 ### Tier 1: Cache local por domínio
 
-Antes de qualquer busca online, **consultar o catálogo local específico do domínio** — resposta instantânea, custo zero em tokens de rede.
+Antes de qualquer busca online, **consultar o catálogo local específico do domínio** — resposta instantânea, custo zero.
 
 | Domínio | Arquivo de cache local |
 |---------|------------------------|
@@ -30,16 +30,16 @@ Antes de qualquer busca online, **consultar o catálogo local específico do dom
 | Funções restritas | [`skills/protheus-reference/restricted-functions.md`](../protheus-reference/restricted-functions.md) |
 | Processos de negócio | [`skills/protheus-business/modulo-*.md`](../protheus-business/) |
 
-**Sucesso Tier 1:** termo encontrado no catálogo com metadados completos → usar diretamente, não avançar para tiers online.
+**Sucesso Tier 1:** termo encontrado no catálogo com metadados completos → usar diretamente, não avançar para busca online.
 **Falha Tier 1:** termo não listado, ou listado com informações parciais que exigem complemento → avançar para Tier 2.
 
-### Tier 2: WebFetch direto na API REST do Confluence
+### Tier 2: Busca na API REST do Confluence (TDN)
 
 1. Montar a URL:
    ```
    https://tdn.totvs.com/rest/api/search?cql=<CQL_ENCODADO>&expand=body.view&limit=3
    ```
-2. Executar `WebFetch` na URL
+2. Fazer fetch da URL
 3. Se retornar JSON válido com `size > 0`:
    - Extrair `results[0].content.title`, `results[0].excerpt`, `results[0].url`
    - Extrair `results[0].content.body.view.value` (HTML do conteúdo completo)
@@ -48,40 +48,12 @@ Antes de qualquer busca online, **consultar o catálogo local específico do dom
 4. Se `size == 0` → repetir com CQL fuzzy (ver tabela de CQL abaixo)
 5. Se falhar (403 Cloudflare, timeout, HTML em vez de JSON) → Tier 3
 
-### Tier 3: Playwright na API REST (JSON via navegador)
+### Tier 3: Busca na web (fallback)
 
-1. `browser_navigate` → mesma URL do Tier 2
-2. `browser_snapshot` → extrair o JSON como texto
-3. Parsear o JSON com mesmo processo do Tier 2
-4. Se `size == 0` → repetir com CQL fuzzy
-5. Se falhar (JSON inválido, API fora) → Tier 4
+Se a API REST falhar, buscar na web com query: `site:tdn.totvs.com "<TERMO>" advpl`
 
-### Tier 4: WebSearch + Playwright na URL encontrada
-
-O Google indexa o TDN de forma diferente do CQL — pode encontrar páginas que a busca via API não encontra.
-
-1. Executar `WebSearch` com query: `site:tdn.totvs.com "<TERMO>" advpl`
-2. Se retornar resultados com URL do TDN:
-   - `browser_navigate` → URL retornada pelo WebSearch
-   - `browser_snapshot` → extrair conteúdo textual da página
-   - Se insuficiente → `browser_take_screenshot` para captura visual
-   - **Usar diretamente** (fim)
-3. Se WebSearch não retornar resultados → Tier 5
-
-### Tier 5: Playwright busca visual no site TDN (último recurso)
-
-Para quando nem a API REST nem o Google encontram — busca manual no site.
-
-1. `browser_navigate` → `https://tdn.totvs.com`
-2. `browser_fill_form` → preencher campo de busca com o termo
-3. `browser_click` → disparar busca
-4. `browser_snapshot` → ler resultados e navegar ao mais relevante
-5. Se insuficiente → `browser_take_screenshot` para captura visual
-6. Sintetizar resultados no formato da referência local
-
-### Limpeza de recursos
-
-- **Sempre** executar `browser_close` ao finalizar Tier 3, 4 ou 5, independentemente de sucesso ou falha.
+1. Se retornar resultados com URL do TDN, acessar a página e extrair o conteúdo
+2. Se não retornar resultados → informar ao usuário que a documentação não foi encontrada online
 
 ## CQL Patterns por tipo de consulta
 
@@ -115,17 +87,15 @@ results[i].content.body.view.value → HTML do conteúdo (Descrição, Sintaxe, 
 | Tier | Sucesso | Falha → próximo tier |
 |------|---------|---------------------|
 | **1 (Cache local)** | Termo encontrado no arquivo de cache do domínio com metadados completos | Termo não catalogado ou informações insuficientes |
-| **2 (WebFetch API)** | JSON com `"results"` e `size > 0` | HTTP 403, body com `"Attention Required"` ou `"cf-browser-verification"`, timeout, body vazio, JSON com `size: 0` após fuzzy |
-| **3 (Playwright API)** | Snapshot parseável como JSON com `size > 0` | Snapshot é HTML em vez de JSON, snapshot vazio, JSON com `size: 0` após fuzzy |
-| **4 (WebSearch + Playwright)** | WebSearch retorna URL do TDN e snapshot tem conteúdo relevante | WebSearch retorna 0 resultados ou nenhuma URL do TDN |
-| **5 (Playwright busca visual)** | Snapshot com conteúdo textual relevante | Página de erro, "page not found", snapshot vazio |
+| **2 (API REST)** | JSON com `"results"` e `size > 0` | HTTP 403, body com `"Attention Required"`, timeout, body vazio, JSON com `size: 0` após fuzzy |
+| **3 (Busca na web)** | Resultados com URL do TDN e conteúdo relevante | Nenhum resultado encontrado |
 
 ## Informações técnicas do TDN
 
 - **Plataforma:** Confluence Data Center 7.19
 - **API:** REST v1 (`/rest/api/`) — v2 não existe em Data Center
 - **Autenticação:** Acesso anônimo habilitado
-- **Proteção:** Cloudflare managed challenge (bloqueia WebFetch ~80%, Playwright resolve)
+- **Proteção:** Cloudflare managed challenge (pode bloquear requisições diretas)
 - **Rate limit:** ~10 requests/min para anônimo
 - **Spaces conhecidos:** `tec` (funções nativas), `framework` (framework MVC/REST)
 

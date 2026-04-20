@@ -37,8 +37,8 @@ Activate this agent when the user:
 
 ### Phase 2: Analyze Each File
 - For each changed file:
-  - Read the current version with `Read` tool
-  - Get the diff with Bash: `git diff <since> -- <file>` (if git available)
+  - Read the current version of the file
+  - Get the diff (if git available)
   - Identify new, modified, and removed functions
   - Detect tables affected (scan for DBSelectArea, RecLock, BeginSQL, %table:%)
   - Classify change type based on diff content:
@@ -57,32 +57,6 @@ Activate this agent when the user:
 - Group entries by change type
 - Apply the requested format (--format flag)
 - Include: date, version (if provided), summary, detailed entries
-
-### Persistência do Plano
-
-Após gerar o changelog, salvar automaticamente:
-
-1. Criar a pasta se necessário via Bash: `mkdir -p docs/plans`
-2. Nome do arquivo: `YYYY-MM-DD-changelog-<descricao-slug>.md`
-   - `<descricao-slug>`: derivado do título do changelog (lowercase, hifens, sem acentos, max 50 chars)
-   - Verificar existência via Bash: `ls docs/plans/<nome>.md 2>/dev/null`
-   - Se o arquivo já existir, adicionar sufixo: `-2`, `-3`
-3. Salvar via ferramenta `Write` com o template:
-
-```
-# <Título descritivo>
-
-**Data:** YYYY-MM-DD
-**Comando:** /advpl-specialist:changelog
-**Parâmetros:** <flags e argumentos usados pelo usuário>
-**Arquivos envolvidos:** <lista de arquivos analisados no diff>
-
----
-
-## Plano
-
-<conteúdo do changelog gerado>
-```
 
 ### Phase 4: Deliver
 - If `--output` specified, write to file

@@ -2,7 +2,7 @@
 description: Generate ADVPL/TLPP code - functions, classes, MVC structures, REST APIs, Web Services, and entry points for TOTVS Protheus
 ---
 
-# /advpl-specialist:generate
+# /generate
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations and suggestions to the user's language. Code comments may remain in English or match the user's language.
 
@@ -11,7 +11,7 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 ## Usage
 
 ```bash
-/advpl-specialist:generate <type> [name] [--module <module>]
+/generate <type> [name] [--module <module>]
 ```
 
 ## Types
@@ -45,27 +45,27 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 
 ### No Project Source Scanning (CRITICAL)
 
-**Do NOT scan the customer's project source files.** The plugin is template-driven — all code is generated from the plugin's own templates and skills. Reading existing `.prw` / `.tlpp` / `.prx` files from the customer's project is **not required** for any `/generate` scenario and must be avoided because:
+**Do NOT scan the customer's project source files.** The code generation is template-driven — all code is generated from the templates and skills. Reading existing `.prw` / `.tlpp` / `.prx` files from the customer's project is **not required** for any `/generate` scenario and must be avoided because:
 
 - Protheus projects routinely have thousands of source files — scanning them is prohibitively slow and wastes the user's time
-- The generated code comes from the plugin's templates, not from the customer's codebase
+- The generated code comes from the templates, not from the customer's codebase
 - Naming, style and patterns come from `skills/advpl-code-generation/reference.md`, not from existing files
 - The caller already provides everything the generator needs: `type`, `name`, `--module`, business requirements
 
-**Allowed uses of `Read` / `Glob` / `Grep`:**
-- Reading files **inside the plugin itself** — `skills/*`, `templates-*.md`, `patterns-*.md`, `agents/code-generator.md`, `skills/advpl-code-generation/reference.md`
-- `Write` the final generated `.prw` / `.tlpp` file to disk
-- `Read` a **specific file** the user explicitly referenced in their request (single file, exact path the user provided)
+**Allowed file operations:**
+- Reading files **inside the skills directory** — `skills/*`, `templates-*.md`, `patterns-*.md`, `agents/code-generator.md`, `skills/advpl-code-generation/reference.md`
+- Writing the final generated `.prw` / `.tlpp` file to disk
+- Reading a **specific file** the user explicitly referenced in their request (single file, exact path the user provided)
 
-**Forbidden uses:**
-- `Glob "**/*.prw"`, `Glob "**/*.tlpp"`, `Glob "src/**/*"` — never list customer source files
-- `Grep` across the customer's source tree to "find patterns" or "check existing naming"
-- `Read` customer source files "to understand the codebase" — the templates are self-contained
-- `Bash ls`, `Bash find`, `Bash tree` on the customer project root — same prohibition
+**Forbidden operations:**
+- Searching for all `.prw` / `.tlpp` files across the project — never list customer source files
+- Searching across the customer's source tree to "find patterns" or "check existing naming"
+- Reading customer source files "to understand the codebase" — the templates are self-contained
+- Listing or searching project directories
 
-**Output path rule:** Save the generated file to the **current working directory** using `<name>.<ext>` (or the path passed via `--output`). Never `Glob` to discover module folders, never "guess" the right location by scanning. If the user has a preferred location, either they pass `--output` or the generator asks a direct question.
+**Output path rule:** Save the generated file to the **current working directory** using `<name>.<ext>` (or the path passed via `--output`). Never search to discover module folders, never "guess" the right location by scanning. If the user has a preferred location, either they pass `--output` or the generator asks a direct question.
 
-**Only exception:** The user explicitly references an existing file in their request (e.g., *"gere um REST similar ao que está em `src/fontes/FATA001.prw`"*). In that case, `Read` is allowed **only** on the exact path the user provided — never expanded into a full-project scan.
+**Only exception:** The user explicitly references an existing file in their request (e.g., *"gere um REST similar ao que está em `src/fontes/FATA001.prw`"*). In that case, reading is allowed **only** on the exact path the user provided — never expanded into a full-project scan.
 
 ### Planning Phase (REQUIRED)
 1. **Parse arguments** - Extract type, name, and flags
@@ -79,11 +79,11 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 5. **Load patterns** - Read appropriate supporting file for the type
 6. **Resolve entry point metadata** - **If the type is `ponto-entrada`**, resolve PARAMIXB, return type, calling routine and execution moment in this order:
    1. **Tier 1 — local cache first:** read [`skills/advpl-code-generation/catalogo-top-50-pes.md`](../skills/advpl-code-generation/catalogo-top-50-pes.md) and search for the exact PE name. If found with complete metadata, extract PARAMIXB, return type, calling routine and moment directly from the catalog. **Skip TDN search.** Initial coverage: 20 PEs across COM, FAT, EST and FIN.
-   2. **Tier 2+ — TDN fallback:** if the PE is not in the local catalog, apply the full lookup strategy documented in [`skills/tdn-lookup/reference.md`](../skills/tdn-lookup/reference.md) (WebFetch on Confluence REST API, then Playwright fallbacks). Extract the same metadata from the TDN page.
+   2. **Tier 2+ — TDN fallback:** if the PE is not in the local catalog, apply the full lookup strategy documented in [`skills/tdn-lookup/reference.md`](../skills/tdn-lookup/reference.md). Extract the same metadata from the TDN page.
 
    This cache-first strategy reduces latency by ~70% for the most common entry points and keeps TDN search as a correctness-preserving fallback. The generated code must cite the source used (catalog or TDN URL) in a code comment so reviewers can trace where the PARAMIXB came from.
-7. **Enter plan mode** - Use `EnterPlanMode` to create a structured implementation plan
-8. **Present plan** - Show the user a clear plan including:
+7. **Present plan** - Present a structured implementation plan to the user
+8. **Show plan details** - Show the user a clear plan including:
    - File(s) to be created (name, path, extension)
    - Code structure (functions, classes, methods to implement)
    - **Explicit declaration of the function keyword** to be used for every function in the plan: `User Function` (default for customer-callable code), `Static Function` (internal helper), or `Method ... Class` (TLPP class). **Never** plan a bare `Function` keyword for customer code — it is reserved for the TOTVS core RPO and will not compile in a customer RPO.
@@ -96,7 +96,6 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
    - **For entry points:** TDN documentation found (PARAMIXB parameters, return type, calling routine)
    - **For REST endpoints (TLPP annotation-based):** confirm the plan uses `User Function` with `@Get/@Post/@Put/@Patch/@Delete` annotations, following the official TOTVS sample `totvs/tlpp-sample-rest/rest-mod02.tlpp`. The class-based variant (`rest-mod03.tlpp`) is also supported — use it when multiple methods share state. **Both variants require the `namespace` declaration.**
 9. **Wait for approval** - The user must approve the plan before any code is written. If the user requests changes, revise the plan.
-10. **Exit plan mode** - Use `ExitPlanMode` after approval
 
 ### Implementation Phase (only after approval)
 11. **Generate code** - Create complete, production-ready code following the approved plan
@@ -107,34 +106,34 @@ Generate new ADVPL or TLPP code following Protheus conventions and best practice
 
 ```bash
 # Create a User Function for billing module
-/advpl-specialist:generate function FATA050 --module FAT
+/generate function FATA050 --module FAT
 
 # Create a TLPP service class
-/advpl-specialist:generate class PedidoService
+/generate class PedidoService
 
 # Create complete MVC CRUD
-/advpl-specialist:generate mvc CadProduto --module EST
+/generate mvc CadProduto --module EST
 
 # Create a REST API endpoint
-/advpl-specialist:generate rest ClienteAPI --lang tlpp
+/generate rest ClienteAPI --lang tlpp
 
 # Create an entry point
-/advpl-specialist:generate ponto-entrada MT100LOK
+/generate ponto-entrada MT100LOK
 
 # Create a SOAP Web Service
-/advpl-specialist:generate webservice WSPedido
+/generate webservice WSPedido
 
 # Create a TReport report
-/advpl-specialist:generate treport RelProdutos --module EST
+/generate treport RelProdutos --module EST
 
 # Create a FWFormBrowse screen
-/advpl-specialist:generate fwformbrowse CadFornecedores --module COM
+/generate fwformbrowse CadFornecedores --module COM
 
 # Create a batch processing job
-/advpl-specialist:generate job JobProcessaNotas --module FAT
+/generate job JobProcessaNotas --module FAT
 
 # Create an approval workflow
-/advpl-specialist:generate workflow AprovacaoPedido --module COM
+/generate workflow AprovacaoPedido --module COM
 ```
 
 ## Output

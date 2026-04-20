@@ -4,14 +4,14 @@ description: Generate technical documentation from ADVPL/TLPP source code - Prot
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.
 
-# /advpl-specialist:document
+# /document
 
 Generate technical documentation from existing ADVPL/TLPP source code.
 
 ## Usage
 
 ```bash
-/advpl-specialist:document <target> [options]
+/document <target> [options]
 ```
 
 ## Options
@@ -43,19 +43,19 @@ Generate technical documentation from existing ADVPL/TLPP source code.
 
 ```bash
 # Generate complete routine documentation
-/advpl-specialist:document src/MATA461.prw
+/document src/MATA461.prw
 
 # Generate just the Protheus.doc header
-/advpl-specialist:document src/MATA461.prw --type header
+/document src/MATA461.prw --type header
 
 # Document a REST API endpoint
-/advpl-specialist:document src/ApiClientes.tlpp --type api
+/document src/ApiClientes.tlpp --type api
 
 # Save documentation to a file
-/advpl-specialist:document src/MATA461.prw --output docs/MATA461.md
+/document src/MATA461.prw --output docs/MATA461.md
 
 # Document all files in a directory
-/advpl-specialist:document src/
+/document src/
 ```
 
 ## Output

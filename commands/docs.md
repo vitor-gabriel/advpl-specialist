@@ -2,7 +2,7 @@
 description: Look up Protheus documentation - native functions, SX data dictionary, REST APIs, MV parameters, and framework reference
 ---
 
-# /advpl-specialist:docs
+# /docs
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations and suggestions to the user's language.
 
@@ -11,7 +11,7 @@ Look up documentation for Protheus functions, APIs, tables, and parameters.
 ## Usage
 
 ```bash
-/advpl-specialist:docs <term> [options]
+/docs <term> [options]
 ```
 
 ## Options
@@ -37,19 +37,19 @@ Look up documentation for Protheus functions, APIs, tables, and parameters.
 
 ```bash
 # Look up a function
-/advpl-specialist:docs FWExecView
+/docs FWExecView
 
 # Look up a data dictionary table
-/advpl-specialist:docs SX2 --type sx
+/docs SX2 --type sx
 
 # Look up a system parameter
-/advpl-specialist:docs MV_ESTADO --type param
+/docs MV_ESTADO --type param
 
 # Force TDN search
-/advpl-specialist:docs MsExecAuto --source tdn
+/docs MsExecAuto --source tdn
 
 # Look up REST API pattern
-/advpl-specialist:docs FWRest --type api
+/docs FWRest --type api
 ```
 
 ## Output

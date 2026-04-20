@@ -22,7 +22,7 @@ Activate this agent when the user:
 
 1. **Never change behavior** — Refactoring preserves functionality
 2. **One change at a time** — Apply refactorings incrementally
-3. **Verify before removing** — Use Grep to check for external callers
+3. **Verify before removing** — Search for external callers before removing code
 4. **Present before applying** — Always show before/after and get approval
 5. **Prioritize safety** — Skip refactoring if behavior change is uncertain
 6. **Follow conventions** — All new code follows Hungarian notation and Protheus patterns
@@ -45,7 +45,7 @@ Activate this agent when the user:
   6. RF-006 Reduce parameters (medium risk, API improvement)
 
 ### Phase 3: Present Plan
-- Use `EnterPlanMode` to present the refactoring plan
+- Present the refactoring plan to the user
 - For each refactoring show:
   - Pattern ID and name (e.g., [RF-001] Extract Function)
   - Location (file:line)
@@ -53,38 +53,10 @@ Activate this agent when the user:
   - After code snippet
   - Why: brief explanation of the improvement
 - Wait for user approval
-- Use `ExitPlanMode` after approval
-- Executar os passos de "Persistência do Plano" abaixo antes de prosseguir para a Phase 4
-
-### Persistência do Plano
-
-Imediatamente após a aprovação (após `ExitPlanMode`), salvar o plano automaticamente:
-
-1. Criar a pasta se necessário via Bash: `mkdir -p docs/plans`
-2. Nome do arquivo: `YYYY-MM-DD-refactor-<descricao-slug>.md`
-   - `<descricao-slug>`: derivado do título do plano (lowercase, hifens, sem acentos, max 50 chars)
-   - Verificar existência via Bash: `ls docs/plans/<nome>.md 2>/dev/null`
-   - Se o arquivo já existir, adicionar sufixo: `-2`, `-3`
-3. Salvar via ferramenta `Write` com o template:
-
-```
-# <Título descritivo do plano>
-
-**Data:** YYYY-MM-DD
-**Comando:** /advpl-specialist:refactor
-**Parâmetros:** <flags e argumentos usados pelo usuário>
-**Arquivos envolvidos:** <lista de arquivos que serão criados/modificados>
-
----
-
-## Plano
-
-<conteúdo exato do plano aprovado pelo usuário>
-```
 
 ### Phase 4: Apply
 - Apply approved refactorings one at a time
-- Use `Edit` tool for precise modifications
+- Make precise modifications to the code
 - After each refactoring, verify the file is syntactically correct
 
 ### Phase 5: Report
@@ -93,4 +65,4 @@ Imediatamente após a aprovação (após `ExitPlanMode`), salvar o plano automat
 
 #### TDN Lookup (se precisar verificar funções externas ou padrões)
 
-Read `skills/tdn-lookup/reference.md` e seguir a estratégia de busca com CQL: `type=page AND title="{function}" AND space IN ("tec","framework")`.
+Consultar `skills/tdn-lookup/reference.md` e seguir a estratégia de busca com CQL: `type=page AND title="{function}" AND space IN ("tec","framework")`.

@@ -4,14 +4,14 @@ description: Generate Protheus SX data dictionary configuration scripts - SX3 fi
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.
 
-# /advpl-specialist:sxgen
+# /sxgen
 
 Generate Protheus data dictionary configuration scripts for SX tables.
 
 ## Usage
 
 ```bash
-/advpl-specialist:sxgen [options]
+/sxgen [options]
 ```
 
 Describe what you need in natural language after the command. The agent will parse your description and generate the configuration.
@@ -57,7 +57,7 @@ The command automatically:
 
 ```bash
 # Generate SX3 field definitions from description
-/advpl-specialist:sxgen --type sx3
+/sxgen --type sx3
 Criar campos para tabela ZA1 - Ordens de Servico:
 - ZA1_CODIGO: codigo da OS, char 6, obrigatorio
 - ZA1_DESCRI: descricao do servico, char 40, obrigatorio
@@ -65,25 +65,25 @@ Criar campos para tabela ZA1 - Ordens de Servico:
 - ZA1_STATUS: status, char 1, combo 1=Aberta;2=Em Andamento;3=Concluida;4=Cancelada
 
 # Generate SIX index definitions
-/advpl-specialist:sxgen --type six
+/sxgen --type six
 Indices para ZA1:
 - Indice 1: filial + codigo (unico)
 - Indice 2: filial + cliente + data abertura
 
 # Generate SX1 report questions
-/advpl-specialist:sxgen --type sx1
+/sxgen --type sx1
 Perguntas para relatorio de OS (grupo ZA1):
 - Data abertura de/ate
 - Status de/ate
 - Cliente de/ate
 
 # Generate SX5 generic table
-/advpl-specialist:sxgen --type sx5
+/sxgen --type sx5
 Tabela generica ZZ para tipos de servico:
 01=Preventiva, 02=Corretiva, 03=Instalacao
 
 # Save to file
-/advpl-specialist:sxgen --type sx3 --output config/ZA1-campos.txt
+/sxgen --type sx3 --output config/ZA1-campos.txt
 ```
 
 ## Output

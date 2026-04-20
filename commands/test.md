@@ -2,7 +2,7 @@
 description: Generate ProBat unit tests for TLPP classes and functions
 ---
 
-# /advpl-specialist:test
+# /test
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations and suggestions to the user's language. Code comments may remain in English or match the user's language.
 
@@ -11,7 +11,7 @@ Generate ProBat unit tests for TLPP classes and functions on TOTVS Protheus.
 ## Usage
 
 ```bash
-/advpl-specialist:test <target> [options]
+/test <target> [options]
 ```
 
 Where `<target>` is a `.tlpp` file path or a function/class name.
@@ -37,7 +37,7 @@ Where `<target>` is a `.tlpp` file path or a function/class name.
 ProBat only works with TLPP (`.tlpp` files). If a `.prw` file is passed:
 
 1. Inform the user that ProBat requires TLPP
-2. Suggest using `/advpl-specialist:migrate` first to convert the source to TLPP
+2. Suggest using `/migrate` first to convert the source to TLPP
 3. The test file itself is always `.tlpp`, even when testing ADVPL functions
 
 ## Process
@@ -72,19 +72,19 @@ ProBat only works with TLPP (`.tlpp` files). If a `.prw` file is passed:
 
 ```bash
 # Generate unit tests for a TLPP file
-/advpl-specialist:test src/calculadora.tlpp
+/test src/calculadora.tlpp
 
 # Generate API tests for a REST endpoint
-/advpl-specialist:test src/customer_api.tlpp --type api
+/test src/customer_api.tlpp --type api
 
 # Generate tests with a specific output path
-/advpl-specialist:test src/pedido_service.tlpp --output test/unit/test_pedido.tlpp
+/test src/pedido_service.tlpp --output test/unit/test_pedido.tlpp
 
 # Generate tests for a specific function
-/advpl-specialist:test U_calculateTotal --type unit
+/test U_calculateTotal --type unit
 
 # Generate tests grouped in a suite
-/advpl-specialist:test src/financeiro/ --suite financeiro
+/test src/financeiro/ --suite financeiro
 ```
 
 ## Output

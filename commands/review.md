@@ -4,14 +4,14 @@ description: Review ADVPL/TLPP code for best practices, performance, security, a
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations, error descriptions, and suggestions to the user's language. Code comments may remain in English or match the user's language.
 
-# /advpl-specialist:review
+# /review
 
 Review ADVPL/TLPP code for best practices, performance, security, and modernization opportunities.
 
 ## Usage
 
 ```bash
-/advpl-specialist:review <target> [--focus category]
+/review <target> [--focus category]
 ```
 
 ## Focus Categories
@@ -35,19 +35,19 @@ Review ADVPL/TLPP code for best practices, performance, security, and modernizat
 
 ```bash
 # Review a single source file (all categories)
-/advpl-specialist:review src/FATA001.prw
+/review src/FATA001.prw
 
 # Review an entire directory focusing on performance
-/advpl-specialist:review src/ --focus performance
+/review src/ --focus performance
 
 # Review REST endpoints for security issues
-/advpl-specialist:review src/REST/*.tlpp --focus seguranca
+/review src/REST/*.tlpp --focus seguranca
 
 # Review current directory for modernization opportunities
-/advpl-specialist:review . --focus modernizacao
+/review . --focus modernizacao
 
 # Review specific files for best practices
-/advpl-specialist:review src/MATA010.prw --focus boas-praticas
+/review src/MATA010.prw --focus boas-praticas
 ```
 
 ## Output

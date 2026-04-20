@@ -4,14 +4,14 @@ description: Generate changelog from ADVPL/TLPP code changes - analyzes diffs an
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.
 
-# /advpl-specialist:changelog
+# /changelog
 
 Generate a structured changelog from code changes in ADVPL/TLPP files.
 
 ## Usage
 
 ```bash
-/advpl-specialist:changelog [options]
+/changelog [options]
 ```
 
 ## Options
@@ -37,22 +37,22 @@ Generate a structured changelog from code changes in ADVPL/TLPP files.
 
 ```bash
 # Changelog from last commit
-/advpl-specialist:changelog
+/changelog
 
 # Changelog since a specific commit
-/advpl-specialist:changelog --since abc1234
+/changelog --since abc1234
 
 # Changelog since a date
-/advpl-specialist:changelog --since 2026-03-01
+/changelog --since 2026-03-01
 
 # Changelog in plain text format
-/advpl-specialist:changelog --since v1.0.0 --format txt
+/changelog --since v1.0.0 --format txt
 
 # Save changelog to a file
-/advpl-specialist:changelog --since v1.0.0 --output CHANGELOG.md
+/changelog --since v1.0.0 --output CHANGELOG.md
 
 # Group by module instead of type
-/advpl-specialist:changelog --since v1.0.0 --group-by module
+/changelog --since v1.0.0 --group-by module
 ```
 
 ## Output

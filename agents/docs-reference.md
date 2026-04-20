@@ -43,7 +43,7 @@ Activate this agent when the user:
 
 ### Phase 3: TDN Lookup (se não encontrado localmente)
 
-Read `skills/tdn-lookup/reference.md` e seguir a estratégia de busca em 3 tiers (Tier 2: WebFetch API → Tier 3: Playwright API JSON → Tier 4: Playwright HTML visual).
+Consultar `skills/tdn-lookup/reference.md` e seguir a estratégia de busca no TDN.
 
 **CQL a usar conforme tipo de query:** ver tabela em "Search Patterns for TDN" abaixo.
 

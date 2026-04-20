@@ -159,7 +159,7 @@ Customer code compiled into a customer RPO **must** use `User Function` (or `Sta
 
 ### TLPP REST with annotations
 
-The official TOTVS pattern (from `totvs/tlpp-sample-rest/rest-mod02.tlpp`) is `user function` with annotations. The plugin adds one extra requirement on top of the sample: a mandatory `namespace` declaration (see "TLPP Namespace Rules" below).
+The official TOTVS pattern (from `totvs/tlpp-sample-rest/rest-mod02.tlpp`) is `user function` with annotations. One extra requirement: a mandatory `namespace` declaration (see "TLPP Namespace Rules" below).
 
 ```tlpp
 #include "tlpp-core.th"
@@ -229,7 +229,7 @@ ADVPL inherits a **10-character limit** on identifiers (functions, methods, vari
    - **(A) Shorten the name** — suggest 2-3 abbreviated alternatives (module prefix + mnemonic, e.g., `ProcessaValidacaoItens` → `FATA100`, `VLDITENS`, `PRCVALIT`)
    - **(B) Switch to TLPP with namespace** — ask for the agrupador if `--module` is missing and generate `custom.<agrupador>.<servico>`
 
-**About `longnameclass`:** it is a legacy ADVPL mechanism (magical inheritance) that historically allowed class methods and properties to exceed the 10-char limit. **Do not generate new code based on `longnameclass`** — TLPP with `namespace` is the modern, officially supported replacement. The plugin only recognizes `longnameclass` as an exception during code review (BP-010) to avoid false positives on legacy code.
+**About `longnameclass`:** it is a legacy ADVPL mechanism (magical inheritance) that historically allowed class methods and properties to exceed the 10-char limit. **Do not generate new code based on `longnameclass`** — TLPP with `namespace` is the modern, officially supported replacement. `longnameclass` is only recognized as an exception during code review (BP-010) to avoid false positives on legacy code.
 
 **References:**
 - TDN — [Tamanho do nome (identificador) de função](https://tdn.totvs.com/pages/viewpage.action?pageId=172296510)
@@ -252,4 +252,4 @@ ADVPL inherits a **10-character limit** on identifiers (functions, methods, vari
 | Missing TOTVS.CH include | Always include at minimum: #Include "TOTVS.CH" |
 | Not validating function parameters | Check ValType() and empty values at function start |
 | TLPP REST endpoint with bare `Function` | Use `User Function` with `@Get/@Post/...` annotation (official `rest-mod02.tlpp` pattern) |
-| **Inventar nome de campo `ALIAS_CAMPO` não confirmado no SX3** | **Verificar em `sx3-common-fields.md` → se não encontrar, buscar via WebFetch no SempreJu → se não encontrar, perguntar ao usuário. NUNCA inventar.** |
+| **Inventar nome de campo `ALIAS_CAMPO` não confirmado no SX3** | **Verificar em `sx3-common-fields.md` → se não encontrar, buscar no SempreJu → se não encontrar, perguntar ao usuário. NUNCA inventar.** |

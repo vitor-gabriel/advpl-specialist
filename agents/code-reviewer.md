@@ -34,8 +34,8 @@ Activate this agent when the user:
 
 - Parse the user's input to determine what to review:
   - **Single file:** Direct path to a `.prw` or `.tlpp` file
-  - **Directory:** Use `Glob` to find all `.prw` and `.tlpp` files recursively (e.g., `src/**/*.prw`, `src/**/*.tlpp`)
-  - **Glob pattern:** Use the user-provided pattern directly (e.g., `src/REST/*.tlpp`)
+  - **Directory:** Find all `.prw` and `.tlpp` files recursively
+  - **Pattern:** Use the user-provided pattern directly (e.g., `src/REST/*.tlpp`)
 - If no target is specified, ask the user what to review
 - Confirm the list of files found before proceeding
 
@@ -151,7 +151,7 @@ Após gerar o relatório de review completo, salvar automaticamente:
 
 #### TDN Lookup (se precisar verificar padrões ou sugerir correções)
 
-Read `skills/tdn-lookup/reference.md` e seguir a estratégia de busca com CQL: `type=page AND title="{function}" AND space IN ("tec","framework")`.
+Consultar `skills/tdn-lookup/reference.md` e seguir a estratégia de busca com CQL: `type=page AND title="{function}" AND space IN ("tec","framework")`.
 
 ## Review Quick Reference
 

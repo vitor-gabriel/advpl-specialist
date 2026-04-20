@@ -1,4 +1,4 @@
-name: Validate Plugin
+name: Validate ADVPL Specialist
 
 on:
   push:
@@ -12,59 +12,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Validate JSON syntax
+      - name: Validate Copilot structure
         run: |
           set -e
-          for f in .claude-plugin/*.json; do
-            echo "Validating $f"
-            jq empty "$f"
-          done
-
-      - name: Validate version alignment
-        run: |
-          set -e
-          PLUGIN_VER=$(jq -r '.version' .claude-plugin/plugin.json)
-          MARKET_VER=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)
-          MARKET_ROOT_VER=$(jq -r '.version // empty' .claude-plugin/marketplace.json)
-          SITE_VER=$(grep -oE "PLUGIN_VERSION = 'v[0-9]+\.[0-9]+\.[0-9]+'" documentation/app/page.tsx | grep -oE "[0-9]+\.[0-9]+\.[0-9]+" | head -1)
-          README_VER=$(grep -oE "version-[0-9]+\.[0-9]+\.[0-9]+-blue" README.md | grep -oE "[0-9]+\.[0-9]+\.[0-9]+" | head -1)
-          INDEX_VER=$(grep -oE "version-[0-9]+\.[0-9]+\.[0-9]+-blue" documentation/content/docs/index.mdx | grep -oE "[0-9]+\.[0-9]+\.[0-9]+" | head -1)
-          echo "plugin.json:             $PLUGIN_VER"
-          echo "marketplace.json[0]:     $MARKET_VER"
-          echo "marketplace.json root:   $MARKET_ROOT_VER"
-          echo "documentation landing:   $SITE_VER"
-          echo "README.md badge:         $README_VER"
-          echo "docs index.mdx badge:    $INDEX_VER"
-          if [ "$PLUGIN_VER" != "$MARKET_VER" ]; then
-            echo "ERROR: version mismatch between plugin.json and marketplace.json plugins[0]"
-            exit 1
-          fi
-          if [ -n "$MARKET_ROOT_VER" ] && [ "$MARKET_ROOT_VER" != "$PLUGIN_VER" ]; then
-            echo "ERROR: root version in marketplace.json mismatches plugin.json"
-            exit 1
-          fi
-          if [ -n "$SITE_VER" ] && [ "$SITE_VER" != "$PLUGIN_VER" ]; then
-            echo "ERROR: documentation/app/page.tsx PLUGIN_VERSION ($SITE_VER) mismatches plugin.json ($PLUGIN_VER)"
-            exit 1
-          fi
-          if [ -n "$README_VER" ] && [ "$README_VER" != "$PLUGIN_VER" ]; then
-            echo "ERROR: README.md version badge ($README_VER) mismatches plugin.json ($PLUGIN_VER)"
-            exit 1
-          fi
-          if [ -n "$INDEX_VER" ] && [ "$INDEX_VER" != "$PLUGIN_VER" ]; then
-            echo "ERROR: documentation/content/docs/index.mdx version badge ($INDEX_VER) mismatches plugin.json ($PLUGIN_VER)"
-            exit 1
-          fi
+          echo "Checking .github/copilot-instructions.md..."
+          test -f .github/copilot-instructions.md || { echo "ERROR: .github/copilot-instructions.md not found"; exit 1; }
+          echo "Checking .github/prompts/ directory..."
+          test -d .github/prompts || { echo "ERROR: .github/prompts/ directory not found"; exit 1; }
+          COUNT=$(ls .github/prompts/*.prompt.md 2>/dev/null | wc -l)
+          echo "Found $COUNT prompt files"
+          test "$COUNT" -gt 0 || { echo "ERROR: no .prompt.md files found"; exit 1; }
 
       - name: Validate YAML frontmatter
         run: |
           FAIL=0
-          for f in commands/*.md agents/*.md; do
+          for f in commands/*.md agents/*.md .github/prompts/*.prompt.md; do
+            [ -f "$f" ] || continue
             if ! head -1 "$f" | grep -q "^---$"; then
               echo "ERROR: $f missing frontmatter opener"
               FAIL=1
@@ -76,36 +39,28 @@ jobs:
               FAIL=1
               continue
             fi
-            if ! sed -n "2,$((FM_END-1))p" "$f" | python3 -c "import sys, yaml; yaml.safe_load(sys.stdin)" 2>/dev/null; then
-              echo "ERROR: $f has invalid YAML frontmatter"
+          done
+          exit $FAIL
+
+      - name: Validate agent frontmatter has description
+        run: |
+          FAIL=0
+          for f in agents/*.md; do
+            if ! sed -n "/^---$/,/^---$/p" "$f" | grep -q "^description:"; then
+              echo "ERROR: $f missing required frontmatter field: description"
               FAIL=1
             fi
           done
           exit $FAIL
 
-      - name: Validate agent frontmatter fields
-        run: |
-          FAIL=0
-          for f in agents/*.md; do
-            for field in description tools model; do
-              if ! sed -n "/^---$/,/^---$/p" "$f" | grep -q "^${field}:"; then
-                echo "ERROR: $f missing required frontmatter field: $field"
-                FAIL=1
-              fi
-            done
-          done
-          exit $FAIL
-
-      - name: Validate command frontmatter fields
+      - name: Validate command frontmatter has description
         run: |
           FAIL=0
           for f in commands/*.md; do
-            for field in description allowed-tools; do
-              if ! sed -n "/^---$/,/^---$/p" "$f" | grep -q "^${field}:"; then
-                echo "ERROR: $f missing required frontmatter field: $field"
-                FAIL=1
-              fi
-            done
+            if ! sed -n "/^---$/,/^---$/p" "$f" | grep -q "^description:"; then
+              echo "ERROR: $f missing required frontmatter field: description"
+              FAIL=1
+            fi
           done
           exit $FAIL
 
@@ -121,14 +76,6 @@ jobs:
             fi
           done
           exit $FAIL
-
-      - name: Validate shell scripts syntax
-        run: |
-          set -e
-          for f in hooks/session-start hooks/lib/*.sh; do
-            [ -f "$f" ] || continue
-            bash -n "$f" || { echo "ERROR: $f has syntax errors"; exit 1; }
-          done
 
       - name: Check internal links
         run: |

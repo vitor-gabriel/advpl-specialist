@@ -2,7 +2,7 @@
 description: Consult Protheus ERP business processes, module workflows, routines and integrations
 ---
 
-# /advpl-specialist:process
+# /process
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations, process descriptions, and references to the user's language.
 
@@ -11,7 +11,7 @@ Consult Protheus ERP business processes, module workflows, routines, and integra
 ## Usage
 
 ```bash
-/advpl-specialist:process <query> [options]
+/process <query> [options]
 ```
 
 ## Options
@@ -35,11 +35,7 @@ Consult Protheus ERP business processes, module workflows, routines, and integra
    - Routine: `site:tdn.totvs.com "<ROUTINE_CODE>" rotina`
    - Module: `site:tdn.totvs.com "<module>" modulo protheus`
    - Integration: `site:tdn.totvs.com "<moduleA>" "<moduleB>" integracao`
-6. **Playwright fallback** - If WebSearch/WebFetch fail:
-   - If URL available: `browser_navigate` -> `browser_snapshot` -> `browser_take_screenshot` if needed
-   - If no URL: `browser_navigate` to `https://tdn.totvs.com` -> `browser_fill_form` search -> `browser_click` submit -> `browser_snapshot` results -> navigate to best result
-   - **Always** `browser_close` when finished to release resources
-7. **Deliver answer** - Format response based on query type
+6. **Deliver answer** - Format response based on query type
 
 ## Response Format
 
@@ -82,22 +78,22 @@ When the user needs more detail, read additional references:
 
 ```bash
 # Understand a business process
-/advpl-specialist:process fluxo de compras
+/process fluxo de compras
 
 # Look up a specific routine
-/advpl-specialist:process MATA410
+/process MATA410
 
 # Understand a module
-/advpl-specialist:process modulo Faturamento --type module
+/process modulo Faturamento --type module
 
 # Understand integration between modules
-/advpl-specialist:process integracao Compras Estoque --type integration
+/process integracao Compras Estoque --type integration
 
 # Ask in natural language
-/advpl-specialist:process como funciona o processo de faturamento no Protheus?
+/process como funciona o processo de faturamento no Protheus?
 
 # Look up financial process
-/advpl-specialist:process contas a pagar
+/process contas a pagar
 ```
 
 ## Output

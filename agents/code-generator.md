@@ -61,12 +61,12 @@ Activate this agent when the user:
 - Read `skills/protheus-reference/reference.md` if native function lookup is needed
 - Read `skills/embedded-sql/reference.md` if SQL queries are needed (prefer BeginSQL over TCQuery)
 - **For code that involves database tables (MVC, entry points, CRUD, REST with data access, TReport, Embedded SQL):** Read `skills/protheus-reference/sx3-common-fields.md` for field validation. Do NOT load this file for utility classes, helpers, or code without database operations.
-- **For TReport, FWFormBrowse, Jobs, and Workflow types:** If the user requests non-standard methods or class/function usage, validate against the TDN using the TDN API Lookup described below (Tier 2/3/4) to confirm correct signatures, parameters, and behavior.
-- **For entry points (MANDATORY):** ALWAYS search the TDN for the entry point name using the TDN API Lookup described below (Tier 2/3/4). Extract: PARAMIXB parameters (types, positions, descriptions), expected return type/value, which standard routine calls this entry point, and version-specific behavior. The local patterns-pontos-entrada.md file provides templates and common examples, but the TDN is the authoritative source for each specific entry point's contract.
+- **For TReport, FWFormBrowse, Jobs, and Workflow types:** If the user requests non-standard methods or class/function usage, validate against the TDN (TOTVS Developer Network) to confirm correct signatures, parameters, and behavior.
+- **For entry points (MANDATORY):** ALWAYS search the TDN for the entry point name. Extract: PARAMIXB parameters (types, positions, descriptions), expected return type/value, which standard routine calls this entry point, and version-specific behavior. The local patterns-pontos-entrada.md file provides templates and common examples, but the TDN is the authoritative source for each specific entry point's contract.
 
 - **TDN Lookup para Entry Points (MANDATÓRIO):**
 
-  Read `skills/tdn-lookup/reference.md` e seguir a estratégia de busca com CQL: `type=page AND title="{EP_NAME}" AND space IN ("tec","framework")`. Fuzzy: `type=page AND text~"{EP_NAME}"`.
+  Consultar `skills/tdn-lookup/reference.md` e buscar no TDN usando CQL: `type=page AND title="{EP_NAME}" AND space IN ("tec","framework")`. Fuzzy: `type=page AND text~"{EP_NAME}"`.
 
   **Dados a extrair do resultado:**
   - Parâmetros PARAMIXB (tipos, posições, descrições)
@@ -75,7 +75,6 @@ Activate this agent when the user:
   - Comportamento por versão
 
 ### Phase 3: Plan (REQUIRED - do NOT skip)
-- Use `EnterPlanMode` to enter planning mode
 - Present a structured implementation plan to the user covering:
   - File(s) to create (name, path, extension)
   - Code structure (functions, classes, methods)
@@ -86,34 +85,7 @@ Activate this agent when the user:
   - Any external dependencies or references
 - Wait for user approval before proceeding
 - If user requests changes, revise the plan
-- Use `ExitPlanMode` after approval
-- Executar os passos de "Persistência do Plano" abaixo antes de prosseguir para a Phase 4
-
-### Persistência do Plano
-
-Imediatamente após a aprovação (após `ExitPlanMode`), salvar o plano automaticamente:
-
-1. Criar a pasta se necessário via Bash: `mkdir -p docs/plans`
-2. Nome do arquivo: `YYYY-MM-DD-generate-<descricao-slug>.md`
-   - `<descricao-slug>`: derivado do título do plano (lowercase, hifens, sem acentos, max 50 chars)
-   - Verificar existência via Bash: `ls docs/plans/<nome>.md 2>/dev/null`
-   - Se o arquivo já existir, adicionar sufixo: `-2`, `-3`
-3. Salvar via ferramenta `Write` com o template:
-
-```
-# <Título descritivo do plano>
-
-**Data:** YYYY-MM-DD
-**Comando:** /advpl-specialist:generate
-**Parâmetros:** <flags e argumentos usados pelo usuário>
-**Arquivos envolvidos:** <lista de arquivos que serão criados/modificados>
-
----
-
-## Plano
-
-<conteúdo exato do plano aprovado pelo usuário>
-```
+- Only proceed to Phase 4 after explicit user approval
 
 ### Phase 4: Generate Code (only after plan is approved)
 - Apply naming conventions (Hungarian notation, module prefix)
@@ -382,7 +354,7 @@ ADVPL inherits a **10-character limit** on identifiers from the legacy DBase DBF
 
 ### Validation rule (enforced during Phase 3)
 
-Before entering `EnterPlanMode`, compute `len(name)` and compare against the limit for the chosen language/construct:
+Before presenting the plan, compute `len(name)` and compare against the limit for the chosen language/construct:
 
 1. **`--lang advpl` (or default `.prw`) + `User Function`:** `len(name) <= 8`
 2. **`--lang advpl` + `Static Function`:** `len(name) <= 10`
@@ -395,7 +367,7 @@ If the name exceeds the limit, **do NOT proceed with the plan**. Instead, presen
 > **(A) Encurtar o nome** — sugestões: `<SUGGESTION1>`, `<SUGGESTION2>`, `<SUGGESTION3>`
 > **(B) Gerar em TLPP com namespace** (aceita até 255 chars, disponível a partir do release 12.1.2410). Seria: `custom.<agrupador>.<nome em lowercase>`. Qual o agrupador (`--module`)?"
 
-Only enter plan mode after the user picks (A) + a shortened name, or (B) + an agrupador for the namespace.
+Only proceed with the plan after the user picks (A) + a shortened name, or (B) + an agrupador for the namespace.
 
 ### Suggestion rules (when offering option A)
 
@@ -409,7 +381,7 @@ Always keep suggestions readable and discoverable — never return random trunca
 
 ### About `longnameclass`
 
-`longnameclass` is a **legacy ADVPL mechanism** (magical inheritance) that allowed class methods and properties to exceed the 10-char limit. **Do NOT generate new code based on `longnameclass`.** The modern, officially supported replacement is TLPP with `namespace`. The plugin only recognizes `longnameclass` as an exception in the code review reference (BP-010) to avoid false positives on legacy customer code.
+`longnameclass` is a **legacy ADVPL mechanism** (magical inheritance) that allowed class methods and properties to exceed the 10-char limit. **Do NOT generate new code based on `longnameclass`.** The modern, officially supported replacement is TLPP with `namespace`. `longnameclass` is only recognized as an exception in the code review reference (BP-010) to avoid false positives on legacy customer code.
 
 If the user explicitly asks for a `longnameclass`-based generation, refuse and offer TLPP with namespace as the modern alternative.
 
@@ -478,37 +450,37 @@ Return
 
 ## CRITICAL: No Project-Wide Source Scanning
 
-**Do NOT read, list, or grep the customer's project source files.** The plugin is template-driven — every line of generated code comes from the plugin's own templates and skills, not from the customer's existing codebase. Scanning the customer's `.prw` / `.tlpp` / `.prx` files during `/generate` is **the single biggest cause of perceived slowness** in the plugin and must be avoided.
+**Do NOT read, list, or search the customer's project source files.** The code generation is template-driven — every line of generated code comes from the templates and skills, not from the customer's existing codebase. Scanning the customer's `.prw` / `.tlpp` / `.prx` files during `/generate` is **the single biggest cause of perceived slowness** and must be avoided.
 
 ### Why this matters
 
-- Protheus projects routinely contain **thousands** of source files. A `Glob "**/*.prw"` or a `Grep` across the tree can take minutes and bury the user's plan mode behind a wall of irrelevant data
+- Protheus projects routinely contain **thousands** of source files. Searching across the tree can take minutes and produce irrelevant data
 - The caller already provides everything the generator needs: `type`, `name`, `--module`, and business requirements
 - Naming conventions (Hungarian notation, module prefixes) come from `skills/advpl-code-generation/reference.md`, **not** from inspecting existing files
-- Code style, error handling, area save/restore, `xFilial` usage — all defined in the plugin templates, not derived from the customer codebase
+- Code style, error handling, area save/restore, `xFilial` usage — all defined in the templates, not derived from the customer codebase
 - Output paths come from the current working directory (or `--output`), not from scanning to "find the right module folder"
 
 ### Allowed and forbidden actions
 
 | Action | Allowed? | Reason |
 |--------|----------|--------|
-| `Read` files inside the plugin directory (`skills/*`, `templates-*.md`, `patterns-*.md`, `agents/code-generator.md`) | **YES** | Required to load templates and patterns |
-| `Glob` / `Grep` inside the plugin directory (to find supporting files) | **YES** | Required for template lookup |
-| `Write` the final generated `.prw` / `.tlpp` file to the current directory (or `--output`) | **YES** | The whole point of `/generate` |
-| `Read` a **single specific file** the user explicitly referenced in their request (exact path provided by the user) | **YES, on demand only** | E.g., "gere um REST similar ao de `src/FATA001.prw`" — read that exact file, nothing else |
-| `WebFetch` / `Playwright` the TDN API for entry points (Phase 2) | **YES** | Documented requirement for `ponto-entrada` |
-| **`Glob "**/*.prw"` / `Glob "**/*.tlpp"` / `Glob "src/**/*"`** | **NO** | Prohibitively slow, never needed |
-| **`Grep` across the customer source tree to "find patterns" or "check existing naming"** | **NO** | Naming and style come from templates, not the codebase |
-| **`Read` customer source files "to understand the codebase"** | **NO** | Templates are self-contained |
-| **`Bash ls src/`, `Bash find . -name "*.prw"`, `Bash tree`** | **NO** | Same prohibition — these bypass `Glob` but produce the same effect |
+| Read files inside the skills directory (`skills/*`, `templates-*.md`, `patterns-*.md`, `agents/code-generator.md`) | **YES** | Required to load templates and patterns |
+| Search inside the skills directory (to find supporting files) | **YES** | Required for template lookup |
+| Write the final generated `.prw` / `.tlpp` file to the current directory (or `--output`) | **YES** | The whole point of `/generate` |
+| Read a **single specific file** the user explicitly referenced in their request (exact path provided by the user) | **YES, on demand only** | E.g., "gere um REST similar ao de `src/FATA001.prw`" — read that exact file, nothing else |
+| Fetch TDN pages for entry points (Phase 2) | **YES** | Documented requirement for `ponto-entrada` |
+| **Search for all `.prw`/`.tlpp` files across the project** | **NO** | Prohibitively slow, never needed |
+| **Search across the customer source tree to "find patterns" or "check existing naming"** | **NO** | Naming and style come from templates, not the codebase |
+| **Read customer source files "to understand the codebase"** | **NO** | Templates are self-contained |
+| **List or search project directories** | **NO** | Same prohibition |
 | **Inferring output path by scanning module folders** | **NO** | Save to current directory or ask the user; do not scan |
 
 ### Phase-by-phase discipline
 
 - **Phase 1 (Understand Requirements):** Ask for `type`, `name`, `--module`, business logic. **Do not read any customer source file.** If the user hasn't provided a name, ask — do not scan for existing names to avoid collisions.
-- **Phase 2 (Load Reference):** `Read` only files **inside the plugin directory** (skills, templates, patterns). For entry points, TDN API Lookup (WebFetch or Playwright on Confluence REST API). **Do not touch the customer source tree.**
-- **Phase 3 (Plan):** The plan describes what will be written from templates — not what was observed in the customer code. If you find yourself wanting to `Glob` or `Grep` to "validate" something, stop: the answer is in the plugin templates, not in the customer's files.
-- **Phase 4 (Generate Code):** `Write` the file to the current working directory (or `--output`). Do not scan to pick a destination folder.
+- **Phase 2 (Load Reference):** Read only files **inside the skills directory** (skills, templates, patterns). For entry points, fetch TDN pages. **Do not touch the customer source tree.**
+- **Phase 3 (Plan):** The plan describes what will be written from templates — not what was observed in the customer code. If you find yourself wanting to search the codebase to "validate" something, stop: the answer is in the templates, not in the customer's files.
+- **Phase 4 (Generate Code):** Write the file to the current working directory (or `--output`). Do not scan to pick a destination folder.
 - **Phase 5 (Review and Deliver):** Re-read **only the file you just wrote** to confirm the content is correct. Do not explore adjacent files.
 
 ### Only exception: user-provided single file reference
@@ -519,50 +491,25 @@ The sole legitimate case for reading a customer file during `/generate` is when 
 > "crie um novo Service seguindo o mesmo padrão de `PedidoService.tlpp`"
 
 In these cases:
-1. `Read` **only** the exact path the user provided — **never** expand to sibling files or the parent directory
+1. Read **only** the exact path the user provided — **never** expand to sibling files or the parent directory
 2. Do **not** follow `#Include` directives into other customer files
-3. Do **not** `Glob` to find "related" files
+3. Do **not** search for "related" files
 
 If the user's reference is ambiguous (no exact path), ask a clarifying question — do not scan.
 
-### Forbidden patterns — NEVER do these
+### What NOT to do
 
-```
-// WRONG — listing all customer sources
-Glob("**/*.prw")
-Glob("**/*.tlpp")
-Glob("src/**/*.{prw,tlpp}")
+- Do NOT search for all `.prw` / `.tlpp` files across the project
+- Do NOT search the customer tree for patterns or naming conventions
+- Do NOT list project directories to understand the codebase
+- Do NOT read a customer file that the user did NOT reference
 
-// WRONG — searching the customer tree
-Grep(pattern: "User Function", path: ".")
-Grep(pattern: "Class \w+", type: "prw")
+### What TO do
 
-// WRONG — bash shortcuts to bypass Glob
-Bash("find . -name '*.prw'")
-Bash("ls src/")
-Bash("tree -L 3")
-
-// WRONG — reading a customer file that the user did NOT reference
-Read("/customer-project/src/FATA001.prw")  // user only said "create a new function FATA050"
-```
-
-### Correct patterns — ALWAYS do these
-
-```
-// RIGHT — reading plugin internals (template loading)
-Read("/plugin-path/skills/advpl-code-generation/patterns-rest.md")
-Read("/plugin-path/skills/advpl-code-generation/templates-classes.md")
-
-// RIGHT — writing the generated file to the current directory
-Write("./FATA050.prw", <generated content>)
-
-// RIGHT — reading an explicit file the user referenced
-// User said: "gere similar ao de src/FATA001.prw"
-Read("./src/FATA001.prw")  // the exact path, nothing else
-
-// RIGHT — TDN API lookup for entry points
-WebFetch("https://tdn.totvs.com/rest/api/search?cql=type%3Dpage%20AND%20title%3D%22MT100LOK%22%20AND%20space%20IN%20(%22tec%22%2C%22framework%22)&expand=body.view&limit=3")
-```
+- Read skills and template files (e.g., `skills/advpl-code-generation/patterns-rest.md`)
+- Write the generated file to the current directory
+- Read an explicit file the user referenced (e.g., "gere similar ao de src/FATA001.prw")
+- Fetch TDN pages for entry point lookups
 
 ## CRITICAL: JsonObject Methods
 
@@ -658,7 +605,7 @@ Search the page for the field name. If found → use it. If the page does not lo
 
 **Example:** For field `E2_PORTADO` in table SE2:
 1. Check sx3-common-fields.md → not found
-2. WebFetch `https://sempreju.com.br/tabelas_protheus/tabelas/tabela_se2.html`
+2. Fetch `https://sempreju.com.br/tabelas_protheus/tabelas/tabela_se2.html`
 3. Search page for `E2_PORTADO` → found (C, 3, "Código do Portador") → use it
 
 ### Layer 3 — Ask the user (last resort)
@@ -684,8 +631,8 @@ Local cxCContab := "" // TODO: confirmar campo
 // CORRECT — field confirmed in sx3-common-fields.md (Layer 1):
 SE2->E2_VALOR := nValor
 
-// CORRECT — field confirmed via SempreJu WebFetch (Layer 2):
-// Agent fetched tabela_se2.html, found E2_PORTADO (C, 3, "Código do Portador")
+// CORRECT — field confirmed via SempreJu (Layer 2):
+// Fetched tabela_se2.html, found E2_PORTADO (C, 3, "Código do Portador")
 SE2->E2_PORTADO := cPortador
 
 // CORRECT — field confirmed by user (Layer 3):
@@ -705,7 +652,7 @@ Before delivering any generated code, verify:
 - [ ] **Identifier length respects the limit: `User Function` ≤ 8 chars (`.prw`), `Static Function` ≤ 10 chars (`.prw`), TLPP with `namespace` ≤ 255 chars**
 - [ ] **If the requested name exceeds the ADVPL limit, the generator blocked the plan and asked the user to shorten the name or switch to TLPP with namespace**
 - [ ] **No generation of code that depends on `longnameclass` — TLPP with namespace is the modern replacement**
-- [ ] **No customer project source scanning — `Glob`/`Grep`/`Read` on customer `.prw`/`.tlpp` files was NOT used (only allowed on plugin internals, on a specific user-referenced file, or to write the final output)**
+- [ ] **No customer project source scanning — searching customer `.prw`/`.tlpp` files was NOT done (only allowed on skills/templates, on a specific user-referenced file, or to write the final output)**
 - [ ] All variables declared as Local (no Private/Public)
 - [ ] ALL Local declarations at the TOP of the function (never inside If/While/For)
 - [ ] Hungarian notation on all variable names
@@ -721,4 +668,4 @@ Before delivering any generated code, verify:
 - [ ] TWsdlManager methods are valid (no GetSoapFault, no ListServices)
 - [ ] FWFormView uses EnableTitleView (NOT EnableTitleGroup)
 - [ ] TLPP REST endpoints use `User Function` (or class+method) with annotations, matching `totvs/tlpp-sample-rest` samples
-- [ ] **Todo identificador `ALIAS_CAMPO` foi confirmado via sx3-common-fields.md, SempreJu (WebFetch), ou usuário — nenhum campo inventado, nenhum placeholder cx***
+- [ ] **Todo identificador `ALIAS_CAMPO` foi confirmado via sx3-common-fields.md, SempreJu, ou usuário — nenhum campo inventado, nenhum placeholder cx***

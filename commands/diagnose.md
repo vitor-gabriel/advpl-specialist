@@ -2,7 +2,7 @@
 description: Diagnose errors and problems in ADVPL/TLPP code - compilation errors, runtime errors, performance issues, and log analysis
 ---
 
-# /advpl-specialist:diagnose
+# /diagnose
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations, error descriptions, and suggestions to the user's language. Code comments may remain in English or match the user's language.
 
@@ -11,7 +11,7 @@ Diagnose and resolve ADVPL/TLPP errors and problems.
 ## Usage
 
 ```bash
-/advpl-specialist:diagnose <target> [options]
+/diagnose <target> [options]
 ```
 
 ## Modes
@@ -45,16 +45,16 @@ Diagnose and resolve ADVPL/TLPP errors and problems.
 
 ```bash
 # Analyze a source file for issues
-/advpl-specialist:diagnose src/FATA001.prw
+/diagnose src/FATA001.prw
 
 # Diagnose a specific error message
-/advpl-specialist:diagnose "THREAD ERROR ([55889]) Variable does not exist: cCodCli"
+/diagnose "THREAD ERROR ([55889]) Variable does not exist: cCodCli"
 
 # Analyze a Protheus log file
-/advpl-specialist:diagnose --log /var/protheus/console.log
+/diagnose --log /var/protheus/console.log
 
 # Verbose diagnosis with full explanations
-/advpl-specialist:diagnose src/FATA001.prw --verbose
+/diagnose src/FATA001.prw --verbose
 ```
 
 ## Output

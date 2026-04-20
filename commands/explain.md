@@ -4,14 +4,14 @@ description: Explain ADVPL/TLPP code in plain language for developers and functi
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.
 
-# /advpl-specialist:explain
+# /explain
 
 Explain ADVPL/TLPP code in plain language, adapted to the audience level.
 
 ## Usage
 
 ```bash
-/advpl-specialist:explain <target> [--level level]
+/explain <target> [--level level]
 ```
 
 ## Levels
@@ -38,16 +38,16 @@ If `--level` is not provided, default to `junior`.
 
 ```bash
 # Explain code for a junior developer (default)
-/advpl-specialist:explain src/MATA461.prw
+/explain src/MATA461.prw
 
 # Explain for a functional consultant
-/advpl-specialist:explain src/CustomFaturamento.prw --level funcional
+/explain src/CustomFaturamento.prw --level funcional
 
 # Explain for a senior developer
-/advpl-specialist:explain src/JobProcessaNF.tlpp --level senior
+/explain src/JobProcessaNF.tlpp --level senior
 
 # Explain a specific function
-/advpl-specialist:explain src/Utils.prw::fCalcDesconto
+/explain src/Utils.prw::fCalcDesconto
 ```
 
 ## Output

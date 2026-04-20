@@ -10,7 +10,7 @@ Antes de gerar código para um PE específico, consulte primeiro o **[catalogo-t
 
 Se o PE estiver catalogado, use os metadados direto dali — **não é necessário consultar o TDN** para esses casos. Isso reduz latência em ~70% para PEs comuns.
 
-Se o PE **não** estiver catalogado, siga a estratégia completa da skill [`tdn-lookup`](../tdn-lookup/reference.md) (tiers 2-5 via API do TDN e Playwright).
+Se o PE **não** estiver catalogado, siga a estratégia completa da skill [`tdn-lookup`](../tdn-lookup/reference.md).
 
 ---
 
@@ -19,7 +19,7 @@ Se o PE **não** estiver catalogado, siga a estratégia completa da skill [`tdn-
 Os PEs catalogados cobrem apenas os mais comuns. Existem **centenas** de pontos de entrada em Protheus, cada um com seu PARAMIXB e retorno próprios. Usar parâmetros ou retornos errados causa erros em runtime ou comportamento inesperado.
 
 **Quando o PE não está em `catalogo-top-50-pes.md`, passos obrigatórios:**
-1. Aplicar a estratégia de busca em `skills/tdn-lookup/reference.md` (tiers 2-5)
+1. Aplicar a estratégia de busca em `skills/tdn-lookup/reference.md`
 2. Extrair da página TDN:
    - **PARAMIXB** — posições, tipos e descrições dos parâmetros
    - **Retorno esperado** — tipo e significado (Logical, Array, Character, Nil, etc.)

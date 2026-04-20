@@ -20,31 +20,26 @@ digraph lookup {
     "Check local reference" [shape=box];
     "Found locally?" [shape=diamond];
     "Return result" [shape=doublecircle];
-    "Tier 2: WebFetch TDN API" [shape=box];
+    "Search TDN API" [shape=box];
     "JSON ok?" [shape=diamond];
-    "Tier 3: Playwright API (JSON)" [shape=box];
-    "JSON ok? (2)" [shape=diamond];
-    "Tier 4: Playwright HTML (visual)" [shape=box];
+    "Search web" [shape=box];
     "Inform user: not found" [shape=box];
 
     "Need function/API info?" -> "Check local reference";
     "Check local reference" -> "Found locally?";
     "Found locally?" -> "Return result" [label="yes"];
-    "Found locally?" -> "Tier 2: WebFetch TDN API" [label="no"];
-    "Tier 2: WebFetch TDN API" -> "JSON ok?";
+    "Found locally?" -> "Search TDN API" [label="no"];
+    "Search TDN API" -> "JSON ok?";
     "JSON ok?" -> "Return result" [label="yes"];
-    "JSON ok?" -> "Tier 3: Playwright API (JSON)" [label="no (Cloudflare/error)"];
-    "Tier 3: Playwright API (JSON)" -> "JSON ok? (2)";
-    "JSON ok? (2)" -> "Return result" [label="yes"];
-    "JSON ok? (2)" -> "Tier 4: Playwright HTML (visual)" [label="no"];
-    "Tier 4: Playwright HTML (visual)" -> "Return result" [label="success"];
-    "Tier 4: Playwright HTML (visual)" -> "Inform user: not found" [label="fail"];
+    "JSON ok?" -> "Search web" [label="no"];
+    "Search web" -> "Return result" [label="success"];
+    "Search web" -> "Inform user: not found" [label="fail"];
 }
 ```
 
 1. **Local first:** Check supporting files (native-functions.md, sx-dictionary.md, rest-api-reference.md)
-2. **Online fallback:** Load skill `tdn-lookup` e seguir a estratégia de busca em 3 tiers (Tier 2: WebFetch API → Tier 3: Playwright API JSON → Tier 4: Playwright HTML visual). Consultar a tabela de CQL na seção "TDN API Reference" abaixo.
-3. **Field validation:** Para validar campos SX3: (1) Verificar `sx3-common-fields.md` (referência local com ~15 campos das 21 tabelas principais). (2) Se não encontrar, WebFetch em `https://sempreju.com.br/tabelas_protheus/tabelas/tabela_{alias_lowercase}.html`. (3) Se não encontrar, perguntar ao usuário. NUNCA inventar campo.
+2. **Online fallback:** Load skill `tdn-lookup` e seguir a estratégia de busca online. Consultar a tabela de CQL na seção "TDN API Reference" abaixo.
+3. **Field validation:** Para validar campos SX3: (1) Verificar `sx3-common-fields.md` (referência local com ~15 campos das 21 tabelas principais). (2) Se não encontrar, buscar em `https://sempreju.com.br/tabelas_protheus/tabelas/tabela_{alias_lowercase}.html`. (3) Se não encontrar, perguntar ao usuário. NUNCA inventar campo.
 
 ## CRITICAL: Restricted Functions Check
 

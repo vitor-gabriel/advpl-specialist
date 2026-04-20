@@ -4,14 +4,14 @@ description: Refactor ADVPL/TLPP code - extract functions, simplify logic, remov
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.
 
-# /advpl-specialist:refactor
+# /refactor
 
 Analyze and refactor ADVPL/TLPP code to improve structure without changing behavior.
 
 ## Usage
 
 ```bash
-/advpl-specialist:refactor <target> [options]
+/refactor <target> [options]
 ```
 
 ## Options
@@ -47,13 +47,13 @@ Analyze and refactor ADVPL/TLPP code to improve structure without changing behav
 
 ```bash
 # Refactor a source file (interactive, with approval)
-/advpl-specialist:refactor src/FATA001.prw
+/refactor src/FATA001.prw
 
 # Show suggestions without applying
-/advpl-specialist:refactor src/FATA001.prw --dry-run
+/refactor src/FATA001.prw --dry-run
 
 # Refactor all files in a directory
-/advpl-specialist:refactor src/
+/refactor src/
 ```
 
 ## Output

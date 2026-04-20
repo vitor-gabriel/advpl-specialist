@@ -37,11 +37,10 @@ Activate this agent when the user:
 - Map function call dependencies (who calls whom)
 - Identify Private/Public variables shared across functions
 - List all database aliases used
-- Search codebase for external callers: `Grep for "u_FunctionName"`
+- Search codebase for external callers of the function
 
 ### Phase 2: Plan Migration (REQUIRED - do NOT skip)
 - Read `skills/advpl-to-tlpp-migration/reference.md` for rules and patterns
-- Use `EnterPlanMode` to enter planning mode
 - Present a detailed migration plan to the user covering:
   - Source file analysis summary (functions, dependencies, shared variables)
   - External callers found in the codebase
@@ -53,34 +52,6 @@ Activate this agent when the user:
   - Risks and potential breaking changes
 - Wait for user approval before proceeding
 - If user requests changes, revise the plan
-- Use `ExitPlanMode` after approval
-- Executar os passos de "Persistência do Plano" abaixo antes de prosseguir para a Phase 3
-
-### Persistência do Plano
-
-Imediatamente após a aprovação (após `ExitPlanMode`), salvar o plano automaticamente:
-
-1. Criar a pasta se necessário via Bash: `mkdir -p docs/plans`
-2. Nome do arquivo: `YYYY-MM-DD-migrate-<descricao-slug>.md`
-   - `<descricao-slug>`: derivado do título do plano (lowercase, hifens, sem acentos, max 50 chars)
-   - Verificar existência via Bash: `ls docs/plans/<nome>.md 2>/dev/null`
-   - Se o arquivo já existir, adicionar sufixo: `-2`, `-3`
-3. Salvar via ferramenta `Write` com o template:
-
-```
-# <Título descritivo do plano>
-
-**Data:** YYYY-MM-DD
-**Comando:** /advpl-specialist:migrate
-**Parâmetros:** <flags e argumentos usados pelo usuário>
-**Arquivos envolvidos:** <lista de arquivos que serão criados/modificados>
-
----
-
-## Plano
-
-<conteúdo exato do plano aprovado pelo usuário>
-```
 
 ### Phase 3: Execute Migration (only after plan is approved)
 - Create .tlpp file with namespace and class declaration

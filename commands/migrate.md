@@ -2,7 +2,7 @@
 description: Migrate ADVPL procedural code to TLPP object-oriented code with classes, namespaces, and modern patterns
 ---
 
-# /advpl-specialist:migrate
+# /migrate
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations and suggestions to the user's language. Code comments may remain in English or match the user's language.
 
@@ -11,7 +11,7 @@ Convert ADVPL procedural code to TLPP with object-oriented patterns.
 ## Usage
 
 ```bash
-/advpl-specialist:migrate <file.prw> [options]
+/migrate <file.prw> [options]
 ```
 
 ## Options
@@ -31,13 +31,12 @@ Convert ADVPL procedural code to TLPP with object-oriented patterns.
 ### Analysis Phase
 1. **Read source file** - Read the .prw file completely
 2. **Analyze structure** - Identify functions, dependencies, shared variables
-3. **Search for callers** - Grep codebase for `u_FunctionName` references
+3. **Search for callers** - Search codebase for references to the function
 
 ### Planning Phase (REQUIRED)
 4. **Load reference** - Read `skills/advpl-to-tlpp-migration/reference.md` for rules and checklist
-5. **Enter plan mode** - Use `EnterPlanMode` to create a structured migration plan
-6. **Design class structure** - Map functions to classes and methods
-7. **Present plan** - Show the user a detailed migration plan including:
+5. **Design class structure** - Map functions to classes and methods
+6. **Present plan** - Show the user a detailed migration plan including:
    - Source file analysis (functions found, dependencies, shared variables)
    - External callers that will be impacted
    - Target class structure (class name, namespace, properties, methods)
@@ -46,9 +45,8 @@ Convert ADVPL procedural code to TLPP with object-oriented patterns.
    - Includes to update (TOTVS.CH -> tlpp-core.th, etc.)
    - Whether a backward compatibility wrapper is needed
    - Any risks or breaking changes
-8. **Wait for approval** - The user must approve the plan before any code is written. If the user requests changes, revise the plan.
-9. **If --dry-run** - Stop here after showing the plan
-10. **Exit plan mode** - Use `ExitPlanMode` after approval
+7. **Wait for approval** - The user must approve the plan before any code is written. If the user requests changes, revise the plan.
+8. **If --dry-run** - Stop here after showing the plan
 
 ### Implementation Phase (only after approval)
 11. **Execute migration** - Generate .tlpp file(s) following the approved plan and `skills/advpl-to-tlpp-migration/reference.md`
@@ -60,16 +58,16 @@ Convert ADVPL procedural code to TLPP with object-oriented patterns.
 
 ```bash
 # Migrate a file (shows plan first, then generates)
-/advpl-specialist:migrate src/FATA001.prw
+/migrate src/FATA001.prw
 
 # Preview migration without generating files
-/advpl-specialist:migrate src/FATA001.prw --dry-run
+/migrate src/FATA001.prw --dry-run
 
 # Specify output path and namespace
-/advpl-specialist:migrate src/FATA001.prw --output src/tlpp/PedidoService.tlpp --namespace mycompany.faturamento
+/migrate src/FATA001.prw --output src/tlpp/PedidoService.tlpp --namespace mycompany.faturamento
 
 # Migrate without backward compatibility wrapper
-/advpl-specialist:migrate src/FATA001.prw --wrapper false
+/migrate src/FATA001.prw --wrapper false
 ```
 
 ## Output

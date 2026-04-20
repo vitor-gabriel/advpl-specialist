@@ -3,9 +3,8 @@
 Referência rápida com os campos mais usados de cada tabela principal.
 Fonte: https://sempreju.com.br/tabelas_protheus/
 
-**Para campos não listados aqui:** O agent deve buscar automaticamente em
-`https://sempreju.com.br/tabelas_protheus/tabelas/tabela_{alias_lowercase}.html`
-usando WebFetch.
+**Para campos não listados aqui:** buscar automaticamente em
+`https://sempreju.com.br/tabelas_protheus/tabelas/tabela_{alias_lowercase}.html`.
 
 ---
 
