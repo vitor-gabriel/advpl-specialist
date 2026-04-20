@@ -1,7 +1,5 @@
 ---
 description: Generate changelog from ADVPL/TLPP code changes - analyzes diffs and produces structured release notes
-allowed-tools: Read, Glob, Grep, Bash, Agent
-argument-hint: "[--since commit|date] [--format markdown|txt] [--output path]"
 ---
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.

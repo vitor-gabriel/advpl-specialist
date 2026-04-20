@@ -1,12 +1,12 @@
 # advpl-specialist
 
-![Version](https://img.shields.io/badge/version-1.1.2-blue)
+![Version](https://img.shields.io/badge/version-1.2.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Platform](https://img.shields.io/badge/platform-Claude%20Code-blueviolet)
+![Platform](https://img.shields.io/badge/platform-GitHub%20Copilot-blueviolet)
 ![TOTVS](https://img.shields.io/badge/TOTVS-Protheus-orange)
 ![ADVPL](https://img.shields.io/badge/lang-ADVPL%20%7C%20TLPP-yellow)
 
-Plugin para Claude Code especializado em **ADVPL** e **TLPP** para desenvolvimento no ecossistema **TOTVS Protheus** — para **desenvolvedores** e **consultores funcionais**.
+Extensao de instrucoes para **GitHub Copilot** especializada em **ADVPL** e **TLPP** para desenvolvimento no ecossistema **TOTVS Protheus** — para **desenvolvedores** e **consultores funcionais**.
 
 **Documentacao completa:** [https://thalysjuvenal.github.io/advpl-specialist](https://thalysjuvenal.github.io/advpl-specialist)
 
@@ -30,16 +30,30 @@ Plugin para Claude Code especializado em **ADVPL** e **TLPP** para desenvolvimen
 Repositorio: [https://github.com/thalysjuvenal/advpl-specialist](https://github.com/thalysjuvenal/advpl-specialist)
 
 ```bash
-# 1. Adicione o marketplace do plugin (dentro do Claude Code)
-/plugin marketplace add thalysjuvenal/advpl-specialist
+# 1. Clone o repositorio na raiz do seu projeto Protheus (ou como submodulo)
+git clone https://github.com/thalysjuvenal/advpl-specialist.git
 
-# 2. Instale o plugin
-/plugin install advpl-specialist@thalysjuvenal-advpl-specialist
+# 2. Copie os arquivos do GitHub Copilot para o seu projeto
+cp -r advpl-specialist/.github/copilot-instructions.md .github/
+cp -r advpl-specialist/.github/prompts/ .github/prompts/
+cp -r advpl-specialist/agents/ agents/
+cp -r advpl-specialist/skills/ skills/
 
-# 3. Abra um projeto Protheus e use os comandos
-/advpl-specialist:generate function FATA050 --module FAT
-/advpl-specialist:diagnose "Variable does not exist: cCodCli"
-/advpl-specialist:docs FWExecView
+# 3. Abra o VS Code no seu projeto e use os slash commands no Copilot Chat
+/generate function FATA050 --module FAT
+/diagnose "Variable does not exist: cCodCli"
+/docs FWExecView
+```
+
+### Opcao alternativa: Submodulo Git
+
+```bash
+# Adicione como submodulo na raiz do projeto
+git submodule add https://github.com/thalysjuvenal/advpl-specialist.git .advpl-specialist
+
+# Copie apenas os arquivos .github para o seu projeto
+cp .advpl-specialist/.github/copilot-instructions.md .github/
+cp -r .advpl-specialist/.github/prompts/ .github/prompts/
 ```
 
 ## Funcionalidades
@@ -66,98 +80,88 @@ Repositorio: [https://github.com/thalysjuvenal/advpl-specialist](https://github.
 
 ## Instalacao
 
-### Opcao 1: Via Marketplace (recomendado)
+### Opcao 1: Copiar arquivos para o projeto (recomendado)
 
-Adicione o marketplace e instale o plugin:
-
-```bash
-# Dentro do Claude Code, adicione o marketplace
-/plugin marketplace add thalysjuvenal/advpl-specialist
-
-# Instale o plugin
-/plugin install advpl-specialist@thalysjuvenal-advpl-specialist
-```
-
-### Opcao 2: Direto do diretorio local (para teste/desenvolvimento)
-
-Clone o repositorio e inicie o Claude Code com a flag `--plugin-dir`:
+Copie a pasta `.github/` (com `copilot-instructions.md` e `prompts/`), a pasta `agents/` e a pasta `skills/` para a raiz do seu projeto Protheus:
 
 ```bash
-git clone https://github.com/thalysjuvenal/advpl-specialist.git
-claude --plugin-dir ./advpl-specialist
+git clone https://github.com/thalysjuvenal/advpl-specialist.git /tmp/advpl-specialist
+
+# Copiar instrucoes e prompts do Copilot
+cp /tmp/advpl-specialist/.github/copilot-instructions.md .github/
+cp -r /tmp/advpl-specialist/.github/prompts/ .github/prompts/
+
+# Copiar agents e skills (referenciados pelos prompts)
+cp -r /tmp/advpl-specialist/agents/ agents/
+cp -r /tmp/advpl-specialist/skills/ skills/
 ```
 
-O plugin detecta automaticamente projetos Protheus (`.prw`, `.tlpp`, `.prx`, `.ch`) ao iniciar uma sessao.
-
-### Recomendado: Playwright MCP
-
-O plugin utiliza o **Playwright MCP** como fallback quando o acesso direto a documentacao (WebSearch/WebFetch) falha. Com ele, o plugin abre a pagina em um navegador real para extrair o conteudo:
+### Opcao 2: Submodulo Git
 
 ```bash
-claude mcp add playwright -- npx @anthropic-ai/mcp-playwright@latest
+git submodule add https://github.com/thalysjuvenal/advpl-specialist.git .advpl-specialist
 ```
 
-### Recomendado: Plugin superpowers
+### Requisitos
 
-Para uma experiencia completa, recomendamos instalar o plugin oficial **superpowers** que adiciona skills de planejamento, brainstorming, debugging sistematico e code review:
-
-```bash
-/plugin marketplace add anthropics/claude-code-plugins
-/plugin install superpowers@anthropics-claude-code-plugins
-```
+- **VS Code** com a extensao **GitHub Copilot** instalada
+- **GitHub Copilot Chat** habilitado
+- Recomendado: habilitar "Agent Mode" no Copilot Chat para acesso completo a ferramentas
 
 ## Commands
 
+Os comandos estao disponiveis como **slash commands** no GitHub Copilot Chat (pasta `.github/prompts/`):
+
 | Comando | Descricao |
 |---------|-----------|
-| `/advpl-specialist:generate` | Gerar codigo ADVPL/TLPP (funcoes, classes, MVC, REST, PE, TReport, FWFormBrowse, Jobs, Workflow) |
-| `/advpl-specialist:migrate` | Migrar codigo ADVPL procedural para TLPP orientado a objetos |
-| `/advpl-specialist:diagnose` | Diagnosticar erros e problemas em codigo ADVPL/TLPP |
-| `/advpl-specialist:docs` | Consultar documentacao de funcoes, APIs e dicionario Protheus |
-| `/advpl-specialist:review` | Revisar codigo ADVPL/TLPP (boas praticas, performance, seguranca, modernizacao) |
-| `/advpl-specialist:test` | Gerar testes unitarios ProBat para codigo TLPP |
-| `/advpl-specialist:process` | Consultar processos de negocio, rotinas e integracoes entre modulos |
-| `/advpl-specialist:explain` | Explicar codigo em linguagem simples (nivel junior, senior ou funcional) |
-| `/advpl-specialist:refactor` | Sugerir refatoracoes de estrutura sem mudar comportamento |
-| `/advpl-specialist:document` | Gerar documentacao tecnica automatica (header, full, api) |
-| `/advpl-specialist:changelog` | Gerar changelog formatado a partir do git diff |
-| `/advpl-specialist:sxgen` | Gerar scripts de dicionario SX a partir de descricao em linguagem natural |
+| `/generate` | Gerar codigo ADVPL/TLPP (funcoes, classes, MVC, REST, PE, TReport, FWFormBrowse, Jobs, Workflow) |
+| `/migrate` | Migrar codigo ADVPL procedural para TLPP orientado a objetos |
+| `/diagnose` | Diagnosticar erros e problemas em codigo ADVPL/TLPP |
+| `/docs` | Consultar documentacao de funcoes, APIs e dicionario Protheus |
+| `/review` | Revisar codigo ADVPL/TLPP (boas praticas, performance, seguranca, modernizacao) |
+| `/test` | Gerar testes unitarios ProBat para codigo TLPP |
+| `/process` | Consultar processos de negocio, rotinas e integracoes entre modulos |
+| `/explain` | Explicar codigo em linguagem simples (nivel junior, senior ou funcional) |
+| `/refactor` | Sugerir refatoracoes de estrutura sem mudar comportamento |
+| `/document` | Gerar documentacao tecnica automatica (header, full, api) |
+| `/changelog` | Gerar changelog formatado a partir do git diff |
+| `/sxgen` | Gerar scripts de dicionario SX a partir de descricao em linguagem natural |
 
 ### Exemplos
 
 ```bash
 # Gerar uma User Function para o modulo de faturamento
-/advpl-specialist:generate function FATA050 --module FAT
+/generate function FATA050 --module FAT
 
 # Gerar uma classe TLPP
-/advpl-specialist:generate class PedidoService
+/generate class PedidoService
 
 # Gerar estrutura MVC completa
-/advpl-specialist:generate mvc CadProduto --module EST
+/generate mvc CadProduto --module EST
 
 # Migrar arquivo ADVPL para TLPP
-/advpl-specialist:migrate src/FATA001.prw
+/migrate src/FATA001.prw
 
 # Diagnosticar um erro
-/advpl-specialist:diagnose "Variable does not exist: cCodCli"
+/diagnose "Variable does not exist: cCodCli"
 
 # Consultar documentacao de funcao
-/advpl-specialist:docs FWExecView
+/docs FWExecView
 
 # Explicar codigo para consultor funcional
-/advpl-specialist:explain src/MATA461.prw --level funcional
+/explain src/MATA461.prw --level funcional
 
 # Sugerir refatoracoes
-/advpl-specialist:refactor src/FATA001.prw
+/refactor src/FATA001.prw
 
 # Gerar documentacao completa
-/advpl-specialist:document src/MATA461.prw --type full
+/document src/MATA461.prw --type full
 
 # Gerar changelog desde uma data
-/advpl-specialist:changelog --since 2026-03-01 --format markdown
+/changelog --since 2026-03-01 --format markdown
 
 # Gerar script de dicionario SX3
-/advpl-specialist:sxgen --type sx3
+/sxgen --type sx3
 ```
 
 ## Exemplos
@@ -166,12 +170,12 @@ Consulte a pasta [examples/](examples/) para seis cenarios end-to-end prontos pa
 
 | # | Cenario | Comando principal |
 |---|---------|-------------------|
-| 01 | Gerar MVC completo para tabela customizada ZA1 | `/advpl-specialist:generate` |
-| 02 | Migrar ADVPL procedural (FATA001) para TLPP | `/advpl-specialist:migrate` |
-| 03 | Diagnosticar erro de lock infinito em `RecLock` | `/advpl-specialist:diagnose` |
-| 04 | Criar endpoint REST em TLPP com namespace | `/advpl-specialist:generate` |
-| 05 | Revisar codigo focando em performance | `/advpl-specialist:review` |
-| 06 | Gerar dicionario SX3 + SIX + SX1 para nova tabela | `/advpl-specialist:sxgen` |
+| 01 | Gerar MVC completo para tabela customizada ZA1 | `/generate` |
+| 02 | Migrar ADVPL procedural (FATA001) para TLPP | `/migrate` |
+| 03 | Diagnosticar erro de lock infinito em `RecLock` | `/diagnose` |
+| 04 | Criar endpoint REST em TLPP com namespace | `/generate` |
+| 05 | Revisar codigo focando em performance | `/review` |
+| 06 | Gerar dicionario SX3 + SIX + SX1 para nova tabela | `/sxgen` |
 
 ## Agents
 
@@ -190,7 +194,7 @@ Consulte a pasta [examples/](examples/) para seis cenarios end-to-end prontos pa
 
 ## Referencia Interna
 
-Os agents e commands carregam automaticamente bases de conhecimento internas (`skills/*/reference.md`) conforme necessario. Estas referencias nao aparecem como skills invocaveis — o usuario interage exclusivamente pelos [Commands](#commands) acima.
+Os prompts e agents carregam automaticamente bases de conhecimento internas (`skills/*/reference.md`) conforme necessario. Estas referencias sao incluidas como contexto via `#file:` nos prompts — o usuario interage exclusivamente pelos [Commands](#commands) acima.
 
 | Referencia | Descricao |
 |------------|-----------|
@@ -213,15 +217,26 @@ Os agents e commands carregam automaticamente bases de conhecimento internas (`s
 
 ```
 advpl-specialist/
-├── .claude-plugin/
-│   ├── plugin.json                # Metadata do plugin
-│   └── marketplace.json           # Catalogo do marketplace
 ├── .github/
+│   ├── copilot-instructions.md    # Instrucoes gerais do Copilot (carregadas automaticamente)
+│   ├── prompts/                   # 12 slash commands para o Copilot Chat
+│   │   ├── generate.prompt.md
+│   │   ├── migrate.prompt.md
+│   │   ├── diagnose.prompt.md
+│   │   ├── docs.prompt.md
+│   │   ├── review.prompt.md
+│   │   ├── test.prompt.md
+│   │   ├── process.prompt.md
+│   │   ├── explain.prompt.md
+│   │   ├── refactor.prompt.md
+│   │   ├── document.prompt.md
+│   │   ├── changelog.prompt.md
+│   │   └── sxgen.prompt.md
 │   ├── ISSUE_TEMPLATE/
 │   │   ├── bug_report.md          # Template para reportar bugs
 │   │   └── feature_request.md     # Template para sugestoes
 │   └── pull_request_template.md   # Template para PRs
-├── agents/                        # 10 agents especializados
+├── agents/                        # 10 agents especializados (referenciados pelos prompts)
 │   ├── code-generator.md
 │   ├── code-reviewer.md
 │   ├── migrator.md
@@ -232,7 +247,7 @@ advpl-specialist/
 │   ├── doc-generator.md
 │   ├── changelog-generator.md
 │   └── sx-configurator.md
-├── commands/                      # 12 commands invocaveis
+├── commands/                      # 12 commands (referencia legacy, usados pelos prompts)
 │   ├── generate.md
 │   ├── migrate.md
 │   ├── diagnose.md
@@ -260,9 +275,6 @@ advpl-specialist/
 │   ├── changelog-patterns/        # Tipos de mudanca, impacto, formatos
 │   ├── sx-configuration/          # Dicionario SX3/SIX/SX1/SX5/SX7 completo
 │   └── tdn-lookup/                # Busca online no TDN via API Confluence
-├── hooks/                         # SessionStart hook
-│   ├── hooks.json
-│   └── session-start
 ├── CHANGELOG.md                   # Historico de versoes
 ├── CODE_OF_CONDUCT.md             # Codigo de conduta
 ├── CONTRIBUTING.md                # Guia de contribuicao
@@ -287,7 +299,7 @@ O plugin inclui referencia local para consulta rapida:
 - **MVC completo** com MenuDef, ModelDef, ViewDef e FWMVCRotAuto
 - **Embedded SQL** completo com BeginSQL/EndSQL, macros, JOINs, aggregations
 
-Para casos nao cobertos localmente, o plugin busca no TDN (TOTVS Developer Network) automaticamente. Se o acesso ao TDN falhar (timeout, erro ou conteudo vazio), o plugin utiliza o **Playwright MCP** como fallback — abrindo a pagina em um navegador real para extrair a documentacao via snapshot de texto ou captura visual.
+Para casos nao cobertos localmente, os prompts orientam o Copilot a buscar no TDN (TOTVS Developer Network) automaticamente via fetch de paginas web.
 
 ## Contribuindo
 

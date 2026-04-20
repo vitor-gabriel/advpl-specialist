@@ -1,7 +1,5 @@
 ---
 description: Migrate ADVPL procedural code to TLPP object-oriented code with classes, namespaces, and modern patterns
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, WebSearch, WebFetch
-argument-hint: "<file.prw> [--output file.tlpp] [--dry-run]"
 ---
 
 # /advpl-specialist:migrate

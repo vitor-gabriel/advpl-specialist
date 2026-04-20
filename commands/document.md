@@ -1,7 +1,5 @@
 ---
 description: Generate technical documentation from ADVPL/TLPP source code - Protheus.doc headers, routine docs, API docs
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, WebSearch, WebFetch
-argument-hint: "<file> [--type header|full|api] [--output path]"
 ---
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.

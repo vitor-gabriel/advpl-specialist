@@ -1,7 +1,5 @@
 ---
 description: Explain ADVPL/TLPP code in plain language for developers and functional consultants
-allowed-tools: Read, Glob, Grep, Bash, Agent
-argument-hint: "<file|code> [--level junior|senior|funcional]"
 ---
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.

@@ -1,7 +1,5 @@
 ---
 description: Generate Protheus SX data dictionary configuration scripts - SX3 fields, SIX indexes, SX1 questions, SX5 generic tables
-allowed-tools: Read, Write, Glob, Grep, Bash, Agent
-argument-hint: "[--type sx3|six|sx1|sx5] [--output path]"
 ---
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.

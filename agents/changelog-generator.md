@@ -1,7 +1,5 @@
 ---
 description: Specialized agent for generating changelogs from ADVPL/TLPP code changes - analyzes diffs and produces structured release notes
-tools: Read, Grep, Glob, Bash
-model: haiku
 ---
 
 # ADVPL/TLPP Changelog Generator

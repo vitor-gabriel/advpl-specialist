@@ -1,7 +1,5 @@
 ---
 description: Refactor ADVPL/TLPP code - extract functions, simplify logic, remove dead code, improve naming
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, WebSearch, WebFetch
-argument-hint: "<file> [--dry-run]"
 ---
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English.

@@ -1,7 +1,5 @@
 ---
 description: Generate ProBat unit tests for TLPP classes and functions
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent, WebSearch, WebFetch
-argument-hint: "<file.tlpp|function> [--type unit|api] [--output path]"
 ---
 
 # /advpl-specialist:test

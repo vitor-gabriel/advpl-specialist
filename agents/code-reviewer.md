@@ -1,7 +1,5 @@
 ---
 description: Specialized ADVPL/TLPP code review agent - analyzes existing code for best practices, performance issues, security vulnerabilities, and modernization opportunities
-tools: Read, Grep, Glob, WebSearch, WebFetch
-model: inherit
 ---
 
 # ADVPL/TLPP Code Reviewer

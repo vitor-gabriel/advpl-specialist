@@ -1,7 +1,5 @@
 ---
 description: Review ADVPL/TLPP code for best practices, performance, security, and modernization
-allowed-tools: Read, Glob, Grep, Bash, Agent, WebSearch, WebFetch
-argument-hint: "<file|directory> [--focus category]"
 ---
 
 **IMPORTANT:** Always respond in the same language the user is writing in. If the user writes in Portuguese, respond in Portuguese. If in English, respond in English. Adapt all explanations, error descriptions, and suggestions to the user's language. Code comments may remain in English or match the user's language.
