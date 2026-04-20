@@ -330,7 +330,7 @@ The TLPP approach uses annotations (decorators) to define REST endpoints. This i
 >
 > If `--module` is not provided, the generator must **ask the user** for the namespace agrupador before producing the file. Never silently omit the namespace.
 >
-> **Why mandatory:** namespaces prevent name collisions between customer projects sharing the same Protheus environment, enforce logical grouping by module/service, and keep generated code consistent with the plugin's own migration skill. The minimal TOTVS samples (`rest-mod02.tlpp`, `rest-mod03.tlpp`) omit the namespace for brevity, but production customer code should always declare it.
+> **Why mandatory:** namespaces prevent name collisions between customer projects sharing the same Protheus environment, enforce logical grouping by module/service, and keep generated code consistent with the project's own migration skill. The minimal TOTVS samples (`rest-mod02.tlpp`, `rest-mod03.tlpp`) omit the namespace for brevity, but production customer code should always declare it.
 
 ### 2.1 Complete TLPP REST Service
 

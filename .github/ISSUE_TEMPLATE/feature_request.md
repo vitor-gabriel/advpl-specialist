@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Sugira uma nova funcionalidade para o plugin
+about: Sugira uma nova funcionalidade para o advpl-specialist
 title: "[FEATURE] "
 labels: enhancement
 assignees: ''
@@ -25,7 +25,7 @@ Descreva um cenario real onde essa funcionalidade seria util.
 Exemplo:
 - Modulo: Faturamento
 - Situacao: Preciso gerar um relatorio customizado com TReport
-- Hoje: Nao existe template para TReport no plugin
+- Hoje: Nao existe template para TReport no projeto
 
 ## Contexto adicional
 

@@ -17,7 +17,7 @@ Você precisa entender:
 ## Prompt exato
 
 ```
-/advpl-specialist:diagnose
+/diagnose
 
 Estou vendo erros intermitentes de lock em producao na rotina MATA410.
 Log do AppServer:
@@ -32,7 +32,7 @@ Ambiente: producao com 200 usuarios simultaneos
 A rotina tem um ponto de entrada MT410GRV customizado que tambem faz gravacao.
 ```
 
-## O que o plugin faz
+## O que acontece
 
 1. **Classifica o erro** — usando a skill `advpl-debugging/common-errors.md`:
    - Categoria: concorrência / lock
@@ -63,12 +63,12 @@ Relatório estruturado com:
 
 ## Variações
 
-- **Lock em batch:** se ocorre só em jobs noturnos, plugin foca em `BEGIN SEQUENCE` e isolamento
-- **Lock em impressão:** pode ser `DbSkip` sem fechar tabela; plugin sugere `DbCloseArea`
+- **Lock em batch:** se ocorre só em jobs noturnos, o Copilot foca em `BEGIN SEQUENCE` e isolamento
+- **Lock em impressão:** pode ser `DbSkip` sem fechar tabela; o Copilot sugere `DbCloseArea`
 - **Lock em integração REST:** provavelmente falta `RECOVER` em erro HTTP
 
 ## Próximos passos sugeridos
 
-1. Rodar `/advpl-specialist:review MT410GRV.prw --focus best-practices` para auditar o PE
-2. Rodar `/advpl-specialist:refactor MT410GRV.prw` se a correção envolver reestruturar transações
-3. Consultar `/advpl-specialist:docs RecLock` para ver exemplos corretos na documentação
+1. Rodar `/review MT410GRV.prw --focus best-practices` para auditar o PE
+2. Rodar `/refactor MT410GRV.prw` se a correção envolver reestruturar transações
+3. Consultar `/docs RecLock` para ver exemplos corretos na documentação

@@ -12,7 +12,7 @@ Você precisa expor uma consulta de saldo de produtos via REST para um frontend 
 ## Prompt exato
 
 ```
-/advpl-specialist:generate
+/generate
 
 Criar endpoint REST em TLPP:
 - Nome: SaldoProdutoAPI
@@ -25,9 +25,9 @@ Criar endpoint REST em TLPP:
 - Release: 12.1.2410
 ```
 
-## O que o plugin faz
+## O que acontece
 
-1. **Plan mode** — apresenta:
+1. **Planejamento** — apresenta:
    - Estrutura: `class SaldoProdutoAPI` com método anotado `@Get`
    - Includes: `tlpp-core.th`, `tlpp-rest.th`
    - Validação de parâmetros via `oRequest:getQueryParam()`
@@ -84,11 +84,11 @@ return oResp
 ## Variações
 
 - **Paginação cursor-based:** se a tabela é muito grande, peça `last_id` em vez de `pagina`
-- **Cache de resposta:** plugin pode sugerir TTL com `oResponse:setHeader("Cache-Control", "max-age=60")`
+- **Cache de resposta:** o Copilot pode sugerir TTL com `oResponse:setHeader("Cache-Control", "max-age=60")`
 - **WebService SOAP:** use `type: soap` em vez de REST para integração com sistemas legados
 
 ## Próximos passos sugeridos
 
-1. `/advpl-specialist:review SaldoProdutoAPI.tlpp --focus security` — valida autenticação e sanitização
-2. `/advpl-specialist:test SaldoProdutoAPI.tlpp` — gera testes ProBat com mock de request
-3. `/advpl-specialist:document SaldoProdutoAPI.tlpp --format api` — gera documentação Swagger-like
+1. `/review SaldoProdutoAPI.tlpp --focus security` — valida autenticação e sanitização
+2. `/test SaldoProdutoAPI.tlpp` — gera testes ProBat com mock de request
+3. `/document SaldoProdutoAPI.tlpp --format api` — gera documentação Swagger-like

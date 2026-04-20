@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Reporte um problema com o plugin advpl-specialist
+about: Reporte um problema com o advpl-specialist
 title: "[BUG] "
 labels: bug
 assignees: ''
@@ -26,10 +26,10 @@ O que realmente aconteceu.
 
 ## Ambiente
 
-- **Claude Code version:** (ex: 1.0.0)
-- **Plugin version:** (ex: 1.0.1)
-- **OS:** (ex: macOS 15.3, Ubuntu 24.04)
-- **Comando usado:** (ex: `/advpl-specialist:generate function FATA001`)
+- **VS Code version:** (ex: 1.96.0)
+- **GitHub Copilot version:** (ex: 0.25.0)
+- **OS:** (ex: Windows 11, macOS 15.3, Ubuntu 24.04)
+- **Comando usado:** (ex: `/generate function FATA001`)
 
 ## Logs / Screenshots
 

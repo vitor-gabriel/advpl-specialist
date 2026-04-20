@@ -14,7 +14,7 @@ Tudo em linguagem natural, sem montar cada registro manualmente.
 ## Prompt exato
 
 ```
-/advpl-specialist:sxgen
+/sxgen
 
 Gerar dicionario completo para a tabela customizada ZB1:
 
@@ -46,13 +46,13 @@ Tabela generica (SX5 - tabela ZB):
 - 4 = Garantia
 ```
 
-## O que o plugin faz
+## O que acontece
 
 1. **Valida os campos:**
    - Convenção de nome (prefixo `ZB1_`, tipo apropriado, tamanho condizente)
    - Campos chave marcados como `Obrigatorio = .T.`
    - Campos com `pipe` para outras tabelas geram validação `F3` automática
-2. **Plan mode** — apresenta:
+2. **Planejamento** — apresenta:
    - Nome do arquivo gerado (`dicZB1.prw` ou formato de import preferido)
    - Cada registro SX3 com `PutSx3()` + help via `HlpByReg()`
    - Cada índice SIX com `PutSix()`
@@ -96,10 +96,10 @@ Return Nil
 - `--format excel` — exporta CSV para importar via SXImport (mais seguro em produção)
 - `--format apo` — gera .prw executável (formato antigo, ainda suportado)
 - `--include sx7` — adiciona gatilhos (SX7) para consistência entre campos
-- Sem especificar tudo no prompt: plugin pergunta campo a campo em modo interativo
+- Sem especificar tudo no prompt: o Copilot pergunta campo a campo em modo interativo
 
 ## Próximos passos sugeridos
 
-1. `/advpl-specialist:generate mvc CadVisitasTec` — gerar o CRUD TLPP para a nova tabela
-2. `/advpl-specialist:document dicZB1.prw` — documentar o script de dicionário
+1. `/generate mvc CadVisitasTec` — gerar o CRUD TLPP para a nova tabela
+2. `/document dicZB1.prw` — documentar o script de dicionário
 3. Testar a importação em ambiente de desenvolvimento antes de subir para homologação

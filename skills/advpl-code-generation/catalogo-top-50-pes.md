@@ -7,7 +7,7 @@
 
 ## Como usar
 
-1. `/advpl-specialist:generate ponto-entrada NOME` primeiro procura aqui
+1. `/generate ponto-entrada NOME` primeiro procura aqui
 2. Se o PE estiver listado: extrai PARAMIXB, momento, retorno e rotina chamadora direto deste arquivo (sem TDN)
 3. Se não estiver: cai para `skills/tdn-lookup/reference.md` (Tier 2 em diante)
 

@@ -7,7 +7,7 @@ Você precisa criar o CRUD completo (MenuDef, ModelDef, ViewDef) para a tabela c
 ## Prompt exato
 
 ```
-/advpl-specialist:generate
+/generate
 
 Preciso de um MVC completo para a tabela ZA1 (Ordens de Servico).
 - Modulo: MNT (manutencao)
@@ -17,9 +17,9 @@ Preciso de um MVC completo para a tabela ZA1 (Ordens de Servico).
 - Gerar em TLPP (release 12.1.2410)
 ```
 
-## O que o plugin faz
+## O que acontece
 
-1. **Plan mode** — apresenta:
+1. **Planejamento** — apresenta:
    - Tipo inferido: `mvc`
    - Linguagem: TLPP (por causa do release informado ≥ 12.1.2410)
    - Estrutura proposta: `MenuDef()`, `ModelDef()`, `ViewDef()` + `FWMVCRotAuto()`
@@ -59,13 +59,13 @@ return
 
 ## Variações
 
-- **Sem release configurado:** o plugin pergunta qual linguagem você prefere (ADVPL ou TLPP)
-- **Release < 12.1.2410:** plugin força ADVPL e avisa o motivo
-- **Gerar também o dicionário:** rode depois `/advpl-specialist:sxgen` para criar os SX3/SIX
-- **Campos customizados com `X_*`:** plugin valida se a convenção (`X_` como primeira letra após o prefixo da tabela) está sendo respeitada
+- **Sem release configurado:** o Copilot pergunta qual linguagem você prefere (ADVPL ou TLPP)
+- **Release < 12.1.2410:** o Copilot força ADVPL e avisa o motivo
+- **Gerar também o dicionário:** rode depois `/sxgen` para criar os SX3/SIX
+- **Campos customizados com `X_*`:** o Copilot valida se a convenção (`X_` como primeira letra após o prefixo da tabela) está sendo respeitada
 
 ## Próximos passos sugeridos
 
-1. Rodar `/advpl-specialist:review CadOrdemServico.tlpp` para validação de best practices
-2. Rodar `/advpl-specialist:test CadOrdemServico.tlpp` para gerar testes ProBat
-3. Rodar `/advpl-specialist:sxgen ZA1` para gerar o dicionário da tabela
+1. Rodar `/review CadOrdemServico.tlpp` para validação de best practices
+2. Rodar `/test CadOrdemServico.tlpp` para gerar testes ProBat
+3. Rodar `/sxgen ZA1` para gerar o dicionário da tabela

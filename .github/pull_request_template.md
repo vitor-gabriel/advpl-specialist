@@ -23,6 +23,6 @@ Descreva as alteracoes feitas neste PR.
 
 ## Como testar
 
-1. `claude --plugin-dir ./advpl-specialist`
+1. Copie as pastas `.github/`, `agents/` e `skills/` para um projeto Protheus
 2. Execute: `...`
 3. Verifique: `...`

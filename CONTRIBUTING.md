@@ -8,7 +8,7 @@ Obrigado pelo interesse em contribuir com o **advpl-specialist**! Este guia expl
 
 1. Verifique se o bug ja nao foi reportado em [Issues](https://github.com/thalysjuvenal/advpl-specialist/issues)
 2. Crie uma nova issue usando o template **Bug Report**
-3. Inclua: versao do plugin, versao do Claude Code, passos para reproduzir, comportamento esperado vs atual
+3. Inclua: versao do VS Code, versao do GitHub Copilot, passos para reproduzir, comportamento esperado vs atual
 
 ### Sugerir melhorias
 
@@ -33,10 +33,9 @@ Obrigado pelo interesse em contribuir com o **advpl-specialist**! Este guia expl
 
 | Diretorio | Conteudo |
 |-----------|----------|
-| `commands/` | Comandos invocaveis pelo usuario (`/advpl-specialist:*`) |
+| `commands/` | Comandos de referencia (logica dos slash commands) |
 | `agents/` | Agents especializados com workflows definidos |
 | `skills/` | References com reference.md + arquivos de suporte |
-| `hooks/` | Hooks de sessao (bash scripts) |
 
 ### Exemplos de codigo ADVPL/TLPP
 
@@ -59,8 +58,10 @@ Obrigado pelo interesse em contribuir com o **advpl-specialist**! Este guia expl
 # Clone o repositorio
 git clone https://github.com/thalysjuvenal/advpl-specialist.git
 
-# Teste localmente com Claude Code
-claude --plugin-dir ./advpl-specialist
+# Copie para um projeto Protheus e teste no VS Code com GitHub Copilot
+cp -r advpl-specialist/.github/ seu-projeto/.github/
+cp -r advpl-specialist/agents/ seu-projeto/agents/
+cp -r advpl-specialist/skills/ seu-projeto/skills/
 ```
 
 ## Licenca

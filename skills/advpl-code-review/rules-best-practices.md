@@ -515,7 +515,7 @@ return oRest:setResponse(cData)
 
 **Exceptions:** The bare `Function` keyword is legitimate only in narrow scenarios outside regular customer code — for example, localization sources consumed by `FwExecLocaliz` (where the lookup mechanism requires the exact function name without the `u_` prefix). These cases should be flagged for human review but not auto-rewritten.
 
-**Why it matters:** This is a silent failure mode. The code may look valid in an editor, but the customer's `appre` compiler will reject it when building the customer RPO, or TLPP REST annotations will never be registered. Users who copy-paste from stale examples (including older plugin-generated code) hit this and are blocked until they rename the keyword. Always default to `User Function` unless there is an explicit, documented reason to use something else.
+**Why it matters:** This is a silent failure mode. The code may look valid in an editor, but the customer's `appre` compiler will reject it when building the customer RPO, or TLPP REST annotations will never be registered. Users who copy-paste from stale examples (including older generated code) hit this and are blocked until they rename the keyword. Always default to `User Function` unless there is an explicit, documented reason to use something else.
 
 **Authoritative reference:** TOTVS sample repository `totvs/tlpp-sample-rest`, file `rest-mod02.tlpp` (annotation-based REST with `user function`) and `rest-mod03.tlpp` (class-based REST with annotated methods).
 

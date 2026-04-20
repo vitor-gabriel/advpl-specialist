@@ -211,7 +211,7 @@ Os prompts e agents carregam automaticamente bases de conhecimento internas (`sk
 | `documentation-patterns` | Templates para Protheus.doc header, documentacao completa e API REST |
 | `changelog-patterns` | Tipos de mudanca, niveis de impacto e formatos markdown/texto |
 | `sx-configuration` | Definicoes completas SX3/SIX/SX1/SX5/SX7 com validacoes e pictures |
-| `tdn-lookup` | Estrategia de busca online no TDN via API REST do Confluence (4 tiers) |
+| `tdn-lookup` | Estrategia de busca online no TDN via API REST do Confluence (3 tiers) |
 
 ## Estrutura do Projeto
 
@@ -285,7 +285,7 @@ advpl-specialist/
 
 ## Referencia Embutida
 
-O plugin inclui referencia local para consulta rapida:
+O projeto inclui referencia local para consulta rapida:
 
 - **190+ funcoes nativas** documentadas com sintaxe, parametros e exemplos
 - **10 funcoes FW*** de gestao de empresa/filial (FWCodFil, FWCodEmp, FWFilial, FWCompany, etc.)

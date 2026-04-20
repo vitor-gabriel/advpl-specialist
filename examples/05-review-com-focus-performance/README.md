@@ -9,10 +9,10 @@ O arquivo [`exemplo-lento.prw`](exemplo-lento.prw) simula problemas típicos: qu
 ## Prompt exato
 
 ```
-/advpl-specialist:review examples/05-review-com-focus-performance/exemplo-lento.prw --focus performance
+/review examples/05-review-com-focus-performance/exemplo-lento.prw --focus performance
 ```
 
-## O que o plugin faz
+## O que acontece
 
 1. **Lê o arquivo** e aplica as 6 regras da skill `advpl-code-review/rules-performance`:
    - `RP-001` — N+1 queries (SELECT dentro de loop)
@@ -65,5 +65,5 @@ Ordem sugerida: 1 (RP-001) -> 2 (RP-002) -> ignorar RP-003 por enquanto.
 
 ## Próximos passos sugeridos
 
-1. `/advpl-specialist:refactor exemplo-lento.prw` — aplicar as correções sugeridas automaticamente
-2. Após correção, rodar `/advpl-specialist:test exemplo-lento.prw` para garantir que o comportamento não mudou
+1. `/refactor exemplo-lento.prw` — aplicar as correções sugeridas automaticamente
+2. Após correção, rodar `/test exemplo-lento.prw` para garantir que o comportamento não mudou
