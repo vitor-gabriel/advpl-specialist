@@ -54,6 +54,8 @@ git submodule add https://github.com/vitor-gabriel/advpl-specialist.git .advpl-s
 # Copie apenas os arquivos .github para o seu projeto
 cp .advpl-specialist/.github/copilot-instructions.md .github/
 cp -r .advpl-specialist/.github/prompts/ .github/prompts/
+cp -r .advpl-specialist/agents/ agents/
+cp -r .advpl-specialist/skills/ skills/
 ```
 
 ## Funcionalidades
