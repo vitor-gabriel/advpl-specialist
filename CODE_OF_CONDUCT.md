@@ -34,7 +34,7 @@ Este Codigo de Conduta se aplica tanto em espacos do projeto quanto em espacos p
 
 ## Aplicacao
 
-Casos de comportamento abusivo, de assedio ou de outra forma inaceitavel podem ser reportados entrando em contato com a equipe do projeto atraves das [Issues](https://github.com/thalysjuvenal/advpl-specialist/issues). Todas as reclamacoes serao analisadas e investigadas, resultando em uma resposta considerada necessaria e apropriada as circunstancias.
+Casos de comportamento abusivo, de assedio ou de outra forma inaceitavel podem ser reportados entrando em contato com a equipe do projeto atraves das [Issues](https://github.com/vitor-gabriel/advpl-specialist/issues). Todas as reclamacoes serao analisadas e investigadas, resultando em uma resposta considerada necessaria e apropriada as circunstancias.
 
 ## Atribuicao
 

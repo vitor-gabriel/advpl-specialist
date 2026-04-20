@@ -27,4 +27,4 @@ Cada subpasta contém um cenário end-to-end com prompt exato, output esperado e
 
 ## Tem sugestão de novo exemplo?
 
-Abra uma issue em https://github.com/thalysjuvenal/advpl-specialist/issues com o cenário e o prompt que você gostaria de ver documentado.
+Abra uma issue em https://github.com/vitor-gabriel/advpl-specialist/issues com o cenário e o prompt que você gostaria de ver documentado.

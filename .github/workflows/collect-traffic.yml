@@ -14,7 +14,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GIST_PAT }}
           GIST_ID: 3b11d1d01d17c991dc0c187586264fff
-          REPO: thalysjuvenal/advpl-specialist
+          REPO: vitor-gabriel/advpl-specialist
         run: |
           set -euo pipefail
 

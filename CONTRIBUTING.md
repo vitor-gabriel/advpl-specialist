@@ -6,7 +6,7 @@ Obrigado pelo interesse em contribuir com o **advpl-specialist**! Este guia expl
 
 ### Reportar bugs
 
-1. Verifique se o bug ja nao foi reportado em [Issues](https://github.com/thalysjuvenal/advpl-specialist/issues)
+1. Verifique se o bug ja nao foi reportado em [Issues](https://github.com/vitor-gabriel/advpl-specialist/issues)
 2. Crie uma nova issue usando o template **Bug Report**
 3. Inclua: versao do VS Code, versao do GitHub Copilot, passos para reproduzir, comportamento esperado vs atual
 
@@ -56,7 +56,7 @@ Obrigado pelo interesse em contribuir com o **advpl-specialist**! Este guia expl
 
 ```bash
 # Clone o repositorio
-git clone https://github.com/thalysjuvenal/advpl-specialist.git
+git clone https://github.com/vitor-gabriel/advpl-specialist.git
 
 # Copie para um projeto Protheus e teste no VS Code com GitHub Copilot
 cp -r advpl-specialist/.github/ seu-projeto/.github/

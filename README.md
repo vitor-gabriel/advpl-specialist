@@ -8,7 +8,7 @@
 
 Extensao de instrucoes para **GitHub Copilot** especializada em **ADVPL** e **TLPP** para desenvolvimento no ecossistema **TOTVS Protheus** — para **desenvolvedores** e **consultores funcionais**.
 
-**Documentacao completa:** [https://thalysjuvenal.github.io/advpl-specialist](https://thalysjuvenal.github.io/advpl-specialist)
+**Documentacao completa:** [https://vitor-gabriel.github.io/advpl-specialist](https://vitor-gabriel.github.io/advpl-specialist)
 
 ## Indice
 
@@ -27,11 +27,11 @@ Extensao de instrucoes para **GitHub Copilot** especializada em **ADVPL** e **TL
 
 ## Quick Start
 
-Repositorio: [https://github.com/thalysjuvenal/advpl-specialist](https://github.com/thalysjuvenal/advpl-specialist)
+Repositorio: [https://github.com/vitor-gabriel/advpl-specialist](https://github.com/vitor-gabriel/advpl-specialist)
 
 ```bash
 # 1. Clone o repositorio na raiz do seu projeto Protheus (ou como submodulo)
-git clone https://github.com/thalysjuvenal/advpl-specialist.git
+git clone https://github.com/vitor-gabriel/advpl-specialist.git
 
 # 2. Copie os arquivos do GitHub Copilot para o seu projeto
 cp -r advpl-specialist/.github/copilot-instructions.md .github/
@@ -49,7 +49,7 @@ cp -r advpl-specialist/skills/ skills/
 
 ```bash
 # Adicione como submodulo na raiz do projeto
-git submodule add https://github.com/thalysjuvenal/advpl-specialist.git .advpl-specialist
+git submodule add https://github.com/vitor-gabriel/advpl-specialist.git .advpl-specialist
 
 # Copie apenas os arquivos .github para o seu projeto
 cp .advpl-specialist/.github/copilot-instructions.md .github/
@@ -85,7 +85,7 @@ cp -r .advpl-specialist/.github/prompts/ .github/prompts/
 Copie a pasta `.github/` (com `copilot-instructions.md` e `prompts/`), a pasta `agents/` e a pasta `skills/` para a raiz do seu projeto Protheus:
 
 ```bash
-git clone https://github.com/thalysjuvenal/advpl-specialist.git /tmp/advpl-specialist
+git clone https://github.com/vitor-gabriel/advpl-specialist.git /tmp/advpl-specialist
 
 # Copiar instrucoes e prompts do Copilot
 cp /tmp/advpl-specialist/.github/copilot-instructions.md .github/
@@ -99,7 +99,7 @@ cp -r /tmp/advpl-specialist/skills/ skills/
 ### Opcao 2: Submodulo Git
 
 ```bash
-git submodule add https://github.com/thalysjuvenal/advpl-specialist.git .advpl-specialist
+git submodule add https://github.com/vitor-gabriel/advpl-specialist.git .advpl-specialist
 ```
 
 ### Requisitos

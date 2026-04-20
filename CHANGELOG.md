@@ -119,8 +119,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Workflow de coleta diaria de metricas de trafego
 
 ### Fixed / Corrigido
-- Fixed code generation creating non-existent JsonObject methods for case-insensitive header iteration — now uses `GetNames()` + `Upper()` pattern (thanks [@edusfc15](https://github.com/edusfc15) for reporting [#3](https://github.com/thalysjuvenal/advpl-specialist/issues/3))
-- Corrigida geracao de codigo criando metodos inexistentes do JsonObject para iteracao case-insensitive de headers — agora usa padrao `GetNames()` + `Upper()` (obrigado [@edusfc15](https://github.com/edusfc15) por reportar [#3](https://github.com/thalysjuvenal/advpl-specialist/issues/3))
+- Fixed code generation creating non-existent JsonObject methods for case-insensitive header iteration — now uses `GetNames()` + `Upper()` pattern (thanks [@edusfc15](https://github.com/edusfc15) for reporting [#3](https://github.com/vitor-gabriel/advpl-specialist/issues/3))
+- Corrigida geracao de codigo criando metodos inexistentes do JsonObject para iteracao case-insensitive de headers — agora usa padrao `GetNames()` + `Upper()` (obrigado [@edusfc15](https://github.com/edusfc15) por reportar [#3](https://github.com/vitor-gabriel/advpl-specialist/issues/3))
 - Updated rules count from 24 to 24 and registered corrections in CHANGELOG
 - Atualizada contagem de regras e registradas correcoes no CHANGELOG
 - Moved all Local declarations to function headers
@@ -165,8 +165,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.5] - 2026-03-18
 
 ### Fixed / Corrigido
-- Replaced direct SX dictionary access (`DbSelectArea("SX1/SX2/SX3/SX5/SX6/SIX")`) with recommended TOTVS framework classes: `FWSX1Util`, `FWSX2Util`, `FWSX3Util`, `FWSX6Util`, `FWSIXUtil`, `FWGetSX5()`, `FwPutSX5()` (thanks [@wesleywwf](https://github.com/wesleywwf) for reporting [#1](https://github.com/thalysjuvenal/advpl-specialist/issues/1))
-- Substituido acesso direto aos dicionarios SX (`DbSelectArea("SX1/SX2/SX3/SX5/SX6/SIX")`) pelas classes recomendadas pela TOTVS: `FWSX1Util`, `FWSX2Util`, `FWSX3Util`, `FWSX6Util`, `FWSIXUtil`, `FWGetSX5()`, `FwPutSX5()` (obrigado [@wesleywwf](https://github.com/wesleywwf) por reportar [#1](https://github.com/thalysjuvenal/advpl-specialist/issues/1))
+- Replaced direct SX dictionary access (`DbSelectArea("SX1/SX2/SX3/SX5/SX6/SIX")`) with recommended TOTVS framework classes: `FWSX1Util`, `FWSX2Util`, `FWSX3Util`, `FWSX6Util`, `FWSIXUtil`, `FWGetSX5()`, `FwPutSX5()` (thanks [@wesleywwf](https://github.com/wesleywwf) for reporting [#1](https://github.com/vitor-gabriel/advpl-specialist/issues/1))
+- Substituido acesso direto aos dicionarios SX (`DbSelectArea("SX1/SX2/SX3/SX5/SX6/SIX")`) pelas classes recomendadas pela TOTVS: `FWSX1Util`, `FWSX2Util`, `FWSX3Util`, `FWSX6Util`, `FWSIXUtil`, `FWGetSX5()`, `FwPutSX5()` (obrigado [@wesleywwf](https://github.com/wesleywwf) por reportar [#1](https://github.com/vitor-gabriel/advpl-specialist/issues/1))
 
 ### Added / Adicionado
 - TOTVS disclaimer in documentation site footer (no affiliation with TOTVS S.A.)
