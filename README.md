@@ -309,6 +309,10 @@ Contribuicoes sao bem-vindas! Leia o [CONTRIBUTING.md](CONTRIBUTING.md) para sab
 
 Veja o [CHANGELOG.md](CHANGELOG.md) para o historico completo de versoes.
 
+## Creditos
+
+Projeto originalmente criado por [thalysjuvenal](https://github.com/thalysjuvenal).
+
 ## Licenca
 
 [MIT](LICENSE)
